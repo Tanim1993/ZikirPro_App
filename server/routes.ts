@@ -279,6 +279,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Global stats route
+  app.get('/api/stats/global', async (req, res) => {
+    try {
+      const stats = await storage.getGlobalStats();
+      res.json(stats);
+    } catch (error) {
+      console.error('Error getting global stats:', error);
+      res.status(500).json({ message: 'Failed to get global stats' });
+    }
+  });
+
+  // Global leaderboard route
+  app.get('/api/leaderboard/global', async (req, res) => {
+    try {
+      const leaderboard = await storage.getGlobalLeaderboard(10);
+      res.json(leaderboard);
+    } catch (error) {
+      console.error('Error getting global leaderboard:', error);
+      res.status(500).json({ message: 'Failed to get global leaderboard' });
+    }
+  });
+
   // Admin routes (basic)
   app.get('/api/admin/reports', async (req: any, res) => {
     try {

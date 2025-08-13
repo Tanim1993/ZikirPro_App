@@ -1,162 +1,119 @@
-import { useEffect, useState } from "react";
-import { useParams, useLocation } from "wouter";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Button } from "../components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
-import { useAuth } from "../hooks/useAuth";
-import { useWebSocket } from "../hooks/useWebSocket";
-import { useToast } from "../hooks/use-toast";
-import { isUnauthorizedError } from "../lib/authUtils";
-import { apiRequest } from "../lib/queryClient";
-import TasbihCounter from "../components/tasbih-counter";
-import LiveLeaderboard from "../components/live-leaderboard";
-import CongratulationsModal from "../components/congratulations-modal";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { useWebSocket } from "@/hooks/useWebSocket";
+import { apiRequest } from "@/lib/queryClient";
+import { isUnauthorizedError } from "@/lib/authUtils";
+import { DigitalTasbih } from "@/components/digital-tasbih";
+import { LeaderboardWidget } from "@/components/leaderboard-widget";
 
 export default function Room() {
   const { id } = useParams();
-  const [, setLocation] = useLocation();
-  const { user, isLoading: authLoading } = useAuth();
+  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const roomId = parseInt(id || "0");
   
-  const [showCongratulations, setShowCongratulations] = useState(false);
-  const [congratulationsCount, setCongratulationsCount] = useState(0);
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
-        variant: "destructive",
-      });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
-      return;
-    }
-  }, [user, authLoading, toast]);
+  const [tasbihType, setTasbihType] = useState<'digital' | 'physical' | 'hand'>('digital');
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const { data: room, isLoading: roomLoading } = useQuery({
-    queryKey: ["/api/rooms", roomId],
-    enabled: !!user && !!roomId,
+    queryKey: [`/api/rooms/${roomId}`],
+    enabled: !!roomId,
   });
 
-  const { data: userCount } = useQuery({
-    queryKey: ["/api/rooms", roomId, "user-count"],
-    enabled: !!user && !!roomId,
+  const { data: userCount = 0 } = useQuery({
+    queryKey: [`/api/rooms/${roomId}/user-count`],
+    enabled: !!roomId,
+    refetchInterval: 5000,
   });
 
-  const { data: leaderboard = [], isLoading: leaderboardLoading } = useQuery({
-    queryKey: ["/api/rooms", roomId, "leaderboard"],
-    enabled: !!user && !!roomId,
+  const { data: leaderboard = [] } = useQuery({
+    queryKey: [`/api/rooms/${roomId}/leaderboard`],
+    enabled: !!roomId,
+    refetchInterval: 3000,
   });
 
-  // WebSocket connection for real-time updates
-  const { sendMessage } = useWebSocket({
-    onMessage: (data) => {
-      if (data.type === 'countUpdate' && data.data.roomId === roomId) {
-        // Update leaderboard
-        queryClient.setQueryData(["/api/rooms", roomId, "leaderboard"], data.data.leaderboard);
-        
-        // Show congratulations for milestones
-        if (data.data.userId === (user as any)?.id && data.data.counter.todayCount % 100 === 0) {
-          setCongratulationsCount(data.data.counter.todayCount);
-          setShowCongratulations(true);
-        }
-      }
-    }
-  });
-
-  // Join room WebSocket channel
-  useEffect(() => {
-    if (roomId && user) {
-      sendMessage({
-        type: 'joinRoom',
-        roomId: roomId
-      });
-    }
-  }, [roomId, user, sendMessage]);
-
-  const incrementCountMutation = useMutation({
+  // Optimized count mutation with immediate UI feedback
+  const countMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest("POST", `/api/rooms/${roomId}/count`);
+      return await apiRequest(`/api/rooms/${roomId}/count`, {
+        method: 'POST',
+      });
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/rooms", roomId, "leaderboard"] });
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: [`/api/rooms/${roomId}/user-count`] });
+      
+      // Optimistically update the count
+      const previousCount = queryClient.getQueryData([`/api/rooms/${roomId}/user-count`]) as number;
+      queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], (old: number = 0) => old + 1);
+      
+      return { previousCount };
     },
-    onError: (error: Error) => {
+    onError: (error, variables, context) => {
+      // Rollback on error
+      if (context?.previousCount !== undefined) {
+        queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], context.previousCount);
+      }
+      
       if (isUnauthorizedError(error)) {
         toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
+          title: "Session Expired",
+          description: "Please log in again",
           variant: "destructive",
         });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to increment count",
-          variant: "destructive",
-        });
+        setTimeout(() => window.location.href = "/api/login", 1000);
+        return;
       }
-    }
-  });
-
-  const resetCountMutation = useMutation({
-    mutationFn: async () => {
-      return await apiRequest("POST", `/api/rooms/${roomId}/reset`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/rooms", roomId, "leaderboard"] });
       toast({
-        title: "Count Reset",
-        description: "Your count has been reset to 0",
+        title: "Count Failed",
+        description: "Please try again",
+        variant: "destructive",
       });
     },
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to reset count",
-          variant: "destructive",
-        });
-      }
-    }
+    onSuccess: () => {
+      // Refresh leaderboard after successful count
+      queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/leaderboard`] });
+    },
   });
 
-  const handleBack = () => {
-    setLocation("/");
-  };
+  const handleCount = useCallback(() => {
+    countMutation.mutate();
+  }, [countMutation]);
 
-  const handleTasbihTap = () => {
-    incrementCountMutation.mutate();
-  };
-
-  const handleReset = () => {
-    if (confirm("Are you sure you want to reset your count? This action cannot be undone.")) {
-      resetCountMutation.mutate();
+  const shareRoom = () => {
+    const shareUrl = `${window.location.origin}/room/${roomId}`;
+    const roomCode = `ROOM-${roomId.toString().padStart(6, '0')}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Join ${room?.name || 'Zikir Room'}`,
+        text: `Join my zikir room and compete together! Room code: ${roomCode}`,
+        url: shareUrl,
+      });
+    } else {
+      navigator.clipboard.writeText(`Join my zikir room: ${shareUrl}\nRoom code: ${roomCode}`);
+      toast({
+        title: "Link Copied!",
+        description: "Share this link with others to invite them",
+      });
     }
   };
 
-  if (authLoading || roomLoading) {
+  if (roomLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 text-islamic-green">
-            <i className="fas fa-prayer-beads text-4xl animate-pulse"></i>
+          <div className="w-16 h-16 mx-auto mb-4 animate-spin">
+            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
           </div>
           <p className="text-gray-600">Loading room...</p>
         </div>
@@ -167,78 +124,224 @@ export default function Room() {
   if (!room) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md mx-4">
-          <CardContent className="text-center py-12">
-            <i className="fas fa-exclamation-circle text-red-500 text-4xl mb-4"></i>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Room Not Found</h2>
-            <p className="text-gray-600 mb-4">This room doesn't exist or you don't have access.</p>
-            <Button onClick={handleBack} data-testid="button-back-to-dashboard">
-              Back to Dashboard
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="text-center">
+          <h2 className="text-xl font-semibold mb-2">Room not found</h2>
+          <p className="text-gray-600 mb-4">This room may not exist or you don't have access</p>
+          <Link href="/dashboard">
+            <Button>Back to Dashboard</Button>
+          </Link>
+        </div>
       </div>
     );
   }
 
-  const userInLeaderboard = (leaderboard as any[]).find((u: any) => u.userId === (user as any)?.id);
-  const currentCount = userInLeaderboard?.todayCount || 0;
+  const progress = room.unlimited ? 0 : (userCount / (room.targetCount || 1000)) * 100;
+  const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === user?.id) + 1;
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Room Header */}
-      <div className="bg-gradient-to-r from-islamic-green to-islamic-green-light text-white p-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pb-20">
+      {/* Header */}
+      <header className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
+          <Link href="/dashboard">
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back
+            </Button>
+          </Link>
+          
+          <div className="text-center flex-1">
+            <h1 className="text-lg font-bold truncate">{room.name || `${room.zikirName} Room`}</h1>
+            <p className="text-sm text-green-100">
+              Room #{roomId.toString().padStart(6, '0')}
+            </p>
+          </div>
+          
           <Button 
             variant="ghost" 
-            onClick={handleBack}
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg text-white"
-            data-testid="button-exit-room"
+            size="sm" 
+            onClick={shareRoom}
+            className="text-white hover:bg-white/20"
           >
-            <i className="fas fa-arrow-left text-xl"></i>
+            <Share2 className="w-4 h-4" />
           </Button>
-          <div className="text-center">
-            <h2 className="text-xl font-bold font-amiri">{(room as any).zikirName}</h2>
-            <p className="text-green-100">{(room as any).description || `${(room as any).duration} Days Challenge`}</p>
+        </div>
+        
+        {/* Room Stats */}
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Users className="w-4 h-4" />
+            </div>
+            <div className="text-sm font-bold">{leaderboard.length}</div>
+            <div className="text-xs text-green-100">Members</div>
           </div>
-          <Button 
-            variant="ghost"
-            className="p-2 hover:bg-white hover:bg-opacity-20 rounded-lg text-white"
-            data-testid="button-room-settings"
-          >
-            <i className="fas fa-cog text-xl"></i>
-          </Button>
+          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Target className="w-4 h-4" />
+            </div>
+            <div className="text-sm font-bold">
+              {room.unlimited ? '∞' : room.targetCount?.toLocaleString() || '1000'}
+            </div>
+            <div className="text-xs text-green-100">Target</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
+            <div className="flex items-center justify-center mb-1">
+              <Crown className="w-4 h-4" />
+            </div>
+            <div className="text-sm font-bold">#{currentUserRank || '-'}</div>
+            <div className="text-xs text-green-100">Your Rank</div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="flex flex-col h-screen pt-20">
-        {/* Live Leaderboard Section */}
-        <div className="bg-gray-50 p-4 border-b">
-          <LiveLeaderboard 
-            leaderboard={leaderboard as any[]} 
-            currentUserId={(user as any)?.id}
-            isLoading={leaderboardLoading}
+      {/* Main Content */}
+      <div className="px-4 py-6">
+        {/* Zikir Info Card */}
+        <Card className="mb-6 border-l-4 border-l-green-500">
+          <CardContent className="p-4">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-gray-900 mb-2">{room.zikirName}</h2>
+              {room.zikirArabicText && (
+                <div className="text-2xl mb-2 leading-relaxed" style={{ fontFamily: 'Amiri, serif' }}>
+                  {room.zikirArabicText}
+                </div>
+              )}
+              {room.zikirTransliteration && (
+                <div className="text-gray-600 italic mb-2">{room.zikirTransliteration}</div>
+              )}
+              {room.zikirTranslation && (
+                <div className="text-sm text-gray-700">{room.zikirTranslation}</div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Tasbih Type Selector */}
+        <Card className="mb-6">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold">Choose Tasbih Style</h3>
+              <Settings className="w-5 h-5 text-gray-400" />
+            </div>
+            <Select value={tasbihType} onValueChange={(value: any) => setTasbihType(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select tasbih type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="digital">📱 Digital Tasbih</SelectItem>
+                <SelectItem value="physical">📿 Physical Tasbih</SelectItem>
+                <SelectItem value="hand">✋ Hand Counter</SelectItem>
+              </SelectContent>
+            </Select>
+          </CardContent>
+        </Card>
+
+        {/* Tasbih Counter */}
+        <div className="mb-6">
+          <DigitalTasbih
+            onCount={handleCount}
+            count={userCount}
+            targetCount={room.targetCount}
+            unlimited={room.unlimited}
+            tasbihType={tasbihType}
           />
         </div>
 
-        {/* Digital Tasbih Counter Section */}
-        <div className="flex-1 flex flex-col justify-center items-center p-8 bg-white">
-          <TasbihCounter
-            count={currentCount}
-            target={(room as any).targetCount}
-            onTap={handleTasbihTap}
-            onReset={handleReset}
-            isLoading={incrementCountMutation.isPending || resetCountMutation.isPending}
-          />
-        </div>
-      </div>
+        {/* Tabs */}
+        <Tabs defaultValue="leaderboard" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="leaderboard">
+              <Crown className="w-4 h-4 mr-2" />
+              Leaderboard
+            </TabsTrigger>
+            <TabsTrigger value="details">
+              <Target className="w-4 h-4 mr-2" />
+              Details
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Congratulations Modal */}
-      <CongratulationsModal
-        open={showCongratulations}
-        onOpenChange={setShowCongratulations}
-        count={congratulationsCount}
-      />
+          <TabsContent value="leaderboard" className="mt-4">
+            <LeaderboardWidget
+              entries={leaderboard}
+              currentUserId={user?.id || ''}
+              title="Room Leaderboard"
+              showTop={10}
+            />
+          </TabsContent>
+
+          <TabsContent value="details" className="mt-4 space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>Room Information</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-500">Duration</div>
+                    <div className="font-medium">{room.duration || 30} days</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Type</div>
+                    <div className="font-medium">{room.isPublic ? 'Public' : 'Private'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Country</div>
+                    <div className="font-medium">{room.country || 'Global'}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-500">Created</div>
+                    <div className="font-medium">
+                      {room.createdAt ? new Date(room.createdAt).toLocaleDateString() : 'Recently'}
+                    </div>
+                  </div>
+                </div>
+
+                {room.description && (
+                  <div>
+                    <div className="text-sm text-gray-500 mb-2">Description</div>
+                    <p className="text-gray-700">{room.description}</p>
+                  </div>
+                )}
+
+                {/* Progress Bar */}
+                {!room.unlimited && (
+                  <div>
+                    <div className="flex justify-between text-sm mb-2">
+                      <span>Progress</span>
+                      <span>{Math.round(progress)}%</span>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div 
+                        className="bg-gradient-to-r from-green-500 to-green-600 h-3 rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(progress, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Share Card */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold mb-1">Invite Friends</h3>
+                    <p className="text-sm text-gray-600">
+                      Room Code: <span className="font-mono font-bold">ROOM-{roomId.toString().padStart(6, '0')}</span>
+                    </p>
+                  </div>
+                  <Button onClick={shareRoom} className="bg-green-600 hover:bg-green-700">
+                    <Share2 className="w-4 h-4 mr-2" />
+                    Share
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

@@ -9,6 +9,7 @@ import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Room from "./pages/room";
 import Profile from "./pages/profile";
+import Stats from "./pages/stats";
 import MobileNav from "./components/mobile-nav";
 
 function Router() {
@@ -39,7 +40,7 @@ function Router() {
             <Route path="/room/:id" component={Room} />
             <Route path="/profile" component={Profile} />
             <Route path="/create" component={Dashboard} />
-            <Route path="/stats" component={Dashboard} />
+            <Route path="/stats" component={Stats} />
             <Route path="/rooms" component={Dashboard} />
           </>
         )}

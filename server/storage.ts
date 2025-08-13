@@ -59,6 +59,8 @@ export interface IStorage {
   // Analytics operations
   getUserAnalytics(userId: string): Promise<UserAnalytics | undefined>;
   updateUserAnalytics(userId: string, updates: Partial<UserAnalytics>): Promise<UserAnalytics>;
+  getGlobalStats(): Promise<any>;
+  getGlobalLeaderboard(limit: number): Promise<any[]>;
   
   // Report operations
   createReport(report: Omit<Report, 'id' | 'createdAt'>): Promise<Report>;
@@ -407,6 +409,60 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return analytics;
+  }
+
+  async getGlobalStats(): Promise<any> {
+    // Get total users count
+    const [usersCount] = await db.select({ count: sql<number>`count(*)` }).from(users);
+    
+    // Get total zikir count across all rooms
+    const [totalZikir] = await db.select({ 
+      count: sql<number>`coalesce(sum(${liveCounters.totalCount}), 0)` 
+    }).from(liveCounters);
+    
+    // Get active rooms (rooms created in last 30 days or with recent activity)
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const [activeRooms] = await db.select({ 
+      count: sql<number>`count(distinct ${rooms.id})` 
+    }).from(rooms)
+    .leftJoin(liveCounters, eq(rooms.id, liveCounters.roomId))
+    .where(
+      sql`${rooms.createdAt} >= ${thirtyDaysAgo} OR ${liveCounters.lastCountAt} >= ${thirtyDaysAgo}`
+    );
+    
+    // Get today's count
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const [todayCount] = await db.select({ 
+      count: sql<number>`coalesce(sum(${liveCounters.todayCount}), 0)` 
+    }).from(liveCounters)
+    .where(gte(liveCounters.lastCountAt, today));
+
+    return {
+      totalUsers: usersCount.count || 0,
+      totalZikir: totalZikir.count || 0,
+      activeRooms: activeRooms.count || 0,
+      todayCount: todayCount.count || 0
+    };
+  }
+
+  async getGlobalLeaderboard(limit: number): Promise<any[]> {
+    return await db
+      .select({
+        userId: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        country: users.country,
+        totalCount: sql<number>`coalesce(sum(${liveCounters.totalCount}), 0)`,
+        rank: sql<number>`ROW_NUMBER() OVER (ORDER BY sum(${liveCounters.totalCount}) DESC)`
+      })
+      .from(users)
+      .leftJoin(liveCounters, eq(users.id, liveCounters.userId))
+      .groupBy(users.id)
+      .orderBy(sql`sum(${liveCounters.totalCount}) DESC`)
+      .limit(limit);
   }
 
   // Report operations
