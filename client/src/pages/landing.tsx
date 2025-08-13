@@ -1,10 +1,8 @@
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
+import { Link } from "wouter";
 
 export default function Landing() {
-  const handleLogin = () => {
-    window.location.href = "/api/login";
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-islamic-green via-islamic-green-light to-islamic-gold islamic-pattern">
@@ -50,14 +48,15 @@ export default function Landing() {
             </div>
             
             {/* Login Button */}
-            <Button 
-              onClick={handleLogin}
-              className="w-full bg-islamic-green hover:bg-islamic-green-dark text-white font-semibold py-3"
-              data-testid="button-login"
-            >
-              <i className="fas fa-sign-in-alt mr-2"></i>
-              Start Your Zikir Journey
-            </Button>
+            <Link href="/login">
+              <Button 
+                className="w-full bg-islamic-green hover:bg-islamic-green-dark text-white font-semibold py-3"
+                data-testid="button-login"
+              >
+                <i className="fas fa-sign-in-alt mr-2"></i>
+                Start Your Zikir Journey
+              </Button>
+            </Link>
             
             {/* Islamic Quote */}
             <div className="mt-6 p-4 bg-islamic-green bg-opacity-5 rounded-lg">

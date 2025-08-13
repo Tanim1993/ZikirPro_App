@@ -17,31 +17,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("Database seeding error (may already be seeded):", error);
   }
 
-  // Auth routes - temporarily returning mock user for testing
+  // Auth routes - check session for authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
-      // Return a mock user for testing - will fix authentication later
-      const mockUser = {
-        id: "test-user-123",
-        email: "test@example.com",
-        firstName: "Test",
-        lastName: "User",
-        profileImageUrl: "https://via.placeholder.com/150",
-        country: "Bangladesh",
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
-      res.json(mockUser);
+      // Check if user is logged in via session
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      const userId = req.session.user.id;
+      const user = await storage.getUser(userId);
+      
+      if (!user) {
+        return res.status(401).json({ message: "User not found" });
+      }
+      
+      res.json(user);
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
 
-  // User profile routes - temporarily removed auth
+  // User profile routes with session auth
   app.put('/api/user/profile', async (req: any, res) => {
     try {
-      const userId = "test-user-123"; // Mock user ID
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      const userId = req.session.user.id;
       const updates = updateUserProfileSchema.parse(req.body);
       const user = await storage.updateUserProfile(userId, updates);
       res.json(user);
@@ -53,7 +58,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/user/analytics', async (req: any, res) => {
     try {
-      const userId = "test-user-123"; // Mock user ID
+      if (!req.session?.user?.id) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
+      const userId = req.session.user.id;
       const analytics = await storage.getUserAnalytics(userId);
       res.json(analytics || {
         currentStreak: 0,

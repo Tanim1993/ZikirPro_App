@@ -228,7 +228,22 @@ export class DatabaseStorage implements IStorage {
       .where(and(eq(rooms.isPublic, true), eq(rooms.isActive, true)));
 
     if (country) {
-      query = query.where(and(eq(rooms.isPublic, true), eq(rooms.isActive, true), eq(rooms.country, country)));
+      query = db
+        .select({
+          id: rooms.id,
+          name: rooms.name,
+          description: rooms.description,
+          targetCount: rooms.targetCount,
+          duration: rooms.duration,
+          pictureUrl: rooms.pictureUrl,
+          startDate: rooms.startDate,
+          endDate: rooms.endDate,
+          zikirName: zikirs.name,
+          memberCount: sql<number>`(SELECT COUNT(*) FROM ${roomMembers} WHERE ${roomMembers.roomId} = ${rooms.id} AND ${roomMembers.isActive} = true)`,
+        })
+        .from(rooms)
+        .leftJoin(zikirs, eq(rooms.zikirId, zikirs.id))
+        .where(and(eq(rooms.isPublic, true), eq(rooms.isActive, true), eq(rooms.country, country)));
     }
 
     return await query.orderBy(desc(rooms.createdAt));
