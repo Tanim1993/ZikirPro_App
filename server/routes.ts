@@ -142,6 +142,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Handle GET logout (for direct browser navigation)
+  app.get('/api/logout', (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        console.error("Logout error:", err);
+      }
+      // Redirect to landing page after logout
+      res.redirect('/');
+    });
+  });
+
+  // Handle GET logout (for direct browser navigation)
+  app.get('/api/logout', (req: any, res) => {
+    req.session.destroy((err: any) => {
+      if (err) {
+        console.error("Logout error:", err);
+      }
+      // Redirect to landing page after logout
+      res.redirect('/');
+    });
+  });
+
   // Auth routes - check session for authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
     try {
