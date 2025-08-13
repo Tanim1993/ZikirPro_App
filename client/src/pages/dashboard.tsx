@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/hooks/use-toast";
-import { isUnauthorizedError } from "@/lib/authUtils";
-import RoomCard from "@/components/room-card";
-import CreateRoomModal from "@/components/create-room-modal";
+import { Button } from "../components/ui/button";
+import { Card, CardContent } from "../components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { useAuth } from "../hooks/useAuth";
+import { useToast } from "../hooks/use-toast";
+import { isUnauthorizedError } from "../lib/authUtils";
+import RoomCard from "../components/room-card";
+import CreateRoomModal from "../components/create-room-modal";
 
 export default function Dashboard() {
   const { user, isLoading: authLoading } = useAuth();
@@ -33,18 +33,6 @@ export default function Dashboard() {
   const { data: userRooms = [] } = useQuery({
     queryKey: ["/api/rooms/my"],
     enabled: !!user,
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized",
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    }
   });
 
   const { data: publicRooms = [] } = useQuery({
@@ -52,21 +40,9 @@ export default function Dashboard() {
     enabled: !!user,
   });
 
-  const { data: userAnalytics } = useQuery({
+  const { data: userAnalytics = {} } = useQuery({
     queryKey: ["/api/user/analytics"],
     enabled: !!user,
-    onError: (error: Error) => {
-      if (isUnauthorizedError(error)) {
-        toast({
-          title: "Unauthorized", 
-          description: "You are logged out. Logging in again...",
-          variant: "destructive",
-        });
-        setTimeout(() => {
-          window.location.href = "/api/login";
-        }, 500);
-      }
-    }
   });
 
   if (authLoading) {
@@ -124,19 +100,19 @@ export default function Dashboard() {
             <div className="relative z-10">
               <h2 className="text-2xl font-bold mb-2 font-amiri">Assalamu Alaikum</h2>
               <p className="text-green-100 mb-4">
-                {user?.firstName ? `Brother ${user.firstName}` : 'Welcome'}
+                {(user as any)?.firstName ? `Brother ${(user as any).firstName}` : 'Welcome'}
               </p>
               
               <div className="grid grid-cols-3 gap-4 mt-6">
                 <div className="text-center">
                   <div className="text-2xl font-bold" data-testid="text-streak">
-                    {userAnalytics?.currentStreak || 0}
+                    {(userAnalytics as any)?.currentStreak || 0}
                   </div>
                   <div className="text-sm text-green-100">Day Streak</div>
                 </div>
                 <div className="text-center">
                   <div className="text-2xl font-bold" data-testid="text-total-count">
-                    {userAnalytics?.totalZikir || 0}
+                    {(userAnalytics as any)?.totalZikir || 0}
                   </div>
                   <div className="text-sm text-green-100">Total Count</div>
                 </div>
@@ -192,11 +168,11 @@ export default function Dashboard() {
 
           <TabsContent value="my-rooms" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {userRooms.map((room: any) => (
+              {(userRooms as any[]).map((room: any) => (
                 <RoomCard key={room.id} room={room} />
               ))}
               
-              {userRooms.length === 0 && (
+              {(userRooms as any[]).length === 0 && (
                 <Card className="col-span-full">
                   <CardContent className="text-center py-12">
                     <div className="w-16 h-16 bg-islamic-green bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -219,11 +195,11 @@ export default function Dashboard() {
 
           <TabsContent value="public-rooms" className="mt-6">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {publicRooms.map((room: any) => (
+              {(publicRooms as any[]).map((room: any) => (
                 <RoomCard key={room.id} room={room} isPublic />
               ))}
               
-              {publicRooms.length === 0 && (
+              {(publicRooms as any[]).length === 0 && (
                 <Card className="col-span-full">
                   <CardContent className="text-center py-12">
                     <div className="w-16 h-16 bg-islamic-green bg-opacity-10 rounded-full flex items-center justify-center mx-auto mb-4">
