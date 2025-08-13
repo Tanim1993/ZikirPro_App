@@ -121,13 +121,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const roomId = parseInt(req.params.id);
       const userId = "test-user-123"; // Mock user ID
       
-      // Check if user is in room
+      const room = await storage.getRoomWithDetails(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      // Auto-join user to public room if not already a member
       const isMember = await storage.isUserInRoom(roomId, userId);
-      if (!isMember) {
+      if (!isMember && room.isPublic) {
+        await storage.joinRoom({
+          roomId,
+          userId,
+          role: 'member',
+          nickname: null,
+          isActive: true,
+        });
+      } else if (!isMember) {
         return res.status(403).json({ message: "Access denied" });
       }
 
-      const room = await storage.getRoomWithDetails(roomId);
       res.json(room);
     } catch (error) {
       console.error("Error fetching room:", error);
@@ -185,8 +197,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const roomId = parseInt(req.params.id);
       const userId = "test-user-123"; // Mock user ID
       
+      // Auto-join user to public room if not already a member
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
       const isMember = await storage.isUserInRoom(roomId, userId);
-      if (!isMember) {
+      if (!isMember && room.isPublic) {
+        await storage.joinRoom({
+          roomId,
+          userId,
+          role: 'member',
+          nickname: null,
+          isActive: true,
+        });
+      } else if (!isMember) {
         return res.status(403).json({ message: "Access denied" });
       }
 
@@ -204,8 +230,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const roomId = parseInt(req.params.id);
       const userId = "test-user-123"; // Mock user ID
 
+      // Auto-join user to room if not already a member for public rooms
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
       const isMember = await storage.isUserInRoom(roomId, userId);
-      if (!isMember) {
+      if (!isMember && room.isPublic) {
+        // Auto-join user to public room
+        await storage.joinRoom({
+          roomId,
+          userId,
+          role: 'member',
+          nickname: null,
+          isActive: true,
+        });
+      } else if (!isMember) {
         return res.status(403).json({ message: "Access denied" });
       }
 

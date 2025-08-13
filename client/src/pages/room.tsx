@@ -44,7 +44,17 @@ export default function Room() {
   // Optimized count mutation with immediate UI feedback
   const countMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/rooms/${roomId}/count`, 'POST');
+      const response = await fetch(`/api/rooms/${roomId}/count`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return await response.json();
     },
     onMutate: async () => {
       // Cancel any outgoing refetches
@@ -149,7 +159,7 @@ export default function Room() {
           </Link>
           
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold truncate">{room.name || `${room.zikirName} Room`}</h1>
+            <h1 className="text-lg font-bold truncate">{room?.name || `${room?.zikirName} Room`}</h1>
             <p className="text-sm text-green-100">
               Room #{roomId.toString().padStart(6, '0')}
             </p>
@@ -286,11 +296,11 @@ export default function Room() {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <div className="text-sm text-gray-500">Duration</div>
-                    <div className="font-medium">{room.duration || 30} days</div>
+                    <div className="font-medium">{room?.duration || 30} days</div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">Type</div>
-                    <div className="font-medium">{room.isPublic ? 'Public' : 'Private'}</div>
+                    <div className="font-medium">{room?.isPublic ? 'Public' : 'Private'}</div>
                   </div>
                   <div>
                     <div className="text-sm text-gray-500">Country</div>
