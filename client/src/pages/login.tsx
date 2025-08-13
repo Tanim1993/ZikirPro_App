@@ -29,7 +29,8 @@ export default function Login() {
         title: "Welcome back!",
         description: "You have successfully logged in",
       });
-      setLocation("/dashboard");
+      // Force reload to refresh authentication state
+      window.location.href = "/dashboard";
     },
     onError: (error: any) => {
       toast({
