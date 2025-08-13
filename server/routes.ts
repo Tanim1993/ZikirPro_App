@@ -1,23 +1,136 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer, WebSocket } from "ws";
+import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertRoomSchema, insertRoomMemberSchema, updateUserProfileSchema } from "@shared/schema";
 import { seedDatabase } from "./seedData";
 
+// Extend Express session to include user
+declare module 'express-session' {
+  interface SessionData {
+    user?: { id: string };
+  }
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Session middleware for authentication
+  app.use(session({
+    secret: 'your-session-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  }));
+
   // Auth middleware - temporarily disabled to fix authentication error
   // await setupAuth(app);
 
-  // Seed database on startup - temporarily disabled for faster startup
-  /*
+  // Create test user for authentication testing
   try {
-    await seedDatabase();
+    const existingUser = await storage.getUserByUsername("test001");
+    if (!existingUser) {
+      await storage.createUser({
+        id: "test001-user-id",
+        username: "test001",
+        password: "Pw001",
+        email: "test001@example.com",
+        firstName: "Test",
+        lastName: "User",
+        signupMethod: "username",
+        isVerified: true,
+        country: "Bangladesh"
+      });
+      console.log("Created test user: test001/Pw001");
+    }
   } catch (error) {
-    console.log("Database seeding error (may already be seeded):", error);
+    console.log("Test user creation skipped:", error.message);
   }
-  */
+
+  // Login endpoint
+  app.post('/api/auth/login', async (req: any, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password required" });
+      }
+      
+      const user = await storage.authenticateUser(username, password);
+      
+      if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      
+      // Set session
+      req.session.user = { id: user.id };
+      
+      res.json({ message: "Login successful", user });
+    } catch (error) {
+      console.error("Login error:", error);
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  // Signup endpoint  
+  app.post('/api/auth/signup', async (req: any, res) => {
+    try {
+      const { username, email, password, firstName, lastName, phone, signupMethod } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Username and password required" });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+      
+      if (email) {
+        const existingEmail = await storage.getUserByEmail(email);
+        if (existingEmail) {
+          return res.status(400).json({ message: "Email already exists" });
+        }
+      }
+      
+      // Create new user
+      const newUser = await storage.createUser({
+        username,
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        signupMethod: signupMethod || 'username',
+        isVerified: true,
+        country: 'Bangladesh'
+      });
+      
+      // Set session
+      req.session.user = { id: newUser.id };
+      
+      res.json({ message: "Signup successful", user: newUser });
+    } catch (error) {
+      console.error("Signup error:", error);
+      res.status(500).json({ message: "Signup failed" });
+    }
+  });
+
+  // Logout endpoint
+  app.post('/api/auth/logout', async (req: any, res) => {
+    try {
+      req.session.destroy((err: any) => {
+        if (err) {
+          return res.status(500).json({ message: "Logout failed" });
+        }
+        res.json({ message: "Logout successful" });
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      res.status(500).json({ message: "Logout failed" });
+    }
+  });
 
   // Auth routes - check session for authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
