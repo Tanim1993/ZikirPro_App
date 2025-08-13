@@ -405,6 +405,203 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
 
   // Seed initial data
+  // Authentication routes
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+      }
+
+      const user = await storage.authenticateUser(username, password);
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid username or password' });
+      }
+
+      // Set session
+      (req.session as any).user = { id: user.id };
+      
+      res.json({ 
+        id: user.id, 
+        username: user.username, 
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImageUrl: user.profileImageUrl,
+        country: user.country,
+        avatarType: user.avatarType,
+        bgColor: user.bgColor
+      });
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/auth/signup', async (req, res) => {
+    try {
+      const { username, email, password, signupMethod } = req.body;
+      
+      if (signupMethod === 'username') {
+        if (!username || !email || !password) {
+          return res.status(400).json({ error: 'Username, email, and password are required' });
+        }
+
+        // Check if user already exists
+        const existingUser = await storage.getUserByUsername(username);
+        if (existingUser) {
+          return res.status(409).json({ error: 'Username already exists' });
+        }
+
+        const existingEmail = await storage.getUserByEmail(email);
+        if (existingEmail) {
+          return res.status(409).json({ error: 'Email already exists' });
+        }
+
+        // Create user
+        const user = await storage.createUser({
+          username,
+          email,
+          password, // In real app, hash this with bcrypt
+          signupMethod: 'username',
+          isVerified: true, // Auto-verify for demo
+          country: 'Bangladesh'
+        });
+
+        // Set session
+        (req.session as any).user = { id: user.id };
+        
+        res.json({ 
+          id: user.id, 
+          username: user.username, 
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profileImageUrl: user.profileImageUrl,
+          country: user.country,
+          avatarType: user.avatarType,
+          bgColor: user.bgColor
+        });
+      } else {
+        res.status(400).json({ error: 'Invalid signup method' });
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.post('/api/auth/send-otp', async (req, res) => {
+    try {
+      const { phone } = req.body;
+      
+      if (!phone) {
+        return res.status(400).json({ error: 'Phone number is required' });
+      }
+
+      // In a real app, you'd use Twilio or similar service
+      // For demo, we'll just simulate sending OTP
+      console.log(`Sending OTP to ${phone}: 123456`);
+      
+      res.json({ message: 'OTP sent successfully' });
+    } catch (error) {
+      console.error('Send OTP error:', error);
+      res.status(500).json({ error: 'Failed to send OTP' });
+    }
+  });
+
+  app.post('/api/auth/verify-otp', async (req, res) => {
+    try {
+      const { phone, otp } = req.body;
+      
+      if (!phone || !otp) {
+        return res.status(400).json({ error: 'Phone number and OTP are required' });
+      }
+
+      // For demo, accept 123456 as valid OTP
+      if (otp !== '123456') {
+        return res.status(400).json({ error: 'Invalid OTP' });
+      }
+
+      // Check if user already exists
+      let user = await storage.getUserByPhone(phone);
+      if (!user) {
+        // Create new user
+        user = await storage.createUser({
+          phone,
+          signupMethod: 'phone',
+          isVerified: true,
+          country: 'Bangladesh',
+          username: `user_${phone.replace(/[^0-9]/g, '').slice(-6)}`
+        });
+      }
+
+      // Set session
+      (req.session as any).user = { id: user.id };
+      
+      res.json({ 
+        id: user.id, 
+        username: user.username, 
+        email: user.email,
+        phone: user.phone,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        profileImageUrl: user.profileImageUrl,
+        country: user.country,
+        avatarType: user.avatarType,
+        bgColor: user.bgColor
+      });
+    } catch (error) {
+      console.error('Verify OTP error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  app.get('/api/auth/google', (req, res) => {
+    // In a real app, this would redirect to Google OAuth
+    // For demo, we'll simulate Google login
+    res.redirect('/api/auth/google/callback?code=demo_code');
+  });
+
+  app.get('/api/auth/google/callback', async (req, res) => {
+    try {
+      // In a real app, you'd exchange the code for user info from Google
+      // For demo, we'll create a demo Google user
+      const email = 'google.user@gmail.com';
+      let user = await storage.getUserByEmail(email);
+      
+      if (!user) {
+        user = await storage.createUser({
+          email,
+          firstName: 'Google',
+          lastName: 'User',
+          signupMethod: 'google',
+          isVerified: true,
+          country: 'Bangladesh',
+          username: 'google_user'
+        });
+      }
+
+      // Set session
+      (req.session as any).user = { id: user.id };
+      
+      res.redirect('/dashboard');
+    } catch (error) {
+      console.error('Google callback error:', error);
+      res.redirect('/login?error=google_auth_failed');
+    }
+  });
+
+  app.post('/api/auth/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Failed to logout' });
+      }
+      res.json({ message: 'Logged out successfully' });
+    });
+  });
+
   seedInitialData();
 
   return httpServer;

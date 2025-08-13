@@ -86,6 +86,29 @@ export default function Profile() {
     }
   });
 
+  const logoutMutation = useMutation({
+    mutationFn: async () => {
+      return await apiRequest('/api/auth/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Logged Out",
+        description: "You have been successfully logged out",
+      });
+      window.location.href = "/login";
+    },
+    onError: () => {
+      toast({
+        title: "Logout Failed",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    },
+  });
+
   const updateProfileMutation = useMutation({
     mutationFn: async (data: ProfileFormData) => {
       const response = await apiRequest("PUT", "/api/user/profile", data);

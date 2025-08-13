@@ -80,6 +80,26 @@ export async function seedDatabase() {
     }
   }
 
+  // Create test account: test001 / Pw001
+  try {
+    const existingTestAccount = await storage.getUserByUsername("test001");
+    if (!existingTestAccount) {
+      await storage.createUser({
+        username: "test001",
+        password: "Pw001",
+        email: "test001@example.com",
+        firstName: "Test",
+        lastName: "Account",
+        signupMethod: "username",
+        isVerified: true,
+        country: "Bangladesh"
+      });
+      console.log("Created test account: test001 / Pw001");
+    }
+  } catch (error) {
+    console.log("Test account already exists or error creating:", error);
+  }
+
   // 2. Seed 50 users
   const countries = ["Bangladesh", "Pakistan", "India", "Indonesia", "Malaysia", "Turkey", "Egypt", "Saudi Arabia"];
   const firstNames = ["Ahmed", "Muhammad", "Ali", "Hassan", "Omar", "Fatima", "Aisha", "Khadija", "Zainab", "Maryam"];

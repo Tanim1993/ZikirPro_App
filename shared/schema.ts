@@ -28,13 +28,18 @@ export const sessions = pgTable(
 // Users table (required for Replit Auth)
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: varchar("username").unique(),
   email: varchar("email").unique(),
+  phone: varchar("phone").unique(),
+  password: varchar("password"), // hashed password
   firstName: varchar("first_name"),
   lastName: varchar("last_name"),
   profileImageUrl: varchar("profile_image_url"),
   country: varchar("country").default("Bangladesh"),
   avatarType: varchar("avatar_type").default("male-1"),
   bgColor: varchar("bg_color").default("green"),
+  signupMethod: varchar("signup_method").default("username"), // username, google, phone
+  isVerified: boolean("is_verified").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

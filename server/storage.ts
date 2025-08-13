@@ -27,7 +27,12 @@ import { eq, desc, and, sql, asc, gte, lte } from "drizzle-orm";
 export interface IStorage {
   // User operations (required for Replit Auth)
   getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserByPhone(phone: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createUser(userData: Partial<User>): Promise<User>;
+  authenticateUser(username: string, password: string): Promise<User | null>;
   updateUserProfile(id: string, updates: Partial<User>): Promise<User>;
   
   // Zikir operations
@@ -73,6 +78,41 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
+  }
+
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.email, email));
+    return user;
+  }
+
+  async getUserByPhone(phone: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.phone, phone));
+    return user;
+  }
+
+  async createUser(userData: Partial<User>): Promise<User> {
+    const [user] = await db.insert(users).values(userData).returning();
+    return user;
+  }
+
+  async authenticateUser(username: string, password: string): Promise<User | null> {
+    const user = await this.getUserByUsername(username);
+    if (!user || !user.password) {
+      return null;
+    }
+    
+    // In a real app, you'd use bcrypt.compare() here
+    // For this demo, we'll do simple comparison
+    if (user.password === password) {
+      return user;
+    }
+    
+    return null;
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
