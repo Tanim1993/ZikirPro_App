@@ -20,7 +20,7 @@ export default function Dashboard() {
     queryKey: ["/api/rooms/public"],
   });
 
-  const { data: userAnalytics, isLoading: analyticsLoading } = useQuery({
+  const { data: userAnalytics = {}, isLoading: analyticsLoading } = useQuery({
     queryKey: ["/api/user/analytics"],
   });
 
@@ -115,13 +115,13 @@ export default function Dashboard() {
             </div>
             <div>
               <h1 className="text-xl font-bold">Zikir Amol</h1>
-              <p className="text-sm text-green-100">As-salamu alaykum, {user?.firstName || 'Brother'}</p>
+              <p className="text-sm text-green-100">As-salamu alaykum, {(user as any)?.firstName || 'Brother'}</p>
             </div>
           </div>
           
           <div className="relative">
             <img 
-              src={user?.profileImageUrl || `https://ui-avatars.com/api/?name=${user?.firstName}&background=059669&color=fff`} 
+              src={(user as any)?.profileImageUrl || `https://ui-avatars.com/api/?name=${(user as any)?.firstName || 'User'}&background=059669&color=fff`} 
               alt="Profile" 
               className="w-12 h-12 rounded-full border-2 border-white/30"
             />
@@ -132,15 +132,15 @@ export default function Dashboard() {
         {/* Stats Cards */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{userAnalytics?.currentStreak || 0}</div>
+            <div className="text-lg font-bold">{(userAnalytics as any)?.currentStreak || 0}</div>
             <div className="text-xs text-green-100">Day Streak</div>
           </div>
           <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{userAnalytics?.totalZikir || 0}</div>
+            <div className="text-lg font-bold">{(userAnalytics as any)?.totalZikir || 0}</div>
             <div className="text-xs text-green-100">Total Zikir</div>
           </div>
           <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{userRooms.length}</div>
+            <div className="text-lg font-bold">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
             <div className="text-xs text-green-100">My Rooms</div>
           </div>
         </div>
@@ -195,7 +195,7 @@ export default function Dashboard() {
           </TabsList>
 
           <TabsContent value="my-rooms" className="space-y-4">
-            {userRooms.length === 0 ? (
+            {!Array.isArray(userRooms) || userRooms.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <Home className="w-8 h-8 text-gray-400" />
@@ -212,7 +212,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {userRooms.map((room: any) => (
+                {(userRooms as any[]).map((room: any) => (
                   <RoomCard key={room.id} room={room} isOwner={true} />
                 ))}
               </div>
@@ -220,7 +220,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="public-rooms" className="space-y-4">
-            {publicRooms.length === 0 ? (
+            {!Array.isArray(publicRooms) || publicRooms.length === 0 ? (
               <div className="text-center py-12">
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <Globe className="w-8 h-8 text-gray-400" />
@@ -230,7 +230,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="space-y-3">
-                {publicRooms.map((room: any) => (
+                {(publicRooms as any[]).map((room: any) => (
                   <RoomCard key={room.id} room={room} />
                 ))}
               </div>

@@ -26,6 +26,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - temporarily disabled to fix authentication error
   // await setupAuth(app);
 
+  // Seed database with initial data - temporarily disabled for faster startup
+  // Uncomment the following lines to enable database seeding:
+  /*
+  try {
+    await seedDatabase();
+  } catch (error) {
+    console.log("Database seeding error (may already be seeded):", error.message);
+  }
+  */
+
   // Create test user for authentication testing
   try {
     const existingUser = await storage.getUserByUsername("test001");
