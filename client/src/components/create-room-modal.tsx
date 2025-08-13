@@ -14,9 +14,11 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
+import { Plus } from "lucide-react";
 
 const createRoomSchema = z.object({
   zikirId: z.number().min(1, "Please select a zikir"),
+  name: z.string().min(1, "Room name is required"),
   targetCount: z.number().optional(),
   unlimited: z.boolean().default(false),
   duration: z.number().min(1).max(40, "Duration must be between 1-40 days"),
@@ -40,6 +42,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
     resolver: zodResolver(createRoomSchema),
     defaultValues: {
       zikirId: 0,
+      name: "",
       unlimited: false,
       duration: 30,
       isPublic: true,
@@ -102,7 +105,27 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
         </DialogHeader>
         
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            
+            {/* Room Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Room Name</FormLabel>
+                  <FormControl>
+                    <input
+                      {...field}
+                      placeholder="Enter room name"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      data-testid="input-room-name"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             
             {/* Zikir Selection */}
             <FormField
@@ -111,7 +134,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Select Zikir</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))}>
+                  <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
                     <FormControl>
                       <SelectTrigger data-testid="select-zikir">
                         <SelectValue placeholder="Choose a zikir" />
@@ -123,7 +146,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                           <div className="text-left">
                             <div className="font-medium">{zikir.name}</div>
                             {zikir.arabicText && (
-                              <div className="text-sm text-gray-500 font-amiri">{zikir.arabicText}</div>
+                              <div className="text-sm text-gray-500">{zikir.arabicText}</div>
                             )}
                           </div>
                         </SelectItem>
@@ -169,6 +192,26 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       )}
                     />
                   </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Brief description of your room"
+                      className="min-h-[80px]"
+                      data-testid="textarea-description"
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -266,20 +309,20 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 bg-islamic-green hover:bg-islamic-green-dark"
+                className="flex-1 bg-green-600 hover:bg-green-700"
                 disabled={createRoomMutation.isPending}
                 data-testid="button-create"
               >
                 {createRoomMutation.isPending ? (
-                  <>
-                    <i className="fas fa-spinner fa-spin mr-2"></i>
+                  <div className="flex items-center justify-center">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
                     Creating...
-                  </>
+                  </div>
                 ) : (
-                  <>
-                    <i className="fas fa-plus mr-2"></i>
+                  <div className="flex items-center justify-center">
+                    <Plus className="w-4 h-4 mr-2" />
                     Create Room
-                  </>
+                  </div>
                 )}
               </Button>
             </div>
