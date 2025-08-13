@@ -34,11 +34,10 @@ export default function MobileNav() {
       active: location === "/stats"
     },
     {
-      href: "#logout",
-      emoji: "🚪", 
-      label: "Logout",
-      active: false,
-      onClick: () => window.location.href = '/api/logout'
+      href: "/profile",
+      emoji: "👤", 
+      label: "Profile",
+      active: location === "/profile"
     }
   ];
 
