@@ -64,36 +64,39 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navigation Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+      {/* Mobile App Header */}
+      <header className="bg-gradient-to-r from-green-600 to-green-700 text-white sticky top-0 z-50">
+        <div className="px-4 py-4">
+          <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-islamic-green rounded-full flex items-center justify-center">
-                <i className="fas fa-prayer-beads text-white text-lg"></i>
+              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                <span className="text-2xl">📿</span>
               </div>
-              <h1 className="text-xl font-semibold text-gray-900 font-amiri">Zikir Amol</h1>
+              <div>
+                <h1 className="text-xl font-bold font-amiri">Zikir Amol</h1>
+                <p className="text-xs text-green-100">Islamic Dhikr Competition</p>
+              </div>
             </div>
             
-            <div className="flex items-center space-x-4">
-              <Link href="/profile">
-                <Button variant="ghost" size="sm" data-testid="button-profile">
-                  <div className="w-8 h-8 bg-islamic-green rounded-full overflow-hidden">
-                    <div className="w-full h-full bg-islamic-green flex items-center justify-center">
-                      <i className="fas fa-user text-white text-sm"></i>
-                    </div>
-                  </div>
-                </Button>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout} data-testid="button-logout">
-                <i className="fas fa-sign-out-alt"></i>
-              </Button>
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <img 
+                  src={user.profileImageUrl || "https://via.placeholder.com/40"} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full border-2 border-white/30"
+                />
+                <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full border border-white"></div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-medium">As-salamu alaykum</p>
+                <p className="text-xs text-green-100">{user.firstName}</p>
+              </div>
             </div>
           </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="px-4 py-6 pb-24">
         {/* Welcome Section & Dashboard */}
         <div className="mb-8">
           <div className="bg-gradient-to-r from-islamic-green to-islamic-green-light rounded-2xl p-6 text-white islamic-pattern relative overflow-hidden">
@@ -129,37 +132,50 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
+        {/* Quick Actions - Mobile Style */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
           <Button 
             onClick={() => setShowCreateModal(true)}
-            className="flex-1 bg-islamic-gold hover:bg-islamic-gold-dark text-white font-semibold py-3 px-6 rounded-xl shadow-lg"
+            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-4 px-4 rounded-xl shadow-lg"
             data-testid="button-create-room"
           >
-            <i className="fas fa-plus mr-2"></i>
-            Create Zikir Room
+            <div className="text-center">
+              <span className="text-xl mb-1 block">➕</span>
+              <span className="text-sm">Create Room</span>
+            </div>
           </Button>
           <Button 
             variant="outline"
-            className="flex-1 border-2 border-islamic-green text-islamic-green hover:bg-islamic-green hover:text-white font-semibold py-3 px-6 rounded-xl shadow-lg"
+            className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold py-4 px-4 rounded-xl"
             data-testid="button-join-room"
           >
-            <i className="fas fa-door-open mr-2"></i>
-            Join Room
+            <div className="text-center">
+              <span className="text-xl mb-1 block">🚪</span>
+              <span className="text-sm">Join Room</span>
+            </div>
           </Button>
         </div>
 
-        {/* Tabs Navigation */}
+        {/* Tabs Navigation - Mobile Style */}
         <Tabs defaultValue="my-rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="my-rooms" data-testid="tab-my-rooms">
-              <i className="fas fa-home mr-2"></i>My Rooms
+          <TabsList className="grid w-full grid-cols-3 mb-4">
+            <TabsTrigger value="my-rooms" data-testid="tab-my-rooms" className="text-xs">
+              <div className="text-center">
+                <span className="block text-sm">🏠</span>
+                <span>My Rooms</span>
+              </div>
             </TabsTrigger>
-            <TabsTrigger value="public-rooms" data-testid="tab-public-rooms">
-              <i className="fas fa-globe mr-2"></i>Public Rooms
+            <TabsTrigger value="public-rooms" data-testid="tab-public-rooms" className="text-xs">
+              <div className="text-center">
+                <span className="block text-sm">🌍</span>
+                <span>Public</span>
+              </div>
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
-              <i className="fas fa-trophy mr-2"></i>Leaderboard
+            <TabsTrigger value="leaderboard" data-testid="tab-leaderboard" className="text-xs">
+              <div className="text-center">
+                <span className="block text-sm">🏆</span>
+                <span>Leaders</span>
+              </div>
             </TabsTrigger>
             <TabsTrigger value="library" data-testid="tab-library">
               <i className="fas fa-book mr-2"></i>Library

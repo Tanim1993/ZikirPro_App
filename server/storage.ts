@@ -102,6 +102,11 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(zikirs).orderBy(asc(zikirs.name));
   }
 
+  async createZikir(zikirData: any): Promise<Zikir> {
+    const [zikir] = await db.insert(zikirs).values(zikirData).returning();
+    return zikir;
+  }
+
   async getZikirById(id: number): Promise<Zikir | undefined> {
     const [zikir] = await db.select().from(zikirs).where(eq(zikirs.id, id));
     return zikir;

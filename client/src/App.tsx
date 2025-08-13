@@ -9,6 +9,7 @@ import Landing from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import Room from "./pages/room";
 import Profile from "./pages/profile";
+import MobileNav from "./components/mobile-nav";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -27,18 +28,27 @@ function Router() {
   }
 
   return (
-    <Switch>
-      {!isAuthenticated ? (
-        <Route path="/" component={Landing} />
-      ) : (
-        <>
-          <Route path="/" component={Dashboard} />
-          <Route path="/room/:id" component={Room} />
-          <Route path="/profile" component={Profile} />
-        </>
-      )}
-      <Route component={NotFound} />
-    </Switch>
+    <div className="min-h-screen bg-gray-50 pb-20">
+      <Switch>
+        {!isAuthenticated ? (
+          <Route path="/" component={Landing} />
+        ) : (
+          <>
+            <Route path="/" component={Dashboard} />
+            <Route path="/dashboard" component={Dashboard} />
+            <Route path="/room/:id" component={Room} />
+            <Route path="/profile" component={Profile} />
+            <Route path="/create" component={Dashboard} />
+            <Route path="/stats" component={Dashboard} />
+            <Route path="/rooms" component={Dashboard} />
+          </>
+        )}
+        <Route component={NotFound} />
+      </Switch>
+      
+      {/* Mobile Navigation - only show when authenticated */}
+      {isAuthenticated && <MobileNav />}
+    </div>
   );
 }
 

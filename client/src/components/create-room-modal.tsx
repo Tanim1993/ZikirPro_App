@@ -39,10 +39,13 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
   const form = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
     defaultValues: {
+      zikirId: 0,
       unlimited: false,
       duration: 30,
       isPublic: true,
       description: "",
+      targetCount: 100,
+      country: "Bangladesh"
     },
   });
 

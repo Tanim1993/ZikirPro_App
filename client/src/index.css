@@ -43,24 +43,38 @@
   --radius: 1.3rem;
   --shadow-2xs: 0px 2px 0px 0px hsl(142 76% 36% / 0.00);
   --shadow-xs: 0px 2px 0px 0px hsl(142 76% 36% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(142 76% 36% / 0.00), 0px 1px 2px -1px hsl(142 76% 36% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(142 76% 36% / 0.00), 0px 1px 2px -1px hsl(142 76% 36% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(142 76% 36% / 0.00), 0px 2px 4px -1px hsl(142 76% 36% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(142 76% 36% / 0.00), 0px 4px 6px -1px hsl(142 76% 36% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(142 76% 36% / 0.00), 0px 8px 10px -1px hsl(142 76% 36% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(142 76% 36% / 0.00);
-  
-  /* Islamic theme colors */
-  --islamic-green: hsl(142 76% 36%);
-  --islamic-green-light: hsl(142 76% 46%);
-  --islamic-green-dark: hsl(142 76% 26%);
-  --islamic-gold: hsl(42 92% 56%);
-  --islamic-gold-dark: hsl(42 92% 46%);
-  --islamic-night: hsl(215 32% 17%);
-  --islamic-night-dark: hsl(222 84% 5%);
-  
-  --tracking-normal: 0em;
-  --spacing: 0.25rem;
+}
+
+/* Mobile app styling */
+html {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+body {
+  touch-action: manipulation;
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.safe-area-pb {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Islamic theme colors */
+.islamic-green {
+  color: hsl(142 76% 36%);
+}
+
+.bg-islamic-green {
+  background-color: hsl(142 76% 36%);
+}
+
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20'><circle cx='10' cy='10' r='1' fill='%23ffffff' opacity='0.1'/></svg>");
 }
 
 .dark {

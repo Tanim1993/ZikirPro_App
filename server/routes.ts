@@ -4,10 +4,18 @@ import { WebSocketServer, WebSocket } from "ws";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertRoomSchema, insertRoomMemberSchema, updateUserProfileSchema } from "@shared/schema";
+import { seedDatabase } from "./seedData";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - temporarily disabled to fix authentication error
   // await setupAuth(app);
+
+  // Seed database on startup
+  try {
+    await seedDatabase();
+  } catch (error) {
+    console.log("Database seeding error (may already be seeded):", error);
+  }
 
   // Auth routes - temporarily returning mock user for testing
   app.get('/api/auth/user', async (req: any, res) => {
