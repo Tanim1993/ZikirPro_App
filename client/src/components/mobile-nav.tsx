@@ -18,7 +18,7 @@ export default function MobileNav() {
       href: "/rooms",
       emoji: "🕌",
       label: "Rooms", 
-      active: location === "/rooms"
+      active: location === "/rooms" || location?.startsWith("/room/")
     },
     {
       href: "#create",

@@ -27,26 +27,24 @@ export default function Room() {
   const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: [`/api/rooms/${roomId}`],
     enabled: !!roomId,
-  });
+  }) as { data: any, isLoading: boolean };
 
   const { data: userCount = 0 } = useQuery({
     queryKey: [`/api/rooms/${roomId}/user-count`],
     enabled: !!roomId,
     refetchInterval: 5000,
-  });
+  }) as { data: number };
 
   const { data: leaderboard = [] } = useQuery({
     queryKey: [`/api/rooms/${roomId}/leaderboard`],
     enabled: !!roomId,
     refetchInterval: 3000,
-  });
+  }) as { data: any[] };
 
   // Optimized count mutation with immediate UI feedback
   const countMutation = useMutation({
     mutationFn: async () => {
-      return await apiRequest(`/api/rooms/${roomId}/count`, {
-        method: 'POST',
-      });
+      return await apiRequest(`/api/rooms/${roomId}/count`, 'POST');
     },
     onMutate: async () => {
       // Cancel any outgoing refetches
@@ -135,7 +133,7 @@ export default function Room() {
     );
   }
 
-  const progress = room.unlimited ? 0 : (userCount / (room.targetCount || 1000)) * 100;
+  const progress = room?.unlimited ? 0 : (userCount / (room?.targetCount || 1000)) * 100;
   const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === user?.id) + 1;
 
   return (
@@ -241,9 +239,9 @@ export default function Room() {
         <div className="mb-6">
           <DigitalTasbih
             onCount={handleCount}
-            count={userCount}
-            targetCount={room.targetCount}
-            unlimited={room.unlimited}
+            count={userCount as number}
+            targetCount={room?.targetCount}
+            unlimited={room?.unlimited}
             tasbihType={tasbihType}
           />
         </div>
@@ -262,12 +260,21 @@ export default function Room() {
           </TabsList>
 
           <TabsContent value="leaderboard" className="mt-4">
-            <LeaderboardWidget
-              entries={leaderboard}
-              currentUserId={user?.id || ''}
-              title="Room Leaderboard"
-              showTop={10}
-            />
+            <Link href="/leaderboard">
+              <div className="cursor-pointer" data-testid="link-leaderboard">
+                <LeaderboardWidget
+                  entries={leaderboard as any[]}
+                  currentUserId={user?.id || ''}
+                  title="Room Leaderboard"
+                  showTop={10}
+                />
+                <div className="mt-2 text-center">
+                  <Button variant="outline" size="sm" className="text-xs">
+                    View Global Leaderboard →
+                  </Button>
+                </div>
+              </div>
+            </Link>
           </TabsContent>
 
           <TabsContent value="details" className="mt-4 space-y-4">

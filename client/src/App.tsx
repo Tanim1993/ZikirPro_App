@@ -10,6 +10,8 @@ import Dashboard from "./pages/dashboard";
 import Room from "./pages/room";
 import Profile from "./pages/profile";
 import Stats from "./pages/stats";
+import Rooms from "./pages/rooms";
+import Leaderboard from "./pages/leaderboard";
 import MobileNav from "./components/mobile-nav";
 
 function Router() {
@@ -41,7 +43,8 @@ function Router() {
             <Route path="/profile" component={Profile} />
             <Route path="/create" component={Dashboard} />
             <Route path="/stats" component={Stats} />
-            <Route path="/rooms" component={Dashboard} />
+            <Route path="/rooms" component={Rooms} />
+            <Route path="/leaderboard" component={Leaderboard} />
           </>
         )}
         <Route component={NotFound} />
