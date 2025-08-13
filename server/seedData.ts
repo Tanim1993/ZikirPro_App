@@ -2,6 +2,8 @@ import { storage } from "./storage";
 
 export async function seedDatabase() {
   console.log("Seeding database with initial data...");
+  
+  try {
 
   // 1. Seed Zikirs
   const zikirs = [
@@ -85,6 +87,7 @@ export async function seedDatabase() {
     const existingTestAccount = await storage.getUserByUsername("test001");
     if (!existingTestAccount) {
       await storage.createUser({
+        id: "test001-id",
         username: "test001",
         password: "Pw001",
         email: "test001@example.com",
@@ -97,7 +100,7 @@ export async function seedDatabase() {
       console.log("Created test account: test001 / Pw001");
     }
   } catch (error) {
-    console.log("Test account already exists or error creating:", error);
+    console.log("Test account creation skipped:", error.message);
   }
 
   // 2. Seed 50 users
@@ -114,6 +117,7 @@ export async function seedDatabase() {
       await storage.upsertUser({
         id: `user-${i}`,
         email: `user${i}@example.com`,
+        username: `user${i}`,
         firstName,
         lastName,
         country,
@@ -122,7 +126,7 @@ export async function seedDatabase() {
         bgColor: ['green', 'blue', 'purple', 'orange'][Math.floor(Math.random() * 4)]
       });
     } catch (error) {
-      console.log(`User ${i} already exists or error:`, error);
+      console.log(`User ${i} seeding skipped:`, error.message);
     }
   }
 
@@ -182,5 +186,9 @@ export async function seedDatabase() {
     }
   }
 
-  console.log("Database seeding completed!");
+    console.log("Database seeding completed!");
+  } catch (error) {
+    console.log("Database seeding failed:", error.message);
+    // Continue without seeding if there's an error
+  }
 }

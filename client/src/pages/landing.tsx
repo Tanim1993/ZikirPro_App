@@ -50,13 +50,22 @@ export default function Landing() {
             {/* Login Button */}
             <Link href="/login">
               <Button 
-                className="w-full bg-islamic-green hover:bg-islamic-green-dark text-white font-semibold py-3"
+                className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 text-white font-semibold py-3 text-lg"
                 data-testid="button-login"
               >
-                <i className="fas fa-sign-in-alt mr-2"></i>
                 Start Your Zikir Journey
               </Button>
             </Link>
+            
+            {/* Sign Up Link */}
+            <div className="mt-4 text-center">
+              <p className="text-sm text-gray-600">
+                Don't have an account?{" "}
+                <Link href="/signup" className="text-green-600 hover:text-green-700 font-semibold">
+                  Sign Up
+                </Link>
+              </p>
+            </div>
             
             {/* Islamic Quote */}
             <div className="mt-6 p-4 bg-islamic-green bg-opacity-5 rounded-lg">

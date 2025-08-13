@@ -10,12 +10,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Auth middleware - temporarily disabled to fix authentication error
   // await setupAuth(app);
 
-  // Seed database on startup
+  // Seed database on startup - temporarily disabled for faster startup
+  /*
   try {
     await seedDatabase();
   } catch (error) {
     console.log("Database seeding error (may already be seeded):", error);
   }
+  */
 
   // Auth routes - check session for authenticated user
   app.get('/api/auth/user', async (req: any, res) => {
