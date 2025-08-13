@@ -1,0 +1,156 @@
+Got it! I’ve polished and organized your full idea—keeping every keyword and adding a few thoughtful, “room-focused” extras so a Replit dev can start right away.
+
+---
+
+# Islamic Zikir Competition App — End-to-End Plan
+
+## 1) Core Concept
+
+* **Zikir Amol** app with **digital tasbih** and a **leaderboard** (game-style) to run **zikir competition**.
+* Users join **Zikir Rooms** and tap a **tasbih icon**; **count shows live** and rank moves **up/down live**.
+
+## 2) Roles
+
+* **User** (joins/creates rooms, zikir, profile).
+* **Room Owner** (can invite/add/delete members, share room, set rules).
+* **App Owner/Admin** (full control: view/delete rooms & users, BO moderation).
+
+## 3) Zikir Room (the heart)
+
+* **Create Room** (by app owner or any user):
+
+  * **Zikir name**: dropdown + **search box** (from master Zikir list).
+  * **Target count**: input or **unlimited**.
+  * **Day count**: **1–40 days**.
+  * **Remarks**: **Rules / description / fazilot / references**.
+  * **Room picture** upload.
+  * **Private/Public** toggle.
+* **Join Room**:
+
+  * Join with **nickname**.
+  * See **current leaderboard**; after **Join**, **digital tasbih** appears.
+* **Counting modes** (user can select type):
+
+  * **Digital tasbih**, **manual tasbih**, **tap only**, etc.
+* **Reset count**: allowed with **confirmation** popup.
+* **Day-wise count**: separate button shows **daily history** for each user.
+* **Top 3** highlighted with **crown** + pic; others listed below.
+* **Room Owner tools**: **delete member / add member / invite member / share room**.
+* **Public rooms**: anyone can **see & join**.
+
+## 4) Home & Screens
+
+1. **Home (after login)**
+
+   * Shows **all zikir room** list (public + country wise + global).
+   * **Create Room** button.
+   * **Search** rooms by text.
+   * **Progress dashboard**: position/rank, **streak count**, **spent time**, analytics (“you are better today **60%**”), **reminder** option (daily, time-wise).
+2. **Room Screen (after join)**
+
+   * Live **leaderboard** with **up/down** changes.
+   * **Tasbih icon** (mode selector), **Reset (confirm)**, **Details** (shows **remarks/fazilot/references**).
+   * **Day-wise count** view.
+3. **Profile**
+
+   * **Islamic avatar** (male/female, **7–8 types**) + profile pic.
+   * **BG color** selection.
+   * **Country** (select at entry; change in settings).
+   * **Summary report**, **clear data**, **feedback / user experience** submission to owner.
+4. **Zikir List**
+
+   * All **zikir with fazilot** (from **backend/back office**).
+   * **Select zikir → Create room** directly.
+
+## 5) Leaderboards
+
+* **Personal**, **Country**, **Worldwide** leaderboards.
+* **Live show**: if anyone **cross/less**, rank updates **up/down** instantly.
+
+## 6) Safety & Reporting
+
+* Users can **report a room** or **report a user**.
+* **App owner** can see reports in **BO or admin app** (recommend: **Back Office web portal** for better control), then **view/delete** rooms and users.
+
+## 7) Country & Visibility
+
+* Global app (worldwide base).
+* On first entry user **selects country** (Bangladesh by default for you).
+* **Country-wise rooms** and **Global rooms** both visible; **country can be changed** in settings.
+
+## 8) Islamic UX vibe
+
+* Clean **easy UI/UX**, Islamic theme (soft greens/golds).
+* After completion, show **congratulations** like **“MashaAllah”** (with gentle animation/sound).
+
+## 9) Reminders & Analytics
+
+* **Daily reminders** (time-wise).
+* **Analytics** on dashboard: streak, **spent time**, improvement % (“better today **60%**”).
+* **Summary report** page; user can **clear data**.
+
+## 10) Admin / Back Office (BO)
+
+* Recommend **Back Office** web app for the owner:
+
+  * Manage **Zikir master list** (fazilot, references).
+  * **Rooms & members** (view, delete, lock).
+  * **Reports** queue (room/user), decisions & notes.
+  * **Country** and **visibility** controls.
+  * **Analytics**: active rooms, counts, time spent, top countries.
+
+## 11) Advanced (focused on Zikir Room—future-ready)
+
+* **Anti-cheat**: tap-rate limits, server-side counting, debounce, suspicious-activity flags.
+* **Offline counting** with later **sync** (signed & capped).
+* **Seasonal competitions** (weekly/40-day **seasons**), **badges** for streaks.
+* **Invite links/QR** to join private/public rooms.
+* **Localization**: Bangla/English/Arabic; timezone-aware day boundaries.
+* **Accessibility**: large tasbih, haptics/sound toggle.
+
+---
+
+## Developer handoff (for Replit)
+
+**MVP scope (Phase 1):**
+
+* Auth (email/phone).
+* Country select.
+* Zikir master list (seed).
+* Create/Join **Zikir Room** with fields above.
+* Live **leaderboard** + **digital tasbih** + reset confirm.
+* Day-wise counts, top-3 crowns.
+* Home dashboard (streak, time, % better).
+* Profile (avatar picker 7–8 types, BG color).
+* Report room/user.
+* BO minimal: view/delete rooms, manage zikir list, handle reports.
+
+**Suggested Stack (fast build):**
+
+* **Flutter** (mobile) or React Native;
+* **Realtime**: Firebase (Auth, Firestore, Cloud Functions) or Supabase;
+* **Notifications**: FCM;
+* **Admin BO**: React/Next.js (or Flutter Web) + Firebase.
+
+**Key Data Models (high level):**
+
+* `User(id, country, nickname, avatarType, bgColor, settings)`
+* `Zikir(id, name, fazilat, references)`
+* `Room(id, zikirId, ownerId, type, target, days, remarks, picture, country, startAt, endAt)`
+* `RoomMember(roomId, userId, role, joinedAt)`
+* `CountEntry(roomId, userId, day, delta, createdAt)`
+* `Leaderboard(roomId, snapshotAt, ranks[])`
+* `Report(id, type: room|user, targetId, byUserId, reason, status)`
+
+**Core APIs/Functions (illustrative):**
+
+* `POST /rooms` (create), `GET /rooms?country&global&search`
+* `POST /rooms/{id}/join`
+* `POST /rooms/{id}/count` (secure, server increments)
+* `GET /rooms/{id}/leaderboard (live)` via websocket
+* `POST /reports`
+* Admin: `DELETE /rooms/{id}`, `PUT /zikir/{id}`, etc.
+
+---
+
+If you want, I can turn this into a one-page **PRD** or a **task checklist** for your Replit dev.
