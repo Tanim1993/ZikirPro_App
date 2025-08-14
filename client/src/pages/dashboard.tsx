@@ -246,15 +246,7 @@ export default function Dashboard() {
                   <Home className="w-8 h-8 text-gray-400" />
                 </div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">No rooms yet</h3>
-                <p className="text-gray-600 mb-4">Create your first zikir room to get started</p>
-                <Button 
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-islamic-primary hover:bg-islamic-primary-dark"
-                  data-testid="button-create-first-room"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Room
-                </Button>
+                <p className="text-gray-600">Use the Create Room button above to get started</p>
               </div>
             ) : (
               <div className="space-y-3">
