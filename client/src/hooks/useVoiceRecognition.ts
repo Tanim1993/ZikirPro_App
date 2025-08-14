@@ -47,12 +47,14 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'god is great',
     'الله أكبر'
   ],
-  'Subhanallah': [
+  'SubhanAllah': [
     'subhanallah',
     'subhan allah',
     'subhanollah',
     'glory to god',
-    'سبحان الله'
+    'glory be to allah',
+    'سبحان الله',
+    'سُبْحَانَ اللَّهِ'
   ],
   'Alhamdulillah': [
     'alhamdulillah',

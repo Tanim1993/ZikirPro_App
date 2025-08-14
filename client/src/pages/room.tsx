@@ -292,16 +292,16 @@ export default function Room() {
           <CardContent className="p-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-gray-900 mb-2">{room.zikirName}</h2>
-              {room.zikirArabicText && (
+              {room.zikirArabic && (
                 <div className="text-2xl mb-2 leading-relaxed" style={{ fontFamily: 'Amiri, serif' }}>
-                  {room.zikirArabicText}
+                  {room.zikirArabic}
                 </div>
               )}
-              {room.zikirTransliteration && (
-                <div className="text-gray-600 italic mb-2">{room.zikirTransliteration}</div>
+              {room.transliteration && (
+                <div className="text-gray-600 italic mb-2">{room.transliteration}</div>
               )}
-              {room.zikirTranslation && (
-                <div className="text-sm text-gray-700">{room.zikirTranslation}</div>
+              {room.translation && (
+                <div className="text-sm text-gray-700">{room.translation}</div>
               )}
             </div>
           </CardContent>
