@@ -25,6 +25,7 @@ import Hadith from "./pages/hadith";
 import ZakatCalculator from "./pages/zakat-calculator";
 import Qiblah from "./pages/qiblah";
 import Donations from "./pages/donations";
+import OfflineDemo from "./pages/offline-demo";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -79,6 +80,7 @@ function Router() {
             <Route path="/zakat-calculator" component={ZakatCalculator} />
             <Route path="/qiblah" component={Qiblah} />
             <Route path="/donations" component={Donations} />
+            <Route path="/offline-demo" component={OfflineDemo} />
           </>
         )}
         <Route component={NotFound} />

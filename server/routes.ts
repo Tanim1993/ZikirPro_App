@@ -494,6 +494,77 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Bulk count endpoint for offline sync
+  app.post('/api/rooms/:id/count/bulk', async (req: any, res) => {
+    try {
+      const roomId = parseInt(req.params.id);
+      const { userId, count, timestamps, offlineIds } = req.body;
+
+      if (!userId || !count || count <= 0) {
+        return res.status(400).json({ message: "Invalid bulk count data" });
+      }
+
+      // Verify user is member of room
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const isMember = await storage.isUserInRoom(roomId, userId);
+      if (!isMember && room.isPublic) {
+        // Auto-join user to public room
+        await storage.joinRoom({
+          roomId,
+          userId,
+          role: 'member',
+          nickname: null,
+          isActive: true,
+        });
+      } else if (!isMember) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Add the bulk count
+      let finalCount = 0;
+      for (let i = 0; i < count; i++) {
+        const counter = await storage.incrementCount(roomId, userId);
+        finalCount = counter.currentCount || counter.totalCount || 0;
+      }
+
+      // Update user analytics
+      const analytics = await storage.getUserAnalytics(userId);
+      await storage.updateUserAnalytics(userId, {
+        totalZikir: (analytics?.totalZikir || 0) + count,
+        lastActiveDate: new Date(),
+      });
+
+      // Broadcast final count update to room
+      const leaderboard = await storage.getRoomLeaderboard(roomId);
+      broadcastToRoom(roomId, {
+        type: 'bulkCountUpdate',
+        data: { 
+          roomId, 
+          userId, 
+          count: finalCount, 
+          addedCount: count,
+          leaderboard,
+          offlineIds 
+        }
+      });
+
+      res.json({ 
+        success: true, 
+        finalCount, 
+        addedCount: count,
+        offlineIds 
+      });
+
+    } catch (error) {
+      console.error("Error processing bulk count:", error);
+      res.status(500).json({ message: "Failed to process bulk count" });
+    }
+  });
+
   app.post('/api/rooms/:id/reset', async (req: any, res) => {
     try {
       const roomId = parseInt(req.params.id);
@@ -675,7 +746,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add owner as a member
-      await storage.createRoomMember({
+      await storage.joinRoom({
         roomId: room.id,
         userId: userId,
         role: 'owner'

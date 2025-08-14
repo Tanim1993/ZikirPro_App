@@ -7,10 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap, AlertTriangle, Trash2 } from "lucide-react";
+import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap, AlertTriangle, Trash2, Wifi, WifiOff, Cloud, CloudOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { DigitalTasbih } from "@/components/digital-tasbih";
@@ -27,6 +28,16 @@ export default function Room() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const roomId = parseInt(id || "0");
+
+  // Offline sync functionality
+  const {
+    isOnline,
+    pendingCounts,
+    isSyncing,
+    addOfflineCount,
+    getPendingCountForRoom,
+    syncOfflineCounts
+  } = useOfflineSync();
   
   const [tasbihType, setTasbihType] = useState<'digital' | 'physical' | 'hand'>('digital');
   const [showShareModal, setShowShareModal] = useState(false);
@@ -58,9 +69,18 @@ export default function Room() {
     select: (data: any) => parseInt(data) || 0,
   }) as { data: number };
 
-  // Optimized count mutation with immediate UI feedback
+  // Enhanced count mutation with offline support
   const countMutation = useMutation({
     mutationFn: async () => {
+      // If offline, add to offline queue
+      if (!isOnline) {
+        if (user?.id) {
+          addOfflineCount(roomId, user.id);
+        }
+        return { success: true, offline: true };
+      }
+
+      // Online - make API call
       const response = await fetch(`/api/rooms/${roomId}/count`, {
         method: 'POST',
         headers: {
@@ -234,7 +254,35 @@ export default function Room() {
           </Link>
           
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold truncate">{room?.name || `${room?.zikirName} Room`}</h1>
+            <div className="flex items-center justify-center gap-2 mb-1">
+              <h1 className="text-lg font-bold truncate">{room?.name || `${room?.zikirName} Room`}</h1>
+              {/* Offline Status Indicator */}
+              {!isOnline && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <WifiOff className="w-4 h-4 text-orange-300" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Offline mode - counts will sync when reconnected</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+              {/* Syncing Indicator */}
+              {isSyncing && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <Cloud className="w-4 h-4 text-blue-300 animate-pulse" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Syncing offline counts...</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
             <p className="text-sm text-islamic-secondary/80">
               Room #{roomId.toString().padStart(6, '0')}
             </p>
@@ -388,11 +436,21 @@ export default function Room() {
         <div className="mb-6">
           <DigitalTasbih
             onCount={handleCount}
-            count={userCount as number}
+            count={(userCount as number) + (user?.id ? getPendingCountForRoom(roomId, user.id) : 0)}
             targetCount={room?.targetCount}
             unlimited={room?.unlimited}
             tasbihType={tasbihType}
           />
+          
+          {/* Pending Counts Indicator */}
+          {user?.id && getPendingCountForRoom(roomId, user.id) > 0 && (
+            <div className="mt-2 p-2 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+              <p className="text-sm text-orange-700 dark:text-orange-300 text-center">
+                <CloudOff className="w-4 h-4 inline mr-1" />
+                {getPendingCountForRoom(roomId, user.id)} counts pending sync
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}

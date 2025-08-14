@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff } from "lucide-react";
 
 export default function More() {
   const features = [
@@ -46,6 +46,13 @@ export default function More() {
       icon: Heart,
       href: "/donations",
       color: "from-rose-500 to-rose-700"
+    },
+    {
+      title: "Offline Sync Demo",
+      description: "Test offline counting with secure synchronization",
+      icon: CloudOff,
+      href: "/offline-demo",
+      color: "from-orange-500 to-orange-700"
     }
   ];
 
