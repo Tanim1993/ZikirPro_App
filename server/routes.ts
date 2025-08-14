@@ -222,12 +222,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Calculate real total count from all user's count entries
       const totalCount = await storage.getUserTotalCount(userId);
       
-      // Get user analytics for streaks
+      // Calculate streak data
+      const streakData = await storage.calculateUserStreak(userId);
+      
+      // Get user analytics for other data
       const analytics = await storage.getUserAnalytics(userId);
       
       res.json({
-        currentStreak: analytics?.currentStreak || 0,
-        longestStreak: analytics?.longestStreak || 0,
+        currentStreak: streakData.currentStreak,
+        longestStreak: streakData.longestStreak,
         totalCount: totalCount,
         totalZikir: totalCount, // For backward compatibility
         completedRooms: analytics?.completedRooms || 0

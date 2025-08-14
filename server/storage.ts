@@ -269,7 +269,7 @@ export class DatabaseStorage implements IStorage {
         endDate: rooms.endDate,
         zikirName: zikirs.name,
         role: roomMembers.role,
-        userCount: liveCounters.totalCount,
+        totalCount: liveCounters.totalCount,
         todayCount: liveCounters.todayCount,
         memberCount: sql<number>`(
           SELECT COUNT(*) 
@@ -485,6 +485,65 @@ export class DatabaseStorage implements IStorage {
       .from(liveCounters)
       .where(eq(liveCounters.userId, userId));
     return result?.totalCount || 0;
+  }
+
+  async calculateUserStreak(userId: string): Promise<{ currentStreak: number, longestStreak: number }> {
+    // Get all distinct dates when user made counts
+    const countDates = await db
+      .select({
+        date: sql<string>`date(${liveCounters.lastCountAt})`
+      })
+      .from(liveCounters)
+      .where(and(
+        eq(liveCounters.userId, userId),
+        gt(liveCounters.totalCount, 0)
+      ))
+      .groupBy(sql`date(${liveCounters.lastCountAt})`)
+      .orderBy(sql`date(${liveCounters.lastCountAt}) DESC`);
+
+    if (countDates.length === 0) {
+      return { currentStreak: 0, longestStreak: 0 };
+    }
+
+    // Calculate current streak (consecutive days from today)
+    let currentStreak = 0;
+    let longestStreak = 0;
+    let tempStreak = 0;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    for (let i = 0; i < countDates.length; i++) {
+      const countDate = new Date(countDates[i].date);
+      countDate.setHours(0, 0, 0, 0);
+      
+      if (i === 0) {
+        // Check if today or yesterday
+        const daysDiff = Math.floor((today.getTime() - countDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysDiff <= 1) {
+          currentStreak = 1;
+          tempStreak = 1;
+        }
+      } else {
+        const prevDate = new Date(countDates[i-1].date);
+        prevDate.setHours(0, 0, 0, 0);
+        const daysDiff = Math.floor((prevDate.getTime() - countDate.getTime()) / (1000 * 60 * 60 * 24));
+        
+        if (daysDiff === 1) {
+          if (i < currentStreak || currentStreak === 0) {
+            currentStreak++;
+          }
+          tempStreak++;
+        } else {
+          longestStreak = Math.max(longestStreak, tempStreak);
+          tempStreak = 1;
+        }
+      }
+    }
+    
+    longestStreak = Math.max(longestStreak, tempStreak, currentStreak);
+    
+    return { currentStreak, longestStreak };
   }
 
   async getGlobalStats(): Promise<any> {

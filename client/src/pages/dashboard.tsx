@@ -200,11 +200,11 @@ export default function Dashboard() {
           {/* Quick Stats with Islamic Design */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{userAnalytics.totalCount || 0}</div>
+              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.totalCount || 0}</div>
               <div className="text-xs text-green-100">Total Zikir</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{userAnalytics.currentStreak || 0}</div>
+              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 0}</div>
               <div className="text-xs text-green-100">Day Streak</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
