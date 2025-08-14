@@ -243,6 +243,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         ownerId: userId
       });
       const room = await storage.createRoom(roomData);
+      
+      // Automatically add the creator as a member of their own room
+      await storage.joinRoom({
+        roomId: room.id,
+        userId: userId,
+        role: 'owner',
+        nickname: null,
+        isActive: true,
+      });
+      
       res.json(room);
     } catch (error) {
       console.error("Error creating room:", error);
@@ -564,7 +574,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Authentication routes
   app.post('/api/auth/login', async (req, res) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, rememberMe } = req.body;
       
       if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
@@ -575,19 +585,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ error: 'Invalid username or password' });
       }
 
-      // Set session
-      (req.session as any).user = { id: user.id };
+      // Set session with extended duration if "Remember Me" is checked
+      const sessionData = { id: user.id };
+      (req.session as any).user = sessionData;
+      
+      // Set session maxAge based on rememberMe flag
+      if (rememberMe) {
+        // Extend session to 30 days (30 * 24 * 60 * 60 * 1000 milliseconds)
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+        console.log('Extended session set for 30 days for user:', user.username);
+      } else {
+        // Default session duration (browser session only)
+        req.session.cookie.maxAge = undefined;
+        console.log('Regular session set for user:', user.username);
+      }
       
       res.json({ 
-        id: user.id, 
-        username: user.username, 
-        email: user.email,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        profileImageUrl: user.profileImageUrl,
-        country: user.country,
-        avatarType: user.avatarType,
-        bgColor: user.bgColor
+        message: 'Login successful',
+        user: {
+          id: user.id, 
+          username: user.username, 
+          email: user.email,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          profileImageUrl: user.profileImageUrl,
+          country: user.country,
+          avatarType: user.avatarType,
+          bgColor: user.bgColor
+        }
       });
     } catch (error) {
       console.error('Login error:', error);

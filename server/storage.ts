@@ -527,12 +527,18 @@ export class DatabaseStorage implements IStorage {
 
   // Report operations
   async createReport(reportData: Omit<Report, 'id' | 'createdAt'>): Promise<Report> {
-    const dbData = {
-      ...reportData,
-      type: reportData.kind // Add type field for database compatibility
-    };
-    const [report] = await db.insert(reports).values(dbData).returning();
-    return report;
+    console.log('Creating report with data:', reportData);
+    
+    // Direct SQL insert to bypass Drizzle field mapping issues
+    const result = await db.execute(sql`
+      INSERT INTO reports (kind, target_id, by_user_id, reason, details, status, admin_notes, resolved_at, type, reported_by_id)
+      VALUES (${reportData.kind}, ${reportData.targetId}, ${reportData.byUserId}, ${reportData.reason}, 
+              ${reportData.details || null}, ${reportData.status}, ${reportData.adminNotes || null}, 
+              ${reportData.resolvedAt || null}, ${reportData.kind}, ${reportData.byUserId})
+      RETURNING *
+    `);
+    
+    return result.rows[0] as any;
   }
 
   async getReports(): Promise<Report[]> {

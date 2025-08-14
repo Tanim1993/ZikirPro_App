@@ -285,16 +285,11 @@ export type CountEntry = typeof countEntries.$inferSelect;
 export type InsertReport = typeof reports.$inferInsert;
 export type Report = typeof reports.$inferSelect;
 
-
-
 export type InsertLiveCounter = typeof liveCounters.$inferInsert;
 export type LiveCounter = typeof liveCounters.$inferSelect;
 
 export type InsertUserAnalytics = typeof userAnalytics.$inferInsert;
 export type UserAnalytics = typeof userAnalytics.$inferSelect;
-
-export type InsertReport = typeof reports.$inferInsert;
-export type Report = typeof reports.$inferSelect;
 
 // Zod schemas
 export const insertRoomSchema = createInsertSchema(rooms).omit({

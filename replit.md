@@ -35,6 +35,8 @@ Preferred communication style: Simple, everyday language.
 - **Live Leaderboards**: Real-time ranking updates via WebSocket connections
 - **User Analytics**: Progress tracking, streaks, and performance metrics
 - **Islamic Content**: Master list of authentic zikir with Arabic text, transliteration, and translations
+- **Room Management**: Deletion system for owners (when sole member) and reporting system for inappropriate content
+- **Auto-Membership**: Room creators automatically become members with owner role
 
 ## Component Structure
 - **Modular Components**: Reusable UI components for tasbih counter, room cards, leaderboards
