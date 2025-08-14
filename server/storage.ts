@@ -201,6 +201,7 @@ export class DatabaseStorage implements IStorage {
         pictureUrl: rooms.pictureUrl,
         startDate: rooms.startDate,
         endDate: rooms.endDate,
+        ownerId: rooms.ownerId,
         zikirName: zikirs.name,
         zikirArabic: zikirs.arabicText,
         fazilat: zikirs.fazilat,
