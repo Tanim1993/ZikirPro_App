@@ -5,6 +5,8 @@ This is an Islamic Zikir Competition App called "Zikir Amol" that combines digit
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
+Theme preference: Clean blue and white professional design with gradient styling (FINAL - strongly rejected green theme).
+Design approach: Minimal, modern, professional look with blue gradients and white backgrounds.
 
 # System Architecture
 
@@ -35,7 +37,7 @@ Preferred communication style: Simple, everyday language.
 - **Live Leaderboards**: Real-time ranking updates via WebSocket connections
 - **User Analytics**: Progress tracking, streaks, and performance metrics
 - **Islamic Content**: Master list of authentic zikir with Arabic text, transliteration, and translations
-- **Theme Design**: Clean blue and white professional theme (hsl(220 91% 55%)) with modern design patterns, minimal shadows, and crisp typography - applied across dashboard, stats, and all pages for a professional Islamic app experience
+- **Theme Design**: Complete blue gradient professional theme with linear gradient (105.9deg, rgba(0,122,184,1) 24.4%, rgba(46,0,184,0.88) 80.5%) applied across entire application - stunning gradient headers, modern glass-effect cards, clean white content areas, and professional typography for a premium Islamic app experience
 - **Room Management**: Deletion system for owners (when sole member) and reporting system for inappropriate content
 - **Auto-Membership**: Room creators automatically become members with owner role
 - **Verified Organizations**: Complete institutional competition system with organization accounts, prize management, and verified badges

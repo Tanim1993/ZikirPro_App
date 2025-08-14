@@ -138,12 +138,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Logout endpoint
   app.post('/api/auth/logout', async (req: any, res) => {
     try {
-      req.session.destroy((err: any) => {
-        if (err) {
-          return res.status(500).json({ message: "Logout failed" });
-        }
-        res.json({ message: "Logout successful" });
-      });
+      // Set logout flag in session instead of destroying
+      req.session.loggedOut = true;
+      res.json({ message: "Logout successful" });
     } catch (error) {
       console.error("Logout error:", error);
       res.status(500).json({ message: "Logout failed" });
@@ -152,18 +149,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Handle GET logout (for direct browser navigation)
   app.get('/api/logout', (req: any, res) => {
-    req.session.destroy((err: any) => {
-      if (err) {
-        console.error("Logout error:", err);
-      }
-      // Redirect to landing page after logout
-      res.redirect('/');
-    });
+    // Since we're using mock auth, just redirect to root
+    res.redirect('/');
   });
 
-  // Auth routes - temporary mock for testing
+  // Auth routes - check if user is logged out via session flag
   app.get('/api/auth/user', async (req: any, res) => {
     try {
+      // Check if user was manually logged out
+      if (req.session?.loggedOut) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+      
       // Return test user for now
       const testUser = {
         id: "test-user-123",
