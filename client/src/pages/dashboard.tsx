@@ -107,39 +107,41 @@ export default function Dashboard() {
   }
 
   const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
-    <Card className="mb-3 border border-gray-200 shadow-sm">
+    <Card className="mb-3 border border-green-200 shadow-lg bg-gradient-to-r from-white to-green-50">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <h3 className="font-semibold text-lg truncate">{room.name}</h3>
+              <h3 className="font-semibold text-lg truncate text-gray-800">{room.name}</h3>
               {!isPublic && (
-                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                  isOwner ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                <div className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                  isOwner 
+                    ? 'bg-blue-100 text-blue-700 border-blue-200' 
+                    : 'bg-orange-100 text-orange-700 border-orange-200'
                 }`}>
                   {isOwner ? 'Owner' : 'Global'}
                 </div>
               )}
             </div>
-            <p className="text-green-600 font-medium text-sm mb-1">{room.zikirName}</p>
+            <p className="text-green-700 font-medium text-sm mb-1">{room.zikirName}</p>
             {room.description && (
               <p className="text-gray-600 text-sm mb-2 line-clamp-2">{room.description}</p>
             )}
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-4 mb-4 text-center">
-          <div>
-            <div className="text-lg font-bold text-green-600">{room.memberCount || 0}</div>
-            <div className="text-xs text-gray-500">Members</div>
+        <div className="grid grid-cols-3 gap-3 mb-4 text-center">
+          <div className="bg-green-100 rounded-lg p-2 border border-green-200">
+            <div className="text-lg font-bold text-green-700">{room.memberCount || 0}</div>
+            <div className="text-xs text-green-600">Members</div>
           </div>
-          <div>
-            <div className="text-lg font-bold text-blue-600">{room.totalCount || 0}</div>
-            <div className="text-xs text-gray-500">Total Count</div>
+          <div className="bg-blue-100 rounded-lg p-2 border border-blue-200">
+            <div className="text-lg font-bold text-blue-700">{room.totalCount || 0}</div>
+            <div className="text-xs text-blue-600">Total Count</div>
           </div>
-          <div>
-            <div className="text-lg font-bold text-purple-600">{formatDuration(room.duration)}</div>
-            <div className="text-xs text-gray-500">Duration</div>
+          <div className="bg-purple-100 rounded-lg p-2 border border-purple-200">
+            <div className="text-lg font-bold text-purple-700">{formatDuration(room.duration)}</div>
+            <div className="text-xs text-purple-600">Duration</div>
           </div>
         </div>
         
@@ -166,15 +168,28 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-6">
-        <div className="max-w-md mx-auto">
+    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+      {/* Header with Islamic Design */}
+      <div className="bg-gradient-to-r from-green-600 to-emerald-700 px-4 py-6 relative overflow-hidden">
+        {/* Islamic Pattern Background */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="islamic-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <circle cx="10" cy="10" r="2" fill="white"/>
+                <path d="M5,5 L15,5 L15,15 L5,15 Z" fill="none" stroke="white" strokeWidth="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+          </svg>
+        </div>
+        
+        <div className="max-w-md mx-auto relative z-10">
           <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-gray-900">Zikir Amol</h1>
+            <h1 className="text-2xl font-bold text-white">Zikir Amol</h1>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-green-600 hover:bg-green-700"
+              className="bg-white text-green-600 hover:bg-gray-100 shadow-md"
               data-testid="button-create-room"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -182,19 +197,19 @@ export default function Dashboard() {
             </Button>
           </div>
           
-          {/* Quick Stats */}
+          {/* Quick Stats with Islamic Design */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{userAnalytics.totalCount || 0}</div>
-              <div className="text-xs text-gray-500">Total Zikir</div>
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
+              <div className="text-2xl font-bold text-white">{userAnalytics.totalCount || 0}</div>
+              <div className="text-xs text-green-100">Total Zikir</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">{userAnalytics.currentStreak || 0}</div>
-              <div className="text-xs text-gray-500">Day Streak</div>
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
+              <div className="text-2xl font-bold text-white">{userAnalytics.currentStreak || 0}</div>
+              <div className="text-xs text-green-100">Day Streak</div>
             </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-purple-600">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
-              <div className="text-xs text-gray-500">My Rooms</div>
+            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
+              <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
+              <div className="text-xs text-green-100">My Rooms</div>
             </div>
           </div>
         </div>

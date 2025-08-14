@@ -218,12 +218,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
       
       const userId = req.session.user.id;
+      
+      // Calculate real total count from all user's count entries
+      const totalCount = await storage.getUserTotalCount(userId);
+      
+      // Get user analytics for streaks
       const analytics = await storage.getUserAnalytics(userId);
-      res.json(analytics || {
-        currentStreak: 0,
-        longestStreak: 0,
-        totalZikir: 0,
-        completedRooms: 0
+      
+      res.json({
+        currentStreak: analytics?.currentStreak || 0,
+        longestStreak: analytics?.longestStreak || 0,
+        totalCount: totalCount,
+        totalZikir: totalCount, // For backward compatibility
+        completedRooms: analytics?.completedRooms || 0
       });
     } catch (error) {
       console.error("Error fetching analytics:", error);

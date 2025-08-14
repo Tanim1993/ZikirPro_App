@@ -477,6 +477,16 @@ export class DatabaseStorage implements IStorage {
     return analytics;
   }
 
+  async getUserTotalCount(userId: string): Promise<number> {
+    const [result] = await db
+      .select({ 
+        totalCount: sql<number>`coalesce(sum(${liveCounters.totalCount}), 0)` 
+      })
+      .from(liveCounters)
+      .where(eq(liveCounters.userId, userId));
+    return result?.totalCount || 0;
+  }
+
   async getGlobalStats(): Promise<any> {
     // Get total users count
     const [usersCount] = await db.select({ count: sql<number>`count(*)` }).from(users);
