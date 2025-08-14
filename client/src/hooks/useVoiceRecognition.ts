@@ -161,7 +161,6 @@ export function useVoiceRecognition({
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'ar-SA'; // Arabic first, but will also catch English
-      recognition.grammars = null; // Allow any input
       recognition.maxAlternatives = 3;
 
       recognition.onstart = () => {
