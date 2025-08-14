@@ -17,12 +17,12 @@ export default function Stats() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-islamic-gradient">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
+            <div className="w-full h-full border-4 border-white/30 border-t-white rounded-full"></div>
           </div>
-          <p className="text-gray-600">Loading stats...</p>
+          <p className="text-white/80">Loading stats...</p>
         </div>
       </div>
     );
@@ -91,16 +91,16 @@ export default function Stats() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
+    <div className="min-h-screen bg-islamic-gradient pb-20">
       {/* Header */}
-      <header className="bg-gradient-to-r from-islamic-primary to-islamic-primary-dark text-white px-4 py-6">
+      <header className="bg-islamic-gradient-deep text-white px-4 py-6 shadow-2xl">
         <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-xl">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-xl font-bold">Statistics</h1>
-            <p className="text-sm text-islamic-secondary/80">Your progress & achievements</p>
+            <h1 className="text-2xl font-bold drop-shadow-lg">Statistics</h1>
+            <p className="text-sm text-white/80">Your progress & achievements</p>
           </div>
         </div>
       </header>
@@ -116,7 +116,7 @@ export default function Stats() {
             {/* Personal Stats Cards */}
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat, index) => (
-                <Card key={index} className="border border-gray-200">
+                <Card key={index} className="islamic-glass shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
                   <CardContent className="p-4">
                     <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center mb-3`}>
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />

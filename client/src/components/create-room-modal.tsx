@@ -98,9 +98,9 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-screen overflow-y-auto">
+      <DialogContent className="max-w-md max-h-screen overflow-y-auto islamic-glass">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-gray-900 font-amiri">
+          <DialogTitle className="text-2xl font-bold text-islamic-primary font-amiri drop-shadow-lg">
             Create Zikir Room
           </DialogTitle>
         </DialogHeader>
@@ -119,7 +119,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                     <input
                       {...field}
                       placeholder="Enter room name"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      className="w-full p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary focus:border-transparent bg-white/80 backdrop-blur-sm"
                       data-testid="input-room-name"
                     />
                   </FormControl>
@@ -140,7 +140,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       <button
                         type="button"
                         onClick={() => setShowZikirPicker(true)}
-                        className="w-full text-left rounded-xl border border-gray-300 p-4 hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                        className="w-full text-left rounded-xl border border-islamic-secondary/30 p-4 hover:bg-islamic-secondary/10 focus:ring-2 focus:ring-islamic-primary focus:border-transparent transition-all islamic-glass"
                         data-testid="button-select-zikir"
                       >
                         {selectedZikir ? (
@@ -204,7 +204,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                         onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         disabled={form.watch("unlimited")}
                         placeholder="1000"
-                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-primary disabled:bg-gray-100"
+                        className="flex-1 p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary disabled:bg-islamic-secondary/10 bg-white/80 backdrop-blur-sm"
                         data-testid="input-target-count"
                       />
                     </FormControl>
@@ -262,7 +262,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       onChange={(e) => field.onChange(parseInt(e.target.value))}
                       min="1"
                       max="40"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-primary"
+                      className="w-full p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary bg-white/80 backdrop-blur-sm"
                       data-testid="input-duration"
                     />
                   </FormControl>
@@ -340,7 +340,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 bg-islamic-primary hover:bg-islamic-primary-dark text-white"
+                className="flex-1 bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
                 disabled={createRoomMutation.isPending}
                 data-testid="button-create"
               >

@@ -58,13 +58,13 @@ export default function Rooms() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 p-4">
+      <div className="min-h-screen bg-islamic-gradient p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 text-islamic-primary">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-islamic-primary"></div>
+            <div className="w-16 h-16 mx-auto mb-4 text-white">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
             </div>
-            <p className="text-gray-600">Loading rooms...</p>
+            <p className="text-white/80">Loading rooms...</p>
           </div>
         </div>
       </div>
@@ -72,12 +72,12 @@ export default function Rooms() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 p-4">
+    <div className="min-h-screen bg-islamic-gradient p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Browse Rooms</h1>
-          <p className="text-gray-600">Join active Zikir competitions from around the world</p>
+          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Browse Rooms</h1>
+          <p className="text-white/80">Join active Zikir competitions from around the world</p>
         </div>
 
         {/* Search and Filters */}
@@ -88,7 +88,7 @@ export default function Rooms() {
               placeholder="Search rooms, zikir, or description..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 islamic-glass text-white placeholder:text-white/60"
               data-testid="input-search-rooms"
             />
           </div>
@@ -103,8 +103,8 @@ export default function Rooms() {
                 className={cn(
                   "text-xs",
                   selectedCountry === country 
-                    ? "bg-islamic-primary hover:bg-islamic-primary-dark" 
-                    : "hover:bg-islamic-secondary/10"
+                    ? "bg-islamic-gradient text-white shadow-xl" 
+                    : "islamic-glass text-white hover:bg-white/20"
                 )}
                 data-testid={`button-filter-${country.toLowerCase()}`}
               >
@@ -116,7 +116,7 @@ export default function Rooms() {
 
         {/* Results Count */}
         <div className="mb-4">
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-white/80">
             Found {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -124,7 +124,7 @@ export default function Rooms() {
         {/* Rooms Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredRooms.map((room: Room) => (
-            <Card key={room.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={room.id} className="overflow-hidden islamic-glass hover:shadow-2xl transition-all duration-300 hover:scale-105">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
