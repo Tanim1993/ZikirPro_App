@@ -56,22 +56,22 @@ export default function Landing() {
             </div>
             
             {/* Login Button */}
-            <a href="/api/login">
+            <Link href="/login">
               <Button 
                 className="w-full primary-btn py-4 text-lg font-semibold rounded-xl"
                 data-testid="button-login"
               >
                 Start Your Zikir Journey
               </Button>
-            </a>
+            </Link>
             
             {/* Sign Up Link */}
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
                 New to Zikir Amol?{" "}
-                <a href="/api/login" className="text-islamic-primary hover:text-islamic-primary-dark font-semibold">
+                <Link href="/signup" className="text-islamic-primary hover:text-islamic-primary-dark font-semibold">
                   Join Today
-                </a>
+                </Link>
               </p>
             </div>
             
