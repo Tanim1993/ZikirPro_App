@@ -559,7 +559,6 @@ export class DatabaseStorage implements IStorage {
     // Delete all related data first (foreign key constraints)
     await db.delete(liveCounters).where(eq(liveCounters.roomId, id));
     await db.delete(countEntries).where(eq(countEntries.roomId, id));
-    await db.delete(userRoomConfigs).where(eq(userRoomConfigs.roomId, id));
     await db.delete(roomMembers).where(eq(roomMembers.roomId, id));
     await db.delete(rooms).where(eq(rooms.id, id));
   }
