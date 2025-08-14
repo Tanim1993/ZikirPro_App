@@ -14,6 +14,9 @@ import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star } from "lucide-re
 
 export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showJoinConfirm, setShowJoinConfirm] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -50,9 +53,6 @@ export default function Dashboard() {
     if (days < 30) return `${days} days`;
     return `${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
   };
-
-  const [showJoinConfirm, setShowJoinConfirm] = useState(false);
-  const [selectedRoom, setSelectedRoom] = useState<any>(null);
 
   // Join room mutation
   const joinRoomMutation = useMutation({
