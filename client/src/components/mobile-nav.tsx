@@ -60,6 +60,12 @@ export default function MobileNav() {
       active: location === "/stats"
     },
     {
+      href: "/more",
+      emoji: "⚡",
+      label: "More",
+      active: location === "/more" || location === "/salah-tracker" || location === "/quran" || location === "/hadith" || location === "/zakat-calculator" || location === "/qiblah" || location === "/donations"
+    },
+    {
       href: "/profile",
       emoji: "👤", 
       label: "Profile",
@@ -72,7 +78,7 @@ export default function MobileNav() {
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 safe-area-pb">
-        <div className="flex justify-around items-center py-3 px-2">
+        <div className="flex justify-around items-center py-2 px-1">
           {navItems.map((item) => {
             if (item.onClick) {
               return (
@@ -80,7 +86,7 @@ export default function MobileNav() {
                   key={item.href}
                   onClick={item.onClick}
                   className={cn(
-                    "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px]",
+                    "flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-colors min-w-[56px]",
                     item.active
                       ? "text-islamic-primary bg-islamic-primary/10"
                       : "text-gray-500 hover:text-gray-700"
@@ -95,7 +101,7 @@ export default function MobileNav() {
             return (
               <Link key={item.href} href={item.href}>
                 <div className={cn(
-                  "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px] cursor-pointer",
+                  "flex flex-col items-center justify-center py-2 px-2 rounded-lg transition-colors min-w-[56px] cursor-pointer",
                   item.active
                     ? "text-islamic-primary bg-islamic-primary/10"
                     : "text-gray-500 hover:text-gray-700"
