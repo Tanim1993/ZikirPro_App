@@ -11,7 +11,7 @@ Preferred communication style: Simple, everyday language.
 ## Frontend Architecture
 - **Framework**: React 18 with TypeScript using Vite as the build tool
 - **UI Library**: Shadcn/ui components built on Radix UI primitives
-- **Styling**: Tailwind CSS with custom Islamic design tokens and patterns
+- **Styling**: Tailwind CSS with custom Islamic blue theme design tokens (moved away from green to elegant blue gradients)
 - **State Management**: TanStack Query (React Query) for server state management
 - **Routing**: Wouter for lightweight client-side routing
 - **Forms**: React Hook Form with Zod validation
@@ -35,6 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Live Leaderboards**: Real-time ranking updates via WebSocket connections
 - **User Analytics**: Progress tracking, streaks, and performance metrics
 - **Islamic Content**: Master list of authentic zikir with Arabic text, transliteration, and translations
+- **Theme Design**: Beautiful blue gradient Islamic theme inspired by prayer time apps, replacing previous green theme
 - **Room Management**: Deletion system for owners (when sole member) and reporting system for inappropriate content
 - **Auto-Membership**: Room creators automatically become members with owner role
 - **Verified Organizations**: Complete institutional competition system with organization accounts, prize management, and verified badges

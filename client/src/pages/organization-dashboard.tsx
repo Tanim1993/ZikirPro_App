@@ -75,7 +75,7 @@ export default function OrganizationDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-islamic-green/5 to-islamic-gold/5 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-islamic-primary/5 to-islamic-secondary/5 p-4">
       {/* Header */}
       <div className="max-w-6xl mx-auto mb-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -88,7 +88,7 @@ export default function OrganizationDashboard() {
           </div>
           <Button
             onClick={() => setShowCreateModal(true)}
-            className="bg-islamic-green hover:bg-islamic-green/90 text-white flex items-center gap-2"
+            className="bg-islamic-primary hover:bg-islamic-primary-dark text-white flex items-center gap-2"
             data-testid="button-create-competition"
           >
             <Plus className="w-4 h-4" />
@@ -98,25 +98,25 @@ export default function OrganizationDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-          <Card className="bg-white border-islamic-green/20">
+          <Card className="bg-white border-islamic-primary/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Competitions</CardTitle>
-              <Trophy className="h-4 w-4 text-islamic-green" />
+              <Trophy className="h-4 w-4 text-islamic-primary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-islamic-green">
+              <div className="text-2xl font-bold text-islamic-primary">
                 {loadingStats ? "..." : (orgStats as any)?.totalCompetitions || 0}
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-islamic-gold/20">
+          <Card className="bg-white border-islamic-secondary/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Active Competitions</CardTitle>
-              <Calendar className="h-4 w-4 text-islamic-gold" />
+              <Calendar className="h-4 w-4 text-islamic-secondary" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-islamic-gold">
+              <div className="text-2xl font-bold text-islamic-secondary">
                 {loadingStats ? "..." : (orgStats as any)?.activeCompetitions || 0}
               </div>
             </CardContent>
@@ -178,7 +178,7 @@ export default function OrganizationDashboard() {
               </p>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-islamic-green hover:bg-islamic-green/90 text-white"
+                className="bg-islamic-primary hover:bg-islamic-primary-dark text-white"
                 data-testid="button-create-first-competition"
               >
                 <Plus className="w-4 h-4 mr-2" />
@@ -189,7 +189,7 @@ export default function OrganizationDashboard() {
         ) : (
           <div className="space-y-4">
             {(competitions as Competition[]).map((competition: Competition) => (
-              <Card key={competition.id} className="bg-white border-l-4 border-l-islamic-green hover:shadow-md transition-shadow">
+              <Card key={competition.id} className="bg-white border-l-4 border-l-islamic-primary hover:shadow-md transition-shadow">
                 <CardHeader>
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="flex-1">
@@ -203,7 +203,7 @@ export default function OrganizationDashboard() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-islamic-green text-islamic-green hover:bg-islamic-green/10"
+                        className="border-islamic-primary text-islamic-primary hover:bg-islamic-primary/10"
                         data-testid={`button-view-competition-${competition.id}`}
                       >
                         <Eye className="w-4 h-4 mr-1" />
@@ -225,7 +225,7 @@ export default function OrganizationDashboard() {
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                       <p className="text-gray-500">Prize Pool</p>
-                      <p className="font-semibold text-islamic-gold">
+                      <p className="font-semibold text-islamic-secondary">
                         {formatPrize(competition.prizeAmount, competition.prizeCurrency)}
                       </p>
                     </div>

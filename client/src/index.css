@@ -6,43 +6,58 @@
 :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(210 25% 7.8431%);
-  --card: hsl(180 6.6667% 97.0588%);
+  --card: hsl(0 0% 100%);
   --card-foreground: hsl(210 25% 7.8431%);
   --popover: hsl(0 0% 100%);
   --popover-foreground: hsl(210 25% 7.8431%);
-  --primary: hsl(142 76% 36%);
+  --primary: hsl(213 78% 50%);
   --primary-foreground: hsl(0 0% 100%);
   --secondary: hsl(210 25% 7.8431%);
   --secondary-foreground: hsl(0 0% 100%);
-  --muted: hsl(240 1.9608% 90%);
+  --muted: hsl(210 40% 96%);
   --muted-foreground: hsl(210 25% 7.8431%);
-  --accent: hsl(211.5789 51.3514% 92.7451%);
-  --accent-foreground: hsl(142 76% 36%);
+  --accent: hsl(213 78% 95%);
+  --accent-foreground: hsl(213 78% 50%);
   --destructive: hsl(356.3033 90.5579% 54.3137%);
   --destructive-foreground: hsl(0 0% 100%);
-  --border: hsl(201.4286 30.4348% 90.9804%);
-  --input: hsl(200 23.0769% 97.4510%);
-  --ring: hsl(142 76% 36%);
-  --chart-1: hsl(142 76% 36%);
+  --border: hsl(214 32% 91%);
+  --input: hsl(214 32% 97%);
+  --ring: hsl(213 78% 50%);
+  --chart-1: hsl(213 78% 50%);
   --chart-2: hsl(42 92% 56%);
-  --chart-3: hsl(42.0290 92.8251% 56.2745%);
-  --chart-4: hsl(147.1429 78.5047% 41.9608%);
+  --chart-3: hsl(197 71% 52%);
+  --chart-4: hsl(190 81% 67%);
   --chart-5: hsl(341.4894 75.2000% 50.9804%);
-  --sidebar: hsl(180 6.6667% 97.0588%);
+  --sidebar: hsl(0 0% 100%);
   --sidebar-foreground: hsl(210 25% 7.8431%);
-  --sidebar-primary: hsl(142 76% 36%);
+  --sidebar-primary: hsl(213 78% 50%);
   --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(211.5789 51.3514% 92.7451%);
-  --sidebar-accent-foreground: hsl(142 76% 36%);
-  --sidebar-border: hsl(205.0000 25.0000% 90.5882%);
-  --sidebar-ring: hsl(142 76% 36%);
+  --sidebar-accent: hsl(213 78% 95%);
+  --sidebar-accent-foreground: hsl(213 78% 50%);
+  --sidebar-border: hsl(214 32% 91%);
+  --sidebar-ring: hsl(213 78% 50%);
+  
+  /* Islamic theme colors */
+  --islamic-primary: hsl(213 78% 50%);
+  --islamic-primary-light: hsl(213 78% 60%);
+  --islamic-primary-dark: hsl(213 78% 40%);
+  --islamic-secondary: hsl(197 71% 52%);
+  --islamic-accent: hsl(42 92% 56%);
+  --islamic-gold: hsl(42 92% 56%);
+  --islamic-gold-light: hsl(42 92% 66%);
+  --islamic-gold-dark: hsl(42 92% 46%);
+  --islamic-navy: hsl(213 78% 25%);
+  --islamic-navy-dark: hsl(213 78% 15%);
+  --islamic-gradient-start: hsl(213 78% 50%);
+  --islamic-gradient-end: hsl(197 71% 52%);
+  
   --font-sans: Inter, sans-serif;
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --font-amiri: Amiri, serif;
-  --radius: 1.3rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(142 76% 36% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(142 76% 36% / 0.00);
+  --radius: 1rem;
+  --shadow-2xs: 0px 2px 0px 0px hsl(213 78% 50% / 0.05);
+  --shadow-xs: 0px 2px 0px 0px hsl(213 78% 50% / 0.05);
 }
 
 /* Mobile app styling */
@@ -64,13 +79,82 @@ body {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
-/* Islamic theme colors */
-.islamic-green {
-  color: hsl(142 76% 36%);
+/* Islamic theme colors and utilities */
+.islamic-primary {
+  color: var(--islamic-primary);
 }
 
-.bg-islamic-green {
-  background-color: hsl(142 76% 36%);
+.bg-islamic-primary {
+  background-color: var(--islamic-primary);
+}
+
+.bg-islamic-gradient {
+  background: linear-gradient(135deg, var(--islamic-gradient-start) 0%, var(--islamic-gradient-end) 100%);
+}
+
+.islamic-gold {
+  color: var(--islamic-gold);
+}
+
+.bg-islamic-gold {
+  background-color: var(--islamic-gold);
+}
+
+.islamic-navy {
+  color: var(--islamic-navy);
+}
+
+.bg-islamic-navy {
+  background-color: var(--islamic-navy);
+}
+
+/* Islamic card styling */
+.islamic-card {
+  background: white;
+  border: 1px solid hsl(214 32% 91%);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+}
+
+.islamic-card-gradient {
+  background: linear-gradient(135deg, var(--islamic-gradient-start) 0%, var(--islamic-gradient-end) 100%);
+  color: white;
+  border-radius: 16px;
+}
+
+/* Islamic button styles */
+.btn-islamic-primary {
+  background: var(--islamic-primary);
+  color: white;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-islamic-primary:hover {
+  background: var(--islamic-primary-dark);
+  transform: translateY(-1px);
+}
+
+.btn-islamic-secondary {
+  background: white;
+  color: var(--islamic-primary);
+  border: 2px solid var(--islamic-primary);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-islamic-secondary:hover {
+  background: var(--islamic-primary);
+  color: white;
+}
+
+/* Prayer time styling */
+.prayer-time-card {
+  background: linear-gradient(135deg, var(--islamic-gradient-start) 0%, var(--islamic-gradient-end) 100%);
+  border-radius: 20px;
+  color: white;
+  padding: 24px;
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.2);
 }
 
 .islamic-pattern {

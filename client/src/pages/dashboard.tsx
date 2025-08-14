@@ -154,14 +154,14 @@ export default function Dashboard() {
               setSelectedRoom(room);
               setShowJoinConfirm(true);
             }}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-islamic-primary hover:bg-islamic-primary-dark text-white"
             data-testid="button-tap-to-join"
           >
             Tap to Join Room
           </Button>
         ) : (
           <Link href={`/room/${room.id}`}>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white" data-testid="button-enter-room">
+            <Button className="w-full bg-islamic-primary hover:bg-islamic-primary-dark text-white" data-testid="button-enter-room">
               {isOwner ? 'Manage Room' : 'Enter Room'}
             </Button>
           </Link>
@@ -171,9 +171,9 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
       {/* Header with Islamic Design */}
-      <div className="bg-gradient-to-r from-green-600 to-emerald-700 px-4 py-6 relative overflow-hidden">
+      <div className="prayer-time-card px-4 py-6 relative overflow-hidden">
         {/* Islamic Pattern Background */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -192,7 +192,7 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-white">Zikir Amol</h1>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-white text-green-600 hover:bg-gray-100 shadow-md"
+              className="bg-white text-islamic-primary hover:bg-gray-100 shadow-md"
               data-testid="button-create-room"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -204,15 +204,15 @@ export default function Dashboard() {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 0}</div>
-              <div className="text-xs text-green-100">Total Zikir</div>
+              <div className="text-xs text-blue-100">Total Zikir</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 0}</div>
-              <div className="text-xs text-green-100">Day Streak</div>
+              <div className="text-xs text-blue-100">Day Streak</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
-              <div className="text-xs text-green-100">My Rooms</div>
+              <div className="text-xs text-blue-100">My Rooms</div>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function Dashboard() {
                 <p className="text-gray-600 mb-4">Create your first zikir room to get started</p>
                 <Button 
                   onClick={() => setShowCreateModal(true)}
-                  className="bg-green-600 hover:bg-green-700"
+                  className="bg-islamic-primary hover:bg-islamic-primary-dark"
                   data-testid="button-create-first-room"
                 >
                   <Plus className="w-4 h-4 mr-2" />

@@ -63,13 +63,18 @@ export default {
         },
         // Islamic theme colors
         islamic: {
-          green: "var(--islamic-green)",
-          "green-light": "var(--islamic-green-light)",
-          "green-dark": "var(--islamic-green-dark)",
+          primary: "var(--islamic-primary)",
+          "primary-light": "var(--islamic-primary-light)",
+          "primary-dark": "var(--islamic-primary-dark)",
+          secondary: "var(--islamic-secondary)",
+          accent: "var(--islamic-accent)",
           gold: "var(--islamic-gold)",
+          "gold-light": "var(--islamic-gold-light)",
           "gold-dark": "var(--islamic-gold-dark)",
-          night: "var(--islamic-night)",
-          "night-dark": "var(--islamic-night-dark)",
+          navy: "var(--islamic-navy)",
+          "navy-dark": "var(--islamic-navy-dark)",
+          "gradient-start": "var(--islamic-gradient-start)",
+          "gradient-end": "var(--islamic-gradient-end)",
         },
       },
       fontFamily: {

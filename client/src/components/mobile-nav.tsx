@@ -95,7 +95,7 @@ export default function MobileNav() {
                   className={cn(
                     "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px]",
                     item.active
-                      ? "text-green-600 bg-green-50"
+                      ? "text-islamic-primary bg-islamic-primary/10"
                       : "text-gray-500 hover:text-gray-700"
                   )}
                 >
@@ -110,7 +110,7 @@ export default function MobileNav() {
                 <a className={cn(
                   "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px] no-underline",
                   item.active
-                    ? "text-green-600 bg-green-50"
+                    ? "text-islamic-primary bg-islamic-primary/10"
                     : "text-gray-500 hover:text-gray-700"
                 )}>
                   <span className="text-lg mb-1">{item.emoji}</span>
