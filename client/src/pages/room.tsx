@@ -132,16 +132,22 @@ export default function Room() {
       return await response.json();
     },
     onSuccess: () => {
-      toast({
-        title: "Left Room",
-        description: "You have successfully left the room",
-      });
-      // Invalidate and refresh user rooms
-      queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
-      // Redirect to dashboard
+      // Immediate navigation without delays
+      setLocation('/dashboard');
+      
+      // Invalidate queries in background (non-blocking)
       setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 1000);
+        queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
+        queryClient.invalidateQueries({ queryKey: ['/api/rooms/public'] });
+      }, 100);
+      
+      // Show success toast after navigation
+      setTimeout(() => {
+        toast({
+          title: "Left Room",
+          description: "You have successfully left the room",
+        });
+      }, 200);
     },
     onError: (error) => {
       if (isUnauthorizedError(error)) {
@@ -150,7 +156,7 @@ export default function Room() {
           description: "Please log in again",
           variant: "destructive",
         });
-        setTimeout(() => window.location.href = "/api/login", 1000);
+        setTimeout(() => window.location.href = "/login", 1000);
         return;
       }
       toast({
