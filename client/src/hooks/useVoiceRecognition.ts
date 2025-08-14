@@ -51,13 +51,9 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
   'SubhanAllah': [
     'subhanallah',
     'subhan allah',
-    'subhanollah',
-    'subchan allah',
-    'glory to god',
     'glory be to allah',
     'سبحان الله',
-    'سُبْحَانَ اللَّهِ',
-    'صبحان الله'
+    'سُبْحَانَ اللَّهِ'
   ],
   'Alhamdulillah': [
     'alhamdulillah',
@@ -67,12 +63,10 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
   ],
   'La ilaha illallah': [
     'la ilaha illa allah',
-    'la ilaha illallah',
+    'la ilaha illallah', 
     'lailahaillallah',
     'there is no god but allah',
-    'لا إله إلا الله',
-    'لا اله الا الله',
-    'لااله الا الله'
+    'لا إله إلا الله'
   ],
   'Astaghfirullah': [
     'astaghfirullah',
@@ -120,43 +114,45 @@ export function useVoiceRecognition({
       .trim();
   };
 
-  // Check if detected text matches target phrase EXACTLY
+  // Check if detected text matches target phrase with VERY STRICT validation
   const isMatchingPhrase = useCallback((detectedText: string): boolean => {
     const normalizedDetected = normalizeText(detectedText);
     const targetVariations = ZIKIR_PHRASES[targetPhrase] || [targetPhrase.toLowerCase()];
     
-    // First check if it matches the target phrase with STRICT validation
+    // ULTRA STRICT: Only accept exact matches or very close variations
     const matchesTarget = targetVariations.some(variation => {
       const normalizedVariation = normalizeText(variation);
       
-      // For very short phrases (like "subhan"), require exact match
-      if (normalizedVariation.length <= 6) {
-        return normalizedDetected === normalizedVariation;
-      }
-      
-      // For longer phrases, require substantial overlap (at least 70% match)
-      const minOverlap = Math.floor(normalizedVariation.length * 0.7);
-      
-      // Check if detected text contains significant portion of target phrase
-      if (normalizedDetected.includes(normalizedVariation) || normalizedVariation.includes(normalizedDetected)) {
+      // Method 1: Exact match (highest priority)
+      if (normalizedDetected === normalizedVariation) {
         return true;
       }
       
-      // For very specific key words check (more restrictive)
-      const keyWords = normalizedVariation.split(' ').filter(word => word.length > 2);
-      const detectedWords = normalizedDetected.split(' ').filter(word => word.length > 2);
+      // Method 2: For Arabic phrases, check if detected text contains the COMPLETE variation
+      if (normalizedVariation.length > 6 && normalizedDetected.includes(normalizedVariation)) {
+        return true;
+      }
       
-      // Require at least 2 key words to match for longer phrases
-      let matchingWords = 0;
-      for (const keyWord of keyWords) {
-        if (detectedWords.some(detectedWord => 
-          detectedWord.includes(keyWord) || keyWord.includes(detectedWord)
-        )) {
-          matchingWords++;
+      // Method 3: For phrases with multiple words, ALL key words must be present
+      const variationWords = normalizedVariation.split(' ').filter(word => word.length >= 2);
+      const detectedWords = normalizedDetected.split(' ').filter(word => word.length >= 2);
+      
+      if (variationWords.length >= 2) {
+        // For multi-word phrases, ALL words must be found
+        const allWordsFound = variationWords.every(variationWord => 
+          detectedWords.some(detectedWord => 
+            detectedWord === variationWord || 
+            (variationWord.length > 3 && detectedWord.includes(variationWord)) ||
+            (detectedWord.length > 3 && variationWord.includes(detectedWord))
+          )
+        );
+        
+        if (allWordsFound) {
+          return true;
         }
       }
       
-      return matchingWords >= Math.min(2, keyWords.length);
+      return false;
     });
     
     // If it matches target, apply lighter cross-validation (only for very specific conflicts)
@@ -240,6 +236,12 @@ export function useVoiceRecognition({
             console.log(`Target phrase: "${targetPhrase}"`);
             const isMatching = isMatchingPhrase(detectedText);
             console.log(`Is matching: ${isMatching}`);
+            
+            // Additional debug for failed matches
+            if (!isMatching) {
+              console.log(`❌ VALIDATION FAILED: "${detectedText}" does not match "${targetPhrase}" variations`);
+              console.log(`Available variations:`, ZIKIR_PHRASES[targetPhrase]);
+            }
             
             // Debounce to prevent rapid counting
             if (debounceRef.current) {
