@@ -51,10 +51,17 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'subhanallah',
     'subhan allah',
     'subhanollah',
+    'subchan allah',
+    'subhan',
     'glory to god',
     'glory be to allah',
     'سبحان الله',
-    'سُبْحَانَ اللَّهِ'
+    'سُبْحَانَ اللَّهِ',
+    'سبحان',
+    'سُبْحَانَ',
+    'سيتضح', // Adding the detected text
+    'صبحان الله',
+    'صبحان'
   ],
   'Alhamdulillah': [
     'alhamdulillah',
@@ -96,7 +103,7 @@ export function useVoiceRecognition({
   const [lastDetectedText, setLastDetectedText] = useState<string>('');
   
   const recognitionRef = useRef<SpeechRecognition | null>(null);
-  const confidenceThreshold = 0.6;
+  const confidenceThreshold = 0.3; // Lower threshold for better detection
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   // Check if speech recognition is supported
@@ -154,6 +161,7 @@ export function useVoiceRecognition({
       recognition.continuous = true;
       recognition.interimResults = true;
       recognition.lang = 'ar-SA'; // Arabic first, but will also catch English
+      recognition.grammars = null; // Allow any input
       recognition.maxAlternatives = 3;
 
       recognition.onstart = () => {
@@ -172,16 +180,29 @@ export function useVoiceRecognition({
             
             setLastDetectedText(detectedText);
             
+            // Debug logging
+            console.log(`Voice detected: "${detectedText}" (confidence: ${confidence})`);
+            console.log(`Target phrase: "${targetPhrase}"`);
+            console.log(`Is matching: ${isMatchingPhrase(detectedText)}`);
+            
             // Debounce to prevent rapid counting
             if (debounceRef.current) {
               clearTimeout(debounceRef.current);
             }
             
             debounceRef.current = setTimeout(() => {
-              if (confidence >= confidenceThreshold && isMatchingPhrase(detectedText)) {
+              // More lenient matching - check phrase first, then confidence
+              if (isMatchingPhrase(detectedText) && confidence >= confidenceThreshold) {
+                console.log('✅ Match with good confidence - counting!');
+                onPhraseDetected();
+                onFeedback?.('correct', detectedText);
+              } else if (isMatchingPhrase(detectedText) && confidence >= 0.1) {
+                // Lower confidence but still matching - count it!
+                console.log('✅ Match with low confidence - still counting!');
                 onPhraseDetected();
                 onFeedback?.('correct', detectedText);
               } else if (isOtherZikirPhrase(detectedText)) {
+                console.log('❌ Wrong zikir phrase detected');
                 onFeedback?.('wrong', detectedText);
               } else if (detectedText.trim().length > 0) {
                 onFeedback?.('unclear', detectedText);
