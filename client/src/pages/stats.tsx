@@ -91,19 +91,33 @@ export default function Stats() {
   ];
 
   return (
-    <div className="min-h-screen bg-islamic-gradient pb-20">
-      {/* Header */}
-      <header className="bg-islamic-gradient-deep text-white px-4 py-6 shadow-2xl">
-        <div className="flex items-center space-x-3 mb-4">
-          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center shadow-xl">
-            <BarChart3 className="w-6 h-6" />
-          </div>
+    <div className="min-h-screen bg-islamic-gradient-subtle islamic-pattern-bg pb-20">
+      {/* Header with Original Bright Green Design */}
+      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-lg relative overflow-hidden">
+        {/* Islamic geometric pattern overlay */}
+        <div className="absolute inset-0 opacity-10">
+          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="islamic-pattern-stats" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+                <polygon points="10,1 4,7 10,13 16,7" fill="white" />
+                <polygon points="4,7 10,13 10,19 1,19 1,10" fill="white" />
+                <polygon points="16,7 19,10 19,19 10,19 10,13" fill="white" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#islamic-pattern-stats)" />
+          </svg>
+        </div>
+        
+        <div className="relative z-10 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold drop-shadow-lg">Statistics</h1>
-            <p className="text-sm text-white/80">Your progress & achievements</p>
+            <h1 className="text-3xl font-bold text-white drop-shadow-lg">Statistics</h1>
+            <p className="text-white/80 font-medium">Your spiritual journey & achievements</p>
+          </div>
+          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
+            <BarChart3 className="w-8 h-8 text-white" />
           </div>
         </div>
-      </header>
+      </div>
 
       <div className="px-4 py-6">
         <Tabs defaultValue="personal" className="w-full">
@@ -116,7 +130,7 @@ export default function Stats() {
             {/* Personal Stats Cards */}
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat, index) => (
-                <Card key={index} className="islamic-glass shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+                <Card key={index} className="bg-white/20 rounded-xl backdrop-blur-sm border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
                   <CardContent className="p-4">
                     <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center mb-3`}>
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />
@@ -124,7 +138,7 @@ export default function Stats() {
                     <div className="text-2xl font-bold text-gray-900 mb-1">
                       {typeof stat.value === 'number' ? stat.value.toLocaleString() : stat.value}
                     </div>
-                    <div className="text-sm text-gray-600">{stat.label}</div>
+                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
                   </CardContent>
                 </Card>
               ))}

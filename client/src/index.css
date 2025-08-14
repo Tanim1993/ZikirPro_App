@@ -37,24 +37,24 @@
   --sidebar-border: hsl(214 32% 91%);
   --sidebar-ring: hsl(213 78% 50%);
   
-  /* Islamic Green theme - original beautiful design */
-  --islamic-primary: hsl(158 64% 52%);
-  --islamic-primary-light: hsl(158 64% 62%);
-  --islamic-primary-dark: hsl(158 64% 42%);
-  --islamic-secondary: hsl(158 64% 75%);
+  /* Original Bright Green Islamic theme */
+  --islamic-primary: hsl(162 88% 55%);
+  --islamic-primary-light: hsl(162 88% 65%);
+  --islamic-primary-dark: hsl(162 88% 45%);
+  --islamic-secondary: hsl(162 88% 75%);
   --islamic-accent: hsl(262 83% 58%);
   --islamic-gold: hsl(262 83% 58%);
   --islamic-gold-light: hsl(262 83% 68%);
   --islamic-gold-dark: hsl(262 83% 48%);
-  --islamic-navy: hsl(158 64% 32%);
-  --islamic-navy-dark: hsl(158 64% 22%);
+  --islamic-navy: hsl(162 88% 35%);
+  --islamic-navy-dark: hsl(162 88% 25%);
   
-  /* Islamic Green gradient definitions - original beautiful design */
-  --islamic-gradient-main: linear-gradient(135deg, hsl(158 64% 52%) 0%, hsl(158 64% 42%) 100%);
-  --islamic-gradient-deep: linear-gradient(135deg, hsl(158 64% 42%) 0%, hsl(158 64% 32%) 100%);
-  --islamic-gradient-sky: linear-gradient(135deg, hsl(158 64% 62%) 0%, hsl(158 64% 52%) 100%);
+  /* Original Bright Green gradient definitions */
+  --islamic-gradient-main: linear-gradient(135deg, hsl(162 88% 55%) 0%, hsl(162 88% 45%) 100%);
+  --islamic-gradient-deep: linear-gradient(135deg, hsl(162 88% 45%) 0%, hsl(162 88% 35%) 100%);
+  --islamic-gradient-sky: linear-gradient(135deg, hsl(162 88% 65%) 0%, hsl(162 88% 55%) 100%);
   --islamic-gradient-gold: linear-gradient(135deg, hsl(262 83% 58%) 0%, hsl(262 83% 68%) 100%);
-  --islamic-gradient-subtle: linear-gradient(135deg, hsl(158 64% 96%) 0%, hsl(158 64% 98%) 100%);
+  --islamic-gradient-subtle: linear-gradient(135deg, hsl(162 88% 96%) 0%, hsl(162 88% 98%) 100%);
   
   /* Islamic geometric patterns with teal theme */
   --islamic-pattern-light: radial-gradient(circle at 25% 25%, hsl(203 39% 90%) 2px, transparent 2px),
