@@ -60,7 +60,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Login endpoint
   app.post('/api/auth/login', async (req: any, res) => {
     try {
-      const { username, password } = req.body;
+      const { username, password, rememberMe } = req.body;
       
       if (!username || !password) {
         return res.status(400).json({ message: "Username and password required" });
@@ -72,8 +72,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Invalid username or password" });
       }
       
-      // Set session
+      // Set session with extended duration if rememberMe is checked
       req.session.user = { id: user.id };
+      
+      if (rememberMe) {
+        // Extend session to 30 days
+        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+      } else {
+        // Default browser session (until browser closes)
+        req.session.cookie.maxAge = undefined;
+      }
       
       res.json({ message: "Login successful", user });
     } catch (error) {

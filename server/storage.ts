@@ -271,6 +271,12 @@ export class DatabaseStorage implements IStorage {
         role: roomMembers.role,
         userCount: liveCounters.totalCount,
         todayCount: liveCounters.todayCount,
+        memberCount: sql<number>`(
+          SELECT COUNT(*) 
+          FROM ${roomMembers} rm 
+          WHERE rm.room_id = ${rooms.id} 
+          AND rm.is_active = true
+        )`,
       })
       .from(roomMembers)
       .leftJoin(rooms, eq(roomMembers.roomId, rooms.id))
