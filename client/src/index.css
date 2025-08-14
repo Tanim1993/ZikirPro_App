@@ -37,7 +37,7 @@
   --sidebar-border: hsl(214 32% 91%);
   --sidebar-ring: hsl(213 78% 50%);
   
-  /* Islamic theme colors - Updated to match user's preferred blue */
+  /* Enhanced Islamic theme with gradients */
   --islamic-primary: hsl(210 100% 56%);
   --islamic-primary-light: hsl(210 100% 66%);
   --islamic-primary-dark: hsl(210 100% 46%);
@@ -48,8 +48,18 @@
   --islamic-gold-dark: hsl(42 92% 46%);
   --islamic-navy: hsl(210 100% 25%);
   --islamic-navy-dark: hsl(210 100% 15%);
-  --islamic-gradient-start: hsl(210 100% 56%);
-  --islamic-gradient-end: hsl(210 100% 76%);
+  
+  /* Enhanced gradient definitions */
+  --islamic-gradient-main: linear-gradient(135deg, hsl(210 100% 56%) 0%, hsl(210 100% 66%) 50%, hsl(210 100% 76%) 100%);
+  --islamic-gradient-deep: linear-gradient(135deg, hsl(210 100% 36%) 0%, hsl(210 100% 56%) 100%);
+  --islamic-gradient-sky: linear-gradient(135deg, hsl(210 100% 66%) 0%, hsl(200 100% 76%) 100%);
+  --islamic-gradient-gold: linear-gradient(135deg, hsl(42 92% 56%) 0%, hsl(45 92% 66%) 100%);
+  --islamic-gradient-subtle: linear-gradient(135deg, hsl(210 100% 96%) 0%, hsl(210 100% 98%) 100%);
+  
+  /* Islamic geometric patterns */
+  --islamic-pattern-light: radial-gradient(circle at 25% 25%, hsl(210 100% 90%) 2px, transparent 2px),
+                          radial-gradient(circle at 75% 75%, hsl(210 100% 90%) 2px, transparent 2px);
+  --islamic-pattern-size: 20px 20px;
   
   --font-sans: Inter, sans-serif;
   --font-serif: Georgia, serif;
@@ -89,7 +99,23 @@ body {
 }
 
 .bg-islamic-gradient {
-  background: linear-gradient(135deg, var(--islamic-gradient-start) 0%, var(--islamic-gradient-end) 100%);
+  background: var(--islamic-gradient-main);
+}
+
+.bg-islamic-gradient-deep {
+  background: var(--islamic-gradient-deep);
+}
+
+.bg-islamic-gradient-sky {
+  background: var(--islamic-gradient-sky);
+}
+
+.bg-islamic-gradient-gold {
+  background: var(--islamic-gradient-gold);
+}
+
+.bg-islamic-gradient-subtle {
+  background: var(--islamic-gradient-subtle);
 }
 
 .islamic-gold {
@@ -117,9 +143,28 @@ body {
 }
 
 .islamic-card-gradient {
-  background: linear-gradient(135deg, var(--islamic-gradient-start) 0%, var(--islamic-gradient-end) 100%);
+  background: var(--islamic-gradient-main);
   color: white;
   border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+}
+
+.islamic-card-subtle {
+  background: var(--islamic-gradient-subtle);
+  border: 1px solid hsl(210 100% 86%);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.islamic-pattern-bg {
+  background-image: var(--islamic-pattern-light);
+  background-size: var(--islamic-pattern-size);
+}
+
+.islamic-glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 /* Islamic button styles */

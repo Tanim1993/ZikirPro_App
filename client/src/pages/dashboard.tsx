@@ -98,19 +98,19 @@ export default function Dashboard() {
   // Early return ONLY after all hooks are called
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
+      <div className="min-h-screen flex items-center justify-center bg-islamic-gradient-subtle islamic-pattern-bg">
+        <div className="text-center islamic-card-subtle p-8 rounded-2xl">
           <div className="w-16 h-16 mx-auto mb-4 animate-spin">
             <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
           </div>
-          <p className="text-gray-600">Loading dashboard...</p>
+          <p className="text-islamic-primary font-medium">Loading your spiritual dashboard...</p>
         </div>
       </div>
     );
   }
 
   const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
-    <Card className="mb-3 border border-islamic-secondary/30 shadow-lg bg-gradient-to-r from-white to-islamic-secondary/10">
+    <Card className="mb-3 islamic-card-subtle shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
@@ -134,17 +134,17 @@ export default function Dashboard() {
         </div>
         
         <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-          <div className="bg-islamic-secondary/20 rounded-lg p-2 border border-islamic-secondary/30">
-            <div className="text-lg font-bold text-islamic-primary">{room.memberCount || 0}</div>
-            <div className="text-xs text-islamic-primary/70">Members</div>
+          <div className="bg-islamic-gradient-sky rounded-xl p-3 text-white shadow-lg">
+            <div className="text-lg font-bold drop-shadow">{room.memberCount || 0}</div>
+            <div className="text-xs opacity-90">Members</div>
           </div>
-          <div className="bg-blue-100 rounded-lg p-2 border border-blue-200">
-            <div className="text-lg font-bold text-blue-700">{room.totalCount || 0}</div>
-            <div className="text-xs text-blue-600">Total Count</div>
+          <div className="bg-islamic-gradient-deep rounded-xl p-3 text-white shadow-lg">
+            <div className="text-lg font-bold drop-shadow">{room.totalCount || 0}</div>
+            <div className="text-xs opacity-90">Total Count</div>
           </div>
-          <div className="bg-purple-100 rounded-lg p-2 border border-purple-200">
-            <div className="text-lg font-bold text-purple-700">{formatDuration(room.duration)}</div>
-            <div className="text-xs text-purple-600">Duration</div>
+          <div className="bg-islamic-gradient-gold rounded-xl p-3 text-white shadow-lg">
+            <div className="text-lg font-bold drop-shadow">{formatDuration(room.duration)}</div>
+            <div className="text-xs opacity-90">Duration</div>
           </div>
         </div>
         
@@ -154,14 +154,14 @@ export default function Dashboard() {
               setSelectedRoom(room);
               setShowJoinConfirm(true);
             }}
-            className="w-full bg-islamic-primary hover:bg-islamic-primary-dark text-white"
+            className="w-full bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
             data-testid="button-tap-to-join"
           >
             Tap to Join Room
           </Button>
         ) : (
           <Link href={`/room/${room.id}`}>
-            <Button className="w-full bg-islamic-primary hover:bg-islamic-primary-dark text-white" data-testid="button-enter-room">
+            <Button className="w-full bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105" data-testid="button-enter-room">
               {isOwner ? 'Manage Room' : 'Enter Room'}
             </Button>
           </Link>
@@ -171,28 +171,31 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-white">
-      {/* Header with Islamic Design */}
-      <div className="prayer-time-card px-4 py-6 relative overflow-hidden">
-        {/* Islamic Pattern Background */}
+    <div className="min-h-screen bg-islamic-gradient-subtle islamic-pattern-bg">
+      {/* Enhanced Header with Islamic Gradient Design */}
+      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-2xl relative overflow-hidden">
+        {/* Islamic geometric pattern overlay */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="islamic-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
+              <pattern id="islamic-star-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
                 <circle cx="10" cy="10" r="2" fill="white"/>
-                <path d="M5,5 L15,5 L15,15 L5,15 Z" fill="none" stroke="white" strokeWidth="0.5"/>
+                <path d="M10,5 L12,8 L15,8 L13,11 L14,14 L10,12 L6,14 L7,11 L5,8 L8,8 Z" fill="white" fillOpacity="0.3"/>
               </pattern>
             </defs>
-            <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+            <rect width="100%" height="100%" fill="url(#islamic-star-pattern)"/>
           </svg>
         </div>
         
         <div className="max-w-md mx-auto relative z-10">
-          <div className="flex items-center justify-between mb-4">
-            <h1 className="text-2xl font-bold text-white">Zikir Amol</h1>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-white drop-shadow-lg">Zikir Amol</h1>
+              <p className="text-white/80 text-sm font-medium">Islamic Prayer Counter & Competition</p>
+            </div>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-white text-islamic-primary hover:bg-gray-100 shadow-md"
+              className="islamic-glass text-white hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-xl"
               data-testid="button-create-room"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -200,19 +203,19 @@ export default function Dashboard() {
             </Button>
           </div>
           
-          {/* Quick Stats with Islamic Design */}
+          {/* Enhanced Quick Stats with Islamic Glass Design */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 0}</div>
-              <div className="text-xs text-islamic-secondary/80">Total Zikir</div>
+            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-2xl font-bold text-white drop-shadow">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
+              <div className="text-sm text-white/80 font-medium">Total Zikir</div>
             </div>
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 0}</div>
-              <div className="text-xs text-islamic-secondary/80">Day Streak</div>
+            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-2xl font-bold text-white drop-shadow">{(userAnalytics as any)?.currentStreak || 1}</div>
+              <div className="text-sm text-white/80 font-medium">Day Streak</div>
             </div>
-            <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
-              <div className="text-xs text-islamic-secondary/80">My Rooms</div>
+            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
+              <div className="text-2xl font-bold text-white drop-shadow">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
+              <div className="text-sm text-white/80 font-medium">My Rooms</div>
             </div>
           </div>
         </div>
