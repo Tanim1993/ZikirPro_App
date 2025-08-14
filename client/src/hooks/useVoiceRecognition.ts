@@ -92,11 +92,11 @@ export function useVoiceRecognition({
     }
   }, []);
 
-  // Normalize text for comparison
+  // Normalize text for comparison (preserve Arabic characters)
   const normalizeText = (text: string): string => {
     return text
       .toLowerCase()
-      .replace(/[^\w\s]/g, '') // Remove punctuation
+      .replace(/[.!?،؛]/g, '') // Remove only specific punctuation, keep Arabic
       .replace(/\s+/g, ' ') // Normalize spaces
       .trim();
   };
