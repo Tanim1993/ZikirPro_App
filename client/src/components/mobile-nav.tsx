@@ -34,6 +34,12 @@ export default function MobileNav() {
       active: location === "/stats"
     },
     {
+      href: "/organizations",
+      emoji: "🏢", 
+      label: "Orgs",
+      active: location === "/organizations"
+    },
+    {
       href: "/profile",
       emoji: "👤", 
       label: "Profile",

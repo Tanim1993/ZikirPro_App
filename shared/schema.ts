@@ -40,6 +40,10 @@ export const users = pgTable("users", {
   bgColor: varchar("bg_color").default("green"),
   signupMethod: varchar("signup_method").default("username"), // username, google, phone
   isVerified: boolean("is_verified").default(false),
+  userType: varchar("user_type").default("regular"), // "regular", "organization"
+  organizationName: varchar("organization_name"),
+  organizationLogo: varchar("organization_logo"),
+  organizationDescription: text("organization_description"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -72,6 +76,12 @@ export const rooms = pgTable("rooms", {
   startDate: timestamp("start_date").defaultNow(),
   endDate: timestamp("end_date"),
   isActive: boolean("is_active").default(true),
+  // Organization competition features
+  prizeDescription: text("prize_description"), // Prize details for organization competitions
+  competitionType: varchar("competition_type").default("regular"), // "regular", "competition"
+  competitionStartDate: timestamp("competition_start_date"),
+  competitionEndDate: timestamp("competition_end_date"),
+  maxParticipants: integer("max_participants"),
   createdAt: timestamp("created_at").defaultNow(),
 });
 

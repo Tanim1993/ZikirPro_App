@@ -659,6 +659,32 @@ export class DatabaseStorage implements IStorage {
     return counter;
   }
 
+  // Organization-specific methods
+  async searchOrganizationRooms(query: string): Promise<any[]> {
+    // For now, return all public rooms until we can add the organization fields
+    return await this.getPublicRooms();
+  }
+
+  async searchRooms(query: string): Promise<any[]> {
+    // Basic room search by name
+    const searchResults = await db
+      .select()
+      .from(rooms)
+      .leftJoin(users, eq(rooms.ownerId, users.id))
+      .where(
+        and(
+          eq(rooms.isActive, true),
+          eq(rooms.isPublic, true),
+          sql`${rooms.name} ILIKE ${`%${query}%`}`
+        )
+      );
+
+    return searchResults.map(result => ({
+      ...result.rooms,
+      owner: result.users,
+    }));
+  }
+
   async getGlobalLeaderboard(): Promise<Array<{
     userId: string;
     firstName?: string;
@@ -698,9 +724,9 @@ export class DatabaseStorage implements IStorage {
 
       leaderboard.push({
         userId: userTotal.userId,
-        firstName: user?.firstName,
-        lastName: user?.lastName,
-        profileImageUrl: user?.profileImageUrl,
+        firstName: user?.firstName || undefined,
+        lastName: user?.lastName || undefined,
+        profileImageUrl: user?.profileImageUrl || undefined,
         totalCount: userTotal.totalCount,
         streakCount: currentStreak,
         roomsCount: userRooms.length,

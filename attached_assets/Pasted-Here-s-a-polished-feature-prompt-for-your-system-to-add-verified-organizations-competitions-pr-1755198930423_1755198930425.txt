@@ -1,0 +1,172 @@
+Here’s a polished **feature prompt** for your system to add verified organizations, competitions, prizes, and room creation features for them:
+
+---
+
+# Feature: Verified Organization User with Room Creation & Competition Prizes
+
+### **Purpose**
+
+Allow verified organizations to create rooms for zikir competitions, including prize details. When a user (e.g., `test001`) searches for the organization's room, they can join, see the prize details, and participate in the competition.
+
+---
+
+## **1. User Types & Roles**
+
+* **Organization User**:
+
+  * **Verified** (shown with a **verified tick** and a custom **logo**).
+  * Ability to **upload a logo** (image size: 100x100px).
+  * Can **create rooms** and manage room settings (e.g., add prize info).
+  * **Prize description**: Each room created by the organization can include details about the prize (e.g., gift card, donation, recognition).
+
+* **Regular User**:
+
+  * Can **search for rooms** created by organizations.
+  * Can **join the rooms** based on open availability.
+  * **No room creation** privileges but can see competition details.
+
+---
+
+## **2. Account Creation Flow (Organization)**
+
+**1. Create Organization Account**
+
+* **Username**: `test002`
+* **Password**: `Pw002`
+* **Email**: [organization@example.com](mailto:organization@example.com) (send confirmation email)
+* **Type**: Organization (selected from dropdown)
+
+**2. Organization Profile**
+
+* Once created, the organization can upload its **logo** and provide a **description** of the organization.
+* The **verified badge** will appear next to their name after verification (manual or via an admin process).
+
+**3. Room Creation**
+
+* Organization can create a new **competition room** by clicking on **Create Room**.
+* **Room Settings**:
+
+  * **Room Name**: E.g., “Zikir Challenge 2025”
+  * **Description**: Details about the competition, goal (e.g., daily recitation), rules, and prize.
+  * **Prize**: E.g., “The winner will receive a gift card worth \$50.”
+  * **Visibility**: Public (open to all users) or Private (invitation only).
+  * **Surah/Ayah/Target Count**: (if applicable for Quran-related competitions)
+  * **Room Image**: Optional image to represent the competition.
+
+---
+
+## **3. Regular User Interaction**
+
+**1. Search for Organization Rooms**
+
+* **Searchable**: Regular users (e.g., `test001`) can search for rooms by **organization name** or **room name**.
+
+  * **Search Filters**: Include filters for room type, competition date, and prize category.
+
+**2. Join Room**
+
+* Once the user finds a room, they can see the **prize details**, **goal description**, and **rules**.
+* They can **join the room** if it’s public or if they receive an invite for private rooms.
+
+**3. Track Competition Progress**
+
+* **Leaderboard**: Users see a **real-time leaderboard** for the competition in the room.
+* Show **daily progress** for each participant and **overall rank** based on recitation progress or completion.
+
+---
+
+## **4. Features for Organization User**
+
+**1. Verified Badge & Logo**
+
+* Upon account creation, verify the organization either automatically (through admin approval) or through a verification process.
+* Once verified, the **verified tick** (badge) and logo appear next to their name and room details.
+
+**2. Prize Information**
+
+* When creating a room, the organization can add a **prize description**.
+
+  * Example: "The winner of this zikir competition will receive a special certificate or a donation to charity in their name."
+* This prize is visible to all users when they search and view the room details.
+
+---
+
+## **5. Admin Verification Flow** (Optional)
+
+* Admin manually verifies organizations by checking provided credentials and background.
+* Once verified, the organization receives a **verified badge** and is granted access to **create competition rooms**.
+* Admin also has the ability to **remove or block organizations** if violations are reported.
+
+---
+
+## **6. Additional Notes**
+
+### **For User Experience:**
+
+* Add a **badge** or **label** next to room names to clearly indicate "Verified Organization" when a user views a room or organization’s profile.
+* **Competition Timeline**: Include a visible timer or countdown for the competition start/end dates.
+* **Prize Notification**: Users should receive a notification when a prize is won or if they are ranked high on the leaderboard.
+* **Progress Tracker**: Have a progress bar showing the percentage of the competition completed, especially for those with fixed targets (e.g., 10 ayat/day).
+
+---
+
+## **7. Telemetry and Event Tracking**
+
+* **Events to Track**:
+
+  * `organization_account_created`
+  * `organization_verified`
+  * `room_created` (including prize info)
+  * `room_joined`
+  * `competition_started`
+  * `competition_completed`
+  * `prize_awarded`
+
+### **Leaderboard Metrics**:
+
+* Top-ranked users and daily progress updates.
+* Filter by `Top 3`, `Overall`, and `Category` (e.g., daily recitations).
+
+---
+
+## **8. Future Ideas for Scaling**
+
+* Add **external sponsorship options** where sponsors can add branded prizes.
+* Allow **organization users** to host **multiple competitions** simultaneously.
+* Provide a **certification feature** for top users to download a certificate for participation or winning a competition.
+
+---
+
+### **User Flow Example**
+
+1. **Organization Account Creation:**
+
+   * `test002` signs up with **Email**, **Password**, and selects **Organization**.
+   * After email verification, `test002` uploads a logo and receives the **verified badge**. They can now create competition rooms.
+
+2. **Room Creation by Organization:**
+
+   * `test002` creates a room titled **"Zikir Challenge 2025"** and sets the prize description.
+   * The room is set as **public** so that regular users can search and join it.
+
+3. **Regular User Joins Room:**
+
+   * `test001` searches for **"Zikir Challenge 2025"** and finds the room listed under **Verified Organization Rooms**.
+   * They see the **prize description** and join the room.
+
+4. **Leaderboard & Prizes:**
+
+   * The competition runs, and users see their progress daily.
+   * The top-ranked user at the end of the competition wins the prize (e.g., **gift card**).
+
+---
+
+### **In Summary:**
+
+* **Verified Organization** users get the ability to create **competition rooms** with **prizes** and **verification badges**.
+* **Regular users** can **search, view, and join** these rooms, track their progress, and see prizes.
+* The process is **simple**, **fun**, and **competitive**, bringing organizations and users together to increase engagement.
+
+---
+
+If you’d like, I can also give you a quick **UI/UX flow** or **database schema** for this functionality!

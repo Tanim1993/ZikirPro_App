@@ -576,6 +576,127 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Organization signup route
+  app.post('/api/auth/signup-organization', async (req, res) => {
+    try {
+      const { username, email, password, organizationName, organizationDescription, country } = req.body;
+      
+      // Validate required fields
+      if (!username || !email || !password || !organizationName || !organizationDescription) {
+        return res.status(400).json({ message: 'All required fields must be provided' });
+      }
+
+      // Check if user already exists
+      const existingUser = await storage.getUserByUsername(username);
+      if (existingUser) {
+        return res.status(400).json({ message: 'Username already exists' });
+      }
+
+      // Create organization user
+      const newUser = await storage.createUser({
+        username,
+        email,
+        password, // In production, this should be hashed
+        userType: 'organization',
+        organizationName,
+        organizationDescription,
+        country: country || 'Bangladesh',
+        isVerified: false, // Will be verified by admin
+        signupMethod: 'username',
+      });
+
+      res.status(201).json({
+        message: 'Organization account created successfully',
+        user: {
+          id: newUser.id,
+          username: newUser.username,
+          email: newUser.email,
+          userType: newUser.userType,
+          organizationName: newUser.organizationName,
+          isVerified: newUser.isVerified,
+        },
+      });
+    } catch (error) {
+      console.error('Error creating organization account:', error);
+      res.status(500).json({ message: 'Failed to create organization account' });
+    }
+  });
+
+  // Create competition room route (for organizations)
+  app.post('/api/rooms/competition', async (req, res) => {
+    try {
+      const userId = "test-user-123"; // Mock user ID for testing
+      
+      const {
+        name,
+        description,
+        zikirId,
+        prizeDescription,
+        competitionStartDate,
+        competitionEndDate,
+        targetCount,
+        unlimited,
+        duration,
+        isPublic,
+        country,
+        maxParticipants,
+      } = req.body;
+
+      // Validate required fields
+      if (!name || !description || !zikirId || !prizeDescription || !competitionStartDate || !competitionEndDate) {
+        return res.status(400).json({ message: 'All required fields must be provided' });
+      }
+
+      // Create competition room
+      const room = await storage.createRoom({
+        zikirId: parseInt(zikirId),
+        ownerId: userId,
+        name,
+        description,
+        targetCount: unlimited ? null : parseInt(targetCount),
+        unlimited: unlimited || false,
+        duration: parseInt(duration) || 30,
+        isPublic: isPublic !== false,
+        country: country || 'Bangladesh',
+        prizeDescription,
+        competitionType: 'competition',
+        competitionStartDate: new Date(competitionStartDate),
+        competitionEndDate: new Date(competitionEndDate),
+        maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+      });
+
+      // Add owner as a member
+      await storage.addUserToRoom(room.id, userId, 'owner');
+
+      res.status(201).json(room);
+    } catch (error) {
+      console.error('Error creating competition room:', error);
+      res.status(500).json({ message: 'Failed to create competition room' });
+    }
+  });
+
+  // Search rooms route (with organization filters)
+  app.get('/api/rooms/search', async (req, res) => {
+    try {
+      const { query, type } = req.query;
+      
+      let rooms = [];
+      
+      if (type === 'organization') {
+        // Search for organization rooms
+        rooms = await storage.searchOrganizationRooms(query as string);
+      } else {
+        // General room search
+        rooms = await storage.searchRooms(query as string);
+      }
+
+      res.json(rooms);
+    } catch (error) {
+      console.error('Error searching rooms:', error);
+      res.status(500).json({ message: 'Failed to search rooms' });
+    }
+  });
+
   // Global stats route
   app.get('/api/stats/global', async (req, res) => {
     try {
