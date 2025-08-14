@@ -8,19 +8,21 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import CreateRoomModal from "@/components/create-room-modal";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star } from "lucide-react";
 
 export default function Dashboard() {
+  // All useState hooks at the top - NEVER move these after any conditional returns
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   
+  // All custom hooks immediately after useState
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
+  // All useQuery hooks together
   const { data: userRooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["/api/rooms/my"],
   });
@@ -33,35 +35,12 @@ export default function Dashboard() {
     queryKey: ["/api/user/analytics"],
   });
 
-  const isLoading = roomsLoading || publicRoomsLoading || analyticsLoading;
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
-          </div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const formatDuration = (days: number) => {
-    if (days === 1) return "1 day";
-    if (days < 30) return `${days} days`;
-    return `${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
-  };
-
-  // Join room mutation
+  // useMutation hooks
   const joinRoomMutation = useMutation({
     mutationFn: async (roomId: number) => {
       const response = await fetch(`/api/rooms/${roomId}/join`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({})
       });
       if (!response.ok) {
@@ -72,12 +51,10 @@ export default function Dashboard() {
     onSuccess: (data, roomId) => {
       toast({
         title: "Joined Room!",
-        description: `You have successfully joined the room`,
+        description: "You have successfully joined the room",
       });
-      // Invalidate and refresh user rooms to show the new joined room
       queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
       setShowJoinConfirm(false);
-      // Navigate to the room
       setTimeout(() => {
         window.location.href = `/room/${roomId}`;
       }, 1000);
@@ -100,62 +77,68 @@ export default function Dashboard() {
     },
   });
 
+  // Helper functions
+  const formatDuration = (days: number) => {
+    if (days === 1) return "1 day";
+    if (days < 30) return `${days} days`;
+    return `${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
+  };
+
   const handleJoinRoom = () => {
     if (selectedRoom) {
       joinRoomMutation.mutate(selectedRoom.id);
     }
   };
 
+  const isLoading = roomsLoading || publicRoomsLoading || analyticsLoading;
+
+  // Early return ONLY after all hooks are called
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="w-16 h-16 mx-auto mb-4 animate-spin">
+            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
+          </div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
     <Card className="mb-3 border border-gray-200 shadow-sm">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900 mb-1">
-              {room.name || `${room.zikirName} Room`}
-            </h3>
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">
-                {room.zikirName}
-              </span>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="font-semibold text-lg truncate">{room.name}</h3>
+              {!isPublic && (
+                <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  isOwner ? 'bg-blue-100 text-blue-700' : 'bg-orange-100 text-orange-700'
+                }`}>
+                  {isOwner ? 'Owner' : 'Global'}
+                </div>
+              )}
             </div>
+            <p className="text-green-600 font-medium text-sm mb-1">{room.zikirName}</p>
             {room.description && (
-              <p className="text-sm text-gray-600 mb-2">{room.description}</p>
+              <p className="text-gray-600 text-sm mb-2 line-clamp-2">{room.description}</p>
             )}
           </div>
-          {isOwner ? (
-            <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-              Owner
-            </span>
-          ) : (
-            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
-              Global
-            </span>
-          )}
         </div>
         
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          <div className="text-center">
-            <div className="flex items-center justify-center text-gray-500 mb-1">
-              <Users className="w-4 h-4" />
-            </div>
-            <div className="text-sm font-medium">{room.memberCount || 0}</div>
+        <div className="grid grid-cols-3 gap-4 mb-4 text-center">
+          <div>
+            <div className="text-lg font-bold text-green-600">{room.memberCount || 0}</div>
             <div className="text-xs text-gray-500">Members</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center text-gray-500 mb-1">
-              <Target className="w-4 h-4" />
-            </div>
-            <div className="text-sm font-medium">
-              {room.unlimited ? '∞' : room.targetCount?.toLocaleString() || '100'}
-            </div>
-            <div className="text-xs text-gray-500">Target</div>
+          <div>
+            <div className="text-lg font-bold text-blue-600">{room.totalCount || 0}</div>
+            <div className="text-xs text-gray-500">Total Count</div>
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center text-gray-500 mb-1">
-              <Clock className="w-4 h-4" />
-            </div>
-            <div className="text-sm font-medium">{formatDuration(room.duration || 30)}</div>
+          <div>
+            <div className="text-lg font-bold text-purple-600">{formatDuration(room.duration)}</div>
             <div className="text-xs text-gray-500">Duration</div>
           </div>
         </div>
@@ -167,12 +150,13 @@ export default function Dashboard() {
               setShowJoinConfirm(true);
             }}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
+            data-testid="button-tap-to-join"
           >
             Tap to Join Room
           </Button>
         ) : (
           <Link href={`/room/${room.id}`}>
-            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+            <Button className="w-full bg-green-600 hover:bg-green-700 text-white" data-testid="button-enter-room">
               {isOwner ? 'Manage Room' : 'Enter Room'}
             </Button>
           </Link>
@@ -182,92 +166,55 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Mobile Header */}
-      <header className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-6">
-        <div className="flex justify-between items-center mb-4">
-          <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-              <span className="text-2xl">📿</span>
-            </div>
-            <div>
-              <h1 className="text-xl font-bold">Zikir Amol</h1>
-              <p className="text-sm text-green-100">As-salamu alaykum, {(user as any)?.firstName || 'Brother'}</p>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-6">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="text-2xl font-bold text-gray-900">Zikir Amol</h1>
+            <Button 
+              onClick={() => setShowCreateModal(true)}
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="button-create-room"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create Room
+            </Button>
           </div>
           
-          <div className="relative">
-            <img 
-              src={(user as any)?.profileImageUrl || `https://ui-avatars.com/api/?name=${(user as any)?.firstName || 'User'}&background=059669&color=fff`} 
-              alt="Profile" 
-              className="w-12 h-12 rounded-full border-2 border-white/30"
-            />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full border-2 border-white"></div>
-          </div>
-        </div>
-        
-        {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{(userAnalytics as any)?.currentStreak || 0}</div>
-            <div className="text-xs text-green-100">Day Streak</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{(userAnalytics as any)?.totalZikir || 0}</div>
-            <div className="text-xs text-green-100">Total Zikir</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-3 text-center">
-            <div className="text-lg font-bold">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
-            <div className="text-xs text-green-100">My Rooms</div>
-          </div>
-        </div>
-      </header>
-
-      {/* Action Buttons */}
-      <div className="px-4 py-4">
-        <div className="grid grid-cols-2 gap-3 mb-6">
-          <Button 
-            onClick={() => setShowCreateModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white font-semibold py-4 rounded-xl shadow-lg"
-            data-testid="button-create-room"
-          >
+          {/* Quick Stats */}
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <Plus className="w-6 h-6 mx-auto mb-1" />
-              <span className="text-sm">Create Room</span>
+              <div className="text-2xl font-bold text-green-600">{userAnalytics.totalCount || 0}</div>
+              <div className="text-xs text-gray-500">Total Zikir</div>
             </div>
-          </Button>
-          <Button 
-            variant="outline"
-            className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white font-semibold py-4 rounded-xl"
-            data-testid="button-browse-rooms"
-          >
             <div className="text-center">
-              <Globe className="w-6 h-6 mx-auto mb-1" />
-              <span className="text-sm">Browse Rooms</span>
+              <div className="text-2xl font-bold text-blue-600">{userAnalytics.currentStreak || 0}</div>
+              <div className="text-xs text-gray-500">Day Streak</div>
             </div>
-          </Button>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-600">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
+              <div className="text-xs text-gray-500">My Rooms</div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Tabs */}
+      {/* Content */}
+      <div className="max-w-md mx-auto p-4">
         <Tabs defaultValue="my-rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 mb-4">
-            <TabsTrigger value="my-rooms" data-testid="tab-my-rooms" className="text-xs">
-              <div className="text-center">
-                <Home className="w-4 h-4 mx-auto mb-1" />
-                <span>My Rooms</span>
-              </div>
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="my-rooms" data-testid="tab-my-rooms">
+              <Home className="w-4 h-4 mr-2" />
+              My Rooms
             </TabsTrigger>
-            <TabsTrigger value="public-rooms" data-testid="tab-public-rooms" className="text-xs">
-              <div className="text-center">
-                <Globe className="w-4 h-4 mx-auto mb-1" />
-                <span>Public</span>
-              </div>
+            <TabsTrigger value="public-rooms" data-testid="tab-public-rooms">
+              <Globe className="w-4 h-4 mr-2" />
+              Public
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" data-testid="tab-leaderboard" className="text-xs">
-              <div className="text-center">
-                <Trophy className="w-4 h-4 mx-auto mb-1" />
-                <span>Leaders</span>
-              </div>
+            <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
+              <Trophy className="w-4 h-4 mr-2" />
+              Leaders
             </TabsTrigger>
           </TabsList>
 
@@ -282,6 +229,7 @@ export default function Dashboard() {
                 <Button 
                   onClick={() => setShowCreateModal(true)}
                   className="bg-green-600 hover:bg-green-700"
+                  data-testid="button-create-first-room"
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Room
