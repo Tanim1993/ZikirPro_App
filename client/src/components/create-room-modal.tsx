@@ -98,12 +98,14 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md max-h-screen overflow-y-auto islamic-glass">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-islamic-primary font-amiri drop-shadow-lg">
-            Create Zikir Room
-          </DialogTitle>
-        </DialogHeader>
+      <DialogContent className="max-w-md max-h-screen overflow-y-auto bg-white/95 backdrop-blur-lg border-0 shadow-2xl">
+        <div className="profile-header -mx-6 -mt-6 mb-6">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-white font-amiri">
+              Create Zikir Room
+            </DialogTitle>
+          </DialogHeader>
+        </div>
         
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -114,12 +116,12 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Room Name</FormLabel>
+                  <FormLabel className="text-slate-700 font-semibold">Room Name</FormLabel>
                   <FormControl>
                     <input
                       {...field}
                       placeholder="Enter room name"
-                      className="w-full p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary focus:border-transparent bg-white/80 backdrop-blur-sm"
+                      className="w-full p-4 border-0 rounded-xl bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
                       data-testid="input-room-name"
                     />
                   </FormControl>
@@ -134,13 +136,13 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="zikirId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Select Zikir</FormLabel>
+                  <FormLabel className="text-slate-700 font-semibold">Select Zikir</FormLabel>
                   <FormControl>
                     <div className="space-y-2">
                       <button
                         type="button"
                         onClick={() => setShowZikirPicker(true)}
-                        className="w-full text-left rounded-xl border border-islamic-secondary/30 p-4 hover:bg-islamic-secondary/10 focus:ring-2 focus:ring-islamic-primary focus:border-transparent transition-all islamic-glass"
+                        className="w-full text-left rounded-xl border-0 bg-gray-100 p-4 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
                         data-testid="button-select-zikir"
                       >
                         {selectedZikir ? (
@@ -195,16 +197,16 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="targetCount"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Target Count</FormLabel>
-                  <div className="flex space-x-2">
+                  <FormLabel className="text-slate-700 font-semibold">Target Count</FormLabel>
+                  <div className="flex space-x-3">
                     <FormControl>
                       <input
                         type="number"
                         {...field}
                         onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         disabled={form.watch("unlimited")}
-                        placeholder="1000"
-                        className="flex-1 p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary disabled:bg-islamic-secondary/10 bg-white/80 backdrop-blur-sm"
+                        placeholder="100"
+                        className="flex-1 p-4 border-0 rounded-xl bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:bg-white disabled:bg-gray-50 disabled:text-gray-400 transition-all duration-200 placeholder-gray-500"
                         data-testid="input-target-count"
                       />
                     </FormControl>
@@ -212,13 +214,14 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       control={form.control}
                       name="unlimited"
                       render={({ field }) => (
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
                           <Checkbox
                             checked={field.value}
                             onCheckedChange={field.onChange}
                             data-testid="checkbox-unlimited"
+                            className="text-blue-600"
                           />
-                          <Label className="text-sm text-gray-600">Unlimited</Label>
+                          <Label className="text-sm text-blue-700 font-medium">Unlimited</Label>
                         </div>
                       )}
                     />
@@ -234,12 +237,12 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description (Optional)</FormLabel>
+                  <FormLabel className="text-slate-700 font-semibold">Description (Optional)</FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       placeholder="Brief description of your room"
-                      className="min-h-[80px]"
+                      className="min-h-[80px] p-4 border-0 rounded-xl bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500 resize-none"
                       data-testid="textarea-description"
                     />
                   </FormControl>
@@ -254,7 +257,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Duration (Days)</FormLabel>
+                  <FormLabel className="text-slate-700 font-semibold">Duration (Days)</FormLabel>
                   <FormControl>
                     <input
                       type="number"
@@ -262,7 +265,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       onChange={(e) => field.onChange(parseInt(e.target.value))}
                       min="1"
                       max="40"
-                      className="w-full p-3 border border-islamic-secondary/30 rounded-lg focus:ring-2 focus:ring-islamic-primary bg-white/80 backdrop-blur-sm"
+                      className="w-full p-4 border-0 rounded-xl bg-gray-100 focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200 placeholder-gray-500"
                       data-testid="input-duration"
                     />
                   </FormControl>
@@ -277,25 +280,25 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               name="isPublic"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Room Type</FormLabel>
+                  <FormLabel className="text-slate-700 font-semibold">Room Type</FormLabel>
                   <FormControl>
                     <RadioGroup
                       value={field.value ? "public" : "private"}
                       onValueChange={(value) => field.onChange(value === "public")}
                     >
                       <div className="grid grid-cols-2 gap-3">
-                        <Label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                          <RadioGroupItem value="public" className="mr-2" />
+                        <Label className="flex items-center p-4 border-0 bg-gray-100 rounded-xl cursor-pointer hover:bg-blue-50 hover:ring-2 hover:ring-blue-200 transition-all duration-200">
+                          <RadioGroupItem value="public" className="mr-3" />
                           <div>
-                            <div className="font-medium text-gray-900">Public</div>
-                            <div className="text-xs text-gray-500">Anyone can join</div>
+                            <div className="font-semibold text-gray-900">Public</div>
+                            <div className="text-xs text-gray-600">Anyone can join</div>
                           </div>
                         </Label>
-                        <Label className="flex items-center p-3 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                          <RadioGroupItem value="private" className="mr-2" />
+                        <Label className="flex items-center p-4 border-0 bg-gray-100 rounded-xl cursor-pointer hover:bg-blue-50 hover:ring-2 hover:ring-blue-200 transition-all duration-200">
+                          <RadioGroupItem value="private" className="mr-3" />
                           <div>
-                            <div className="font-medium text-gray-900">Private</div>
-                            <div className="text-xs text-gray-500">Invite only</div>
+                            <div className="font-semibold text-gray-900">Private</div>
+                            <div className="text-xs text-gray-600">Invite only</div>
                           </div>
                         </Label>
                       </div>
@@ -306,41 +309,20 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               )}
             />
             
-            {/* Room Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description & Rules</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      rows={3}
-                      placeholder="Share the fazilat, rules, or motivation for this zikir..."
-                      className="resize-none"
-                      data-testid="textarea-description"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
             {/* Action Buttons */}
-            <div className="flex space-x-3 pt-4">
+            <div className="flex space-x-3 pt-6">
               <Button 
                 type="button" 
                 variant="outline" 
                 onClick={() => onOpenChange(false)}
-                className="flex-1"
+                className="flex-1 rounded-xl py-3 border-gray-300 hover:bg-gray-50 transition-all duration-200"
                 data-testid="button-cancel"
               >
                 Cancel
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                className="flex-1 primary-btn rounded-xl py-3 font-semibold"
                 disabled={createRoomMutation.isPending}
                 data-testid="button-create"
               >
