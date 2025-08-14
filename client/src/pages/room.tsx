@@ -18,6 +18,7 @@ import { LeaderboardWidget } from "@/components/leaderboard-widget";
 import TasbihGallery from "@/components/tasbih-gallery";
 import { ReportRoomModal } from "@/components/report-room-modal";
 import { DeleteRoomModal } from "@/components/delete-room-modal";
+import { VoiceRecognitionButton } from "@/components/VoiceRecognitionButton";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Room() {
@@ -355,6 +356,23 @@ export default function Room() {
                 <SelectItem value="hand">✋ Hand Counter</SelectItem>
               </SelectContent>
             </Select>
+          </CardContent>
+        </Card>
+
+        {/* Voice Recognition */}
+        <Card className="mb-4">
+          <CardContent className="p-4">
+            <div className="flex flex-col items-center space-y-3">
+              <div className="text-sm text-gray-600 text-center">
+                <span className="font-medium">Voice Recognition</span>
+                <p className="text-xs mt-1">Say "{room?.zikirName}" to count automatically</p>
+              </div>
+              <VoiceRecognitionButton
+                targetPhrase={room?.zikirName || "Allahu Akbar"}
+                onPhraseDetected={handleCount}
+                className="w-full"
+              />
+            </div>
           </CardContent>
         </Card>
 
