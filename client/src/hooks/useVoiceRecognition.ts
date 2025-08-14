@@ -53,15 +53,11 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'subhan allah',
     'subhanollah',
     'subchan allah',
-    'subhan',
     'glory to god',
     'glory be to allah',
     'سبحان الله',
     'سُبْحَانَ اللَّهِ',
-    'سبحان',
-    'سُبْحَانَ',
-    'صبحان الله',
-    'صبحان'
+    'صبحان الله'
   ],
   'Alhamdulillah': [
     'alhamdulillah',
@@ -73,7 +69,6 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'la ilaha illa allah',
     'la ilaha illallah',
     'lailahaillallah',
-    'la ilaha illa',
     'there is no god but allah',
     'لا إله إلا الله',
     'لا اله الا الله',
@@ -130,22 +125,50 @@ export function useVoiceRecognition({
     const normalizedDetected = normalizeText(detectedText);
     const targetVariations = ZIKIR_PHRASES[targetPhrase] || [targetPhrase.toLowerCase()];
     
-    // First check if it matches the target phrase
+    // First check if it matches the target phrase with STRICT validation
     const matchesTarget = targetVariations.some(variation => {
       const normalizedVariation = normalizeText(variation);
-      // Balanced matching - exact match or reasonable substring for Arabic
-      return normalizedDetected === normalizedVariation || 
-             (normalizedVariation.length > 3 && normalizedDetected.includes(normalizedVariation)) ||
-             (normalizedDetected.length > 3 && normalizedVariation.includes(normalizedDetected));
+      
+      // For very short phrases (like "subhan"), require exact match
+      if (normalizedVariation.length <= 6) {
+        return normalizedDetected === normalizedVariation;
+      }
+      
+      // For longer phrases, require substantial overlap (at least 70% match)
+      const minOverlap = Math.floor(normalizedVariation.length * 0.7);
+      
+      // Check if detected text contains significant portion of target phrase
+      if (normalizedDetected.includes(normalizedVariation) || normalizedVariation.includes(normalizedDetected)) {
+        return true;
+      }
+      
+      // For very specific key words check (more restrictive)
+      const keyWords = normalizedVariation.split(' ').filter(word => word.length > 2);
+      const detectedWords = normalizedDetected.split(' ').filter(word => word.length > 2);
+      
+      // Require at least 2 key words to match for longer phrases
+      let matchingWords = 0;
+      for (const keyWord of keyWords) {
+        if (detectedWords.some(detectedWord => 
+          detectedWord.includes(keyWord) || keyWord.includes(detectedWord)
+        )) {
+          matchingWords++;
+        }
+      }
+      
+      return matchingWords >= Math.min(2, keyWords.length);
     });
     
     // If it matches target, apply lighter cross-validation (only for very specific conflicts)
     if (matchesTarget) {
       // Only check for very specific cross-matching issues, not all phrases
-      const problematicCrosses = {
+      const problematicCrosses: Record<string, string[]> = {
         'SubhanAllah': ['Allahu Akbar'], // Only check against Allahu Akbar if needed
         'La ilaha illallah': [], // Don't cross-check this phrase
-        'Allahu Akbar': ['SubhanAllah', 'La ilaha illallah'] // Check Allahu Akbar against others
+        'Allahu Akbar': ['SubhanAllah', 'La ilaha illallah'], // Check Allahu Akbar against others
+        'Alhamdulillah': [],
+        'Astaghfirullah': [],
+        'Hasbi Allah': []
       };
       
       const phrasesToCheck = problematicCrosses[targetPhrase] || [];
