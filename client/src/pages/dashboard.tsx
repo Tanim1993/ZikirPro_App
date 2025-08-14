@@ -74,7 +74,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-center text-gray-500 mb-1">
               <Users className="w-4 h-4" />
             </div>
-            <div className="text-sm font-medium">{room.memberCount || 0}</div>
+            <div className="text-sm font-medium">1</div>
             <div className="text-xs text-gray-500">Members</div>
           </div>
           <div className="text-center">

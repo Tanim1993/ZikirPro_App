@@ -28,7 +28,12 @@ export function DeleteRoomModal({ roomId, roomName, isOpen, onClose }: DeleteRoo
 
   const deleteMutation = useMutation({
     mutationFn: async () => {
-      await apiRequest(`/api/rooms/${roomId}`, "DELETE");
+      const response = await apiRequest("DELETE", `/api/rooms/${roomId}`);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Failed to delete room');
+      }
+      return await response.json();
     },
     onSuccess: () => {
       toast({
@@ -64,14 +69,18 @@ export function DeleteRoomModal({ roomId, roomName, isOpen, onClose }: DeleteRoo
             <Trash2 className="w-5 h-5 text-red-500" />
             Delete Room
           </AlertDialogTitle>
-          <AlertDialogDescription>
-            Are you sure you want to delete "{roomName}"? This action cannot be undone and will permanently remove:
-            <ul className="list-disc list-inside mt-2 space-y-1">
-              <li>The room and all its settings</li>
-              <li>All count entries and progress</li>
-              <li>Room member data</li>
-              <li>Associated analytics</li>
-            </ul>
+          <AlertDialogDescription className="space-y-3">
+            <div>
+              Are you sure you want to delete "{roomName}"? This action cannot be undone and will permanently remove:
+            </div>
+            <div>
+              <ul className="list-disc list-inside space-y-1 text-sm">
+                <li>The room and all its settings</li>
+                <li>All count entries and progress</li>
+                <li>Room member data</li>
+                <li>Associated analytics</li>
+              </ul>
+            </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
