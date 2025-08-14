@@ -109,7 +109,12 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
       const endDate = new Date(formData.competitionEndDate);
       const now = new Date();
       
-      if (startDate < now) {
+      // Allow start date to be from today onwards (more lenient validation)
+      // Set the comparison time to start of today to avoid hour/minute issues
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (startDate < today) {
         newErrors.competitionStartDate = "Start date cannot be in the past";
       }
       
@@ -160,9 +165,17 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  // Default start time (now + 1 hour)
+  // Default start time (today at current hour + 1, or minimum today)
   const defaultStartTime = new Date();
-  defaultStartTime.setHours(defaultStartTime.getHours() + 1);
+  // Ensure it's at least today
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  if (defaultStartTime < today) {
+    defaultStartTime.setTime(today.getTime());
+  } else {
+    defaultStartTime.setHours(defaultStartTime.getHours() + 1);
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
