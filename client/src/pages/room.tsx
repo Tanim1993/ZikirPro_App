@@ -146,7 +146,7 @@ export default function Room() {
     );
   }
 
-  const progress = room?.unlimited ? 0 : (userCount / (room?.targetCount || 1000)) * 100;
+  const progress = room?.unlimited ? 0 : Math.min(100, (userCount / (room?.targetCount || 1000)) * 100);
   const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === (user as any)?.id) + 1;
 
   return (

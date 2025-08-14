@@ -20,7 +20,7 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
     setTimeout(() => setIsPressed(false), 150);
   };
 
-  const progress = unlimited ? 0 : targetCount ? (count / targetCount) * 100 : 0;
+  const progress = unlimited ? 0 : targetCount ? Math.min(100, (count / targetCount) * 100) : 0;
 
   return (
     <div className="flex flex-col items-center space-y-6">
@@ -62,10 +62,10 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
             </div>
             
             <div className="flex justify-between mb-6">
-              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black">
+              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black font-bold">
                 COUNT
               </Button>
-              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black">
+              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black font-bold">
                 RESET
               </Button>
             </div>
@@ -76,14 +76,16 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
                 onClick={handleCount}
                 className={`w-20 h-20 rounded-full bg-gradient-to-b from-gray-300 to-gray-500 shadow-lg border-4 border-gray-400 transition-all duration-100 ${
                   isPressed ? 'scale-95 shadow-md' : 'scale-100'
-                }`}
+                } flex items-center justify-center`}
                 style={{
                   boxShadow: isPressed 
                     ? 'inset 0 4px 8px rgba(0,0,0,0.3)' 
                     : '0 6px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)'
                 }}
               >
-                <div className="w-full h-full rounded-full bg-gradient-to-b from-white to-gray-200 border-2 border-gray-300" />
+                <div className="w-full h-full rounded-full bg-gradient-to-b from-white to-gray-200 border-2 border-gray-300 flex items-center justify-center">
+                  <span className="text-gray-700 font-bold text-xs">TAP</span>
+                </div>
               </button>
             </div>
             
