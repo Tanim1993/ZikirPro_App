@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import type { User as UserType } from "../../shared/schema";
+import type { User as UserType } from "@shared/schema";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
@@ -111,7 +111,7 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-3 text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span>Joined {typedUser?.createdAt ? new Date(typedUser.createdAt).toLocaleDateString() : 'Unknown'}</span>
+              <span>Joined {typedUser?.createdAt ? new Date(typedUser.createdAt as string).toLocaleDateString() : 'Unknown'}</span>
             </div>
           </CardContent>
         </Card>

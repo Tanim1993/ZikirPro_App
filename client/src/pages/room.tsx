@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -13,6 +15,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { DigitalTasbih } from "@/components/digital-tasbih";
 import { LeaderboardWidget } from "@/components/leaderboard-widget";
+import TasbihGallery from "@/components/tasbih-gallery";
 
 export default function Room() {
   const { id } = useParams();
@@ -144,7 +147,7 @@ export default function Room() {
   }
 
   const progress = room?.unlimited ? 0 : (userCount / (room?.targetCount || 1000)) * 100;
-  const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === user?.id) + 1;
+  const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === (user as any)?.id) + 1;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pb-20">
@@ -253,7 +256,7 @@ export default function Room() {
                     <TasbihGallery 
                       roomId={roomId}
                       currentTasbihId="classic_wood"
-                      onTasbihChange={(tasbihId) => {
+                      onTasbihChange={(tasbihId: string) => {
                         toast({
                           title: "Tasbih Updated",
                           description: "Your tasbih has been equipped for this room",
@@ -306,7 +309,7 @@ export default function Room() {
               <div className="cursor-pointer" data-testid="link-leaderboard">
                 <LeaderboardWidget
                   entries={leaderboard as any[]}
-                  currentUserId={user?.id || ''}
+                  currentUserId={(user as any)?.id || ''}
                   title="Room Leaderboard"
                   showTop={10}
                 />
