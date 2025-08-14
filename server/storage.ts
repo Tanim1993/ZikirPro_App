@@ -647,6 +647,17 @@ export class DatabaseStorage implements IStorage {
     await db.delete(roomMembers).where(eq(roomMembers.roomId, id));
     await db.delete(rooms).where(eq(rooms.id, id));
   }
+
+  async getUserCounter(roomId: number, userId: string): Promise<any> {
+    const [counter] = await db
+      .select()
+      .from(liveCounters)
+      .where(and(
+        eq(liveCounters.roomId, roomId),
+        eq(liveCounters.userId, userId)
+      ));
+    return counter;
+  }
 }
 
 export const storage = new DatabaseStorage();

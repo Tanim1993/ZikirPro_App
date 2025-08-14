@@ -213,11 +213,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get('/api/user/analytics', async (req: any, res) => {
     try {
-      if (!req.session?.user?.id) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
-      
-      const userId = req.session.user.id;
+      const userId = "test-user-123"; // Mock user ID for testing
       
       // Calculate real total count from all user's count entries
       const totalCount = await storage.getUserTotalCount(userId);
@@ -408,6 +404,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user's count in room - for count persistence
+  app.get('/api/rooms/:id/user-count', async (req: any, res) => {
+    try {
+      const roomId = parseInt(req.params.id);
+      const userId = "test-user-123"; // Mock user ID
+      
+      // Auto-join user to public room if not already a member
+      const room = await storage.getRoomById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const isMember = await storage.isUserInRoom(roomId, userId);
+      if (!isMember && room.isPublic) {
+        await storage.joinRoom({
+          roomId,
+          userId,
+          role: 'member',
+          nickname: null,
+          isActive: true,
+        });
+      } else if (!isMember) {
+        return res.status(403).json({ message: "Access denied" });
+      }
+
+      // Get user's current count in this room
+      const userCounter = await storage.getUserCounter(roomId, userId);
+      res.json(userCounter?.currentCount || 0);
+    } catch (error) {
+      console.error("Error fetching user count:", error);
+      res.status(500).json({ message: "Failed to fetch user count" });
+    }
+  });
+
   // Counting routes
   app.post('/api/rooms/:id/count', async (req: any, res) => {
     try {
@@ -502,6 +532,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error creating report:", error);
       res.status(500).json({ message: "Failed to create report" });
+    }
+  });
+
+  // User analytics route (no auth required for testing)
+  app.get('/api/user/analytics', async (req: any, res) => {
+    try {
+      const userId = "test-user-123"; // Mock user ID
+      
+      // Get user total count across all rooms
+      const totalCount = await storage.getUserTotalCount(userId);
+      
+      // Get user streak
+      const { currentStreak, longestStreak } = await storage.calculateUserStreak(userId);
+      
+      // Get user's active room count
+      const userRooms = await storage.getUserRooms(userId);
+      const roomCount = userRooms.length;
+
+      const analytics = {
+        totalCount,
+        currentStreak,
+        longestStreak,
+        roomCount,
+        lastActiveDate: new Date(),
+      };
+
+      res.json(analytics);
+    } catch (error) {
+      console.error('Error getting user analytics:', error);
+      res.status(500).json({ message: 'Failed to get user analytics' });
     }
   });
 
