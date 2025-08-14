@@ -14,7 +14,9 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus } from "lucide-react";
+import { Plus, Search } from "lucide-react";
+import ZikirPicker from "@/components/ZikirPicker";
+import type { Zikir } from "@/types/zikir";
 
 const createRoomSchema = z.object({
   zikirId: z.number().min(1, "Please select a zikir"),
@@ -37,6 +39,8 @@ interface CreateRoomModalProps {
 export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showZikirPicker, setShowZikirPicker] = useState(false);
+  const [selectedZikir, setSelectedZikir] = useState<Zikir | null>(null);
   
   const form = useForm<CreateRoomFormData>({
     resolver: zodResolver(createRoomSchema),
@@ -52,10 +56,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
     },
   });
 
-  const { data: zikirs = [] } = useQuery({
-    queryKey: ["/api/zikirs"],
-    enabled: open,
-  });
+
 
   const createRoomMutation = useMutation({
     mutationFn: async (data: CreateRoomFormData) => {
@@ -134,29 +135,59 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Select Zikir</FormLabel>
-                  <Select onValueChange={(value) => field.onChange(parseInt(value))} value={field.value?.toString()}>
-                    <FormControl>
-                      <SelectTrigger data-testid="select-zikir">
-                        <SelectValue placeholder="Choose a zikir" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {zikirs.map((zikir: any) => (
-                        <SelectItem key={zikir.id} value={zikir.id.toString()}>
-                          <div className="text-left">
-                            <div className="font-medium">{zikir.name}</div>
-                            {zikir.arabicText && (
-                              <div className="text-sm text-gray-500">{zikir.arabicText}</div>
-                            )}
+                  <FormControl>
+                    <div className="space-y-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowZikirPicker(true)}
+                        className="w-full text-left rounded-xl border border-gray-300 p-4 hover:bg-gray-50 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
+                        data-testid="button-select-zikir"
+                      >
+                        {selectedZikir ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                              <span className="font-semibold text-gray-900">{selectedZikir.name}</span>
+                              <span className="text-xs rounded-full bg-gray-100 text-gray-600 px-2 py-1">
+                                {selectedZikir.category}
+                              </span>
+                            </div>
+                            <div className="text-lg text-right font-arabic" dir="rtl">
+                              {selectedZikir.arabic}
+                            </div>
+                            <div className="text-sm text-gray-600 italic">
+                              {selectedZikir.transliteration}
+                            </div>
+                            <div className="text-sm text-gray-700">
+                              {selectedZikir.translation}
+                            </div>
                           </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        ) : (
+                          <div className="flex items-center gap-3 text-gray-500">
+                            <Search className="w-5 h-5" />
+                            <span>Search and select a zikir...</span>
+                          </div>
+                        )}
+                      </button>
+                    </div>
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+            {/* Zikir Picker Modal */}
+            {showZikirPicker && (
+              <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+                <ZikirPicker
+                  onSelect={(zikir) => {
+                    setSelectedZikir(zikir);
+                    form.setValue("zikirId", zikir.id);
+                    setShowZikirPicker(false);
+                  }}
+                  onClose={() => setShowZikirPicker(false)}
+                />
+              </div>
+            )}
             
             {/* Target Count */}
             <FormField
