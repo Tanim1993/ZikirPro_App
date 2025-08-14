@@ -5,42 +5,29 @@ import { Link } from "wouter";
 export default function Landing() {
 
   return (
-    <div className="min-h-screen bg-islamic-gradient">
-      {/* Islamic Pattern Background */}
-      <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <pattern id="islamic-stars" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
-            <circle cx="20" cy="20" r="2" fill="white"/>
-            <path d="M20,10 L22,16 L28,16 L23,20 L25,26 L20,22 L15,26 L17,20 L12,16 L18,16 Z" fill="white" fillOpacity="0.3"/>
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#islamic-stars)"/>
-      </svg>
-
-      <div className="min-h-screen flex items-center justify-center p-4 relative z-10">
-        <Card className="w-full max-w-md islamic-glass shadow-2xl">
+    <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <Card className="w-full max-w-md bg-white shadow-xl border border-gray-200">
           <CardContent className="p-8 text-center">
             {/* Islamic Logo */}
-            <div className="w-20 h-20 mx-auto mb-6 bg-white/20 rounded-full flex items-center justify-center shadow-xl backdrop-blur-sm">
-              <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-4h2v2h-2v-2zm0-8h2v6h-2V8z"/>
-              </svg>
+            <div className="w-16 h-16 mx-auto mb-6 bg-islamic-gradient rounded-full flex items-center justify-center shadow-lg">
+              <div className="text-2xl text-white font-bold font-amiri">ج</div>
             </div>
             
             {/* App Title */}
-            <h1 className="text-4xl font-bold text-white mb-2 font-amiri drop-shadow-lg">Zikir Amol</h1>
-            <p className="text-white/90 mb-2 text-lg">Digital Tasbih & Competition</p>
-            <p className="text-sm text-white/80 mb-8">Join millions in remembering Allah</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 font-amiri">Zikir Amol</h1>
+            <p className="text-gray-600 mb-2">Digital Tasbih & Competition</p>
+            <p className="text-sm text-gray-500 mb-8">Join millions in remembering Allah</p>
             
             {/* Features */}
             <div className="space-y-4 mb-8 text-left">
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-islamic-primary/10 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-islamic-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M16 4c0-1.11.89-2 2-2s2 .89 2 2-.89 2-2 2-2-.89-2-2zM4 18v-6h2.5l6 6H4zm16.5-9.5L19 7l-2.5 1.5L15 7l-1.5 1.5L12 7l-1.5 1.5L9 7 7.5 8.5 6 7v11h11.5L21 14.5z"/>
                   </svg>
                 </div>
-                <span className="text-white/90 font-medium">Join Zikir competitions</span>
+                <span className="text-gray-700 font-medium">Join Zikir competitions</span>
               </div>
               <div className="flex items-center space-x-3">
                 <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
@@ -71,7 +58,7 @@ export default function Landing() {
             {/* Login Button */}
             <Link href="/login">
               <Button 
-                className="w-full bg-white/20 backdrop-blur-sm text-white font-semibold py-3 text-lg shadow-xl hover:bg-white/30 hover:shadow-2xl transition-all duration-300 hover:scale-105"
+                className="w-full bg-islamic-gradient text-white font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 data-testid="button-login"
               >
                 Start Your Zikir Journey
@@ -80,20 +67,20 @@ export default function Landing() {
             
             {/* Sign Up Link */}
             <div className="mt-4 text-center">
-              <p className="text-sm text-white/80">
+              <p className="text-sm text-gray-600">
                 Don't have an account?{" "}
-                <Link href="/signup" className="text-white hover:text-white/80 font-semibold underline">
+                <Link href="/signup" className="text-islamic-primary hover:text-islamic-primary-dark font-semibold">
                   Sign Up
                 </Link>
               </p>
             </div>
             
             {/* Islamic Quote */}
-            <div className="mt-6 p-4 bg-white/10 backdrop-blur-sm rounded-lg shadow-xl">
-              <p className="text-sm text-white/90 italic font-amiri">
+            <div className="mt-6 p-4 bg-gray-50 rounded-lg border">
+              <p className="text-sm text-gray-600 italic font-amiri">
                 "And remember your Lord within yourself humbly and with fear"
               </p>
-              <p className="text-xs text-white/70 mt-1">- Quran 7:205</p>
+              <p className="text-xs text-gray-500 mt-1">- Quran 7:205</p>
             </div>
           </CardContent>
         </Card>
