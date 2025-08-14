@@ -42,9 +42,11 @@ export function DeleteRoomModal({ roomId, roomName, isOpen, onClose }: DeleteRoo
         variant: "default",
       });
       
-      // Invalidate queries and redirect
+      // Invalidate all room-related queries
       queryClient.invalidateQueries({ queryKey: ['/api/rooms'] });
-      queryClient.invalidateQueries({ queryKey: ['/api/user/rooms'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/rooms/public'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/user/analytics'] });
       setLocation('/dashboard');
       onClose();
     },
