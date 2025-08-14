@@ -173,7 +173,7 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-islamic-gradient-subtle islamic-pattern-bg">
       {/* Enhanced Header with Islamic Gradient Design */}
-      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-2xl relative overflow-hidden">
+      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-lg relative overflow-hidden">
         {/* Islamic geometric pattern overlay */}
         <div className="absolute inset-0 opacity-10">
           <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -195,7 +195,7 @@ export default function Dashboard() {
             </div>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="islamic-glass text-white hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-xl"
+              className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 shadow-lg"
               data-testid="button-create-room"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -205,17 +205,17 @@ export default function Dashboard() {
           
           {/* Enhanced Quick Stats with Islamic Glass Design */}
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <div className="text-2xl font-bold text-white drop-shadow">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
-              <div className="text-sm text-white/80 font-medium">Total Zikir</div>
+            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
+              <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
+              <div className="text-sm text-white/90 font-medium">Total Zikir</div>
             </div>
-            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <div className="text-2xl font-bold text-white drop-shadow">{(userAnalytics as any)?.currentStreak || 1}</div>
-              <div className="text-sm text-white/80 font-medium">Day Streak</div>
+            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
+              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 1}</div>
+              <div className="text-sm text-white/90 font-medium">Day Streak</div>
             </div>
-            <div className="text-center islamic-glass rounded-xl p-4 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-              <div className="text-2xl font-bold text-white drop-shadow">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
-              <div className="text-sm text-white/80 font-medium">My Rooms</div>
+            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
+              <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
+              <div className="text-sm text-white/90 font-medium">My Rooms</div>
             </div>
           </div>
         </div>

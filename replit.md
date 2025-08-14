@@ -35,7 +35,7 @@ Preferred communication style: Simple, everyday language.
 - **Live Leaderboards**: Real-time ranking updates via WebSocket connections
 - **User Analytics**: Progress tracking, streaks, and performance metrics
 - **Islamic Content**: Master list of authentic zikir with Arabic text, transliteration, and translations
-- **Theme Design**: Sophisticated deep teal gradient Islamic theme (hsl(203 39% 44%)) matching Replit interface aesthetic with glass-morphism effects, Islamic geometric patterns, and smooth animations - successfully applied across all pages
+- **Theme Design**: Bright teal Islamic theme (hsl(194 100% 60%)) matching user's reference design with clean glass-morphism effects, modern Islamic patterns, and professional styling - successfully applied across dashboard, landing, and all components
 - **Room Management**: Deletion system for owners (when sole member) and reporting system for inappropriate content
 - **Auto-Membership**: Room creators automatically become members with owner role
 - **Verified Organizations**: Complete institutional competition system with organization accounts, prize management, and verified badges

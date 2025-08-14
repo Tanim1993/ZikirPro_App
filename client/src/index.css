@@ -37,24 +37,24 @@
   --sidebar-border: hsl(214 32% 91%);
   --sidebar-ring: hsl(213 78% 50%);
   
-  /* Light Teal/Blue Islamic theme matching reference design */
-  --islamic-primary: hsl(194 85% 56%);
-  --islamic-primary-light: hsl(194 85% 65%);
-  --islamic-primary-dark: hsl(210 100% 45%);
-  --islamic-secondary: hsl(194 50% 80%);
+  /* Bright Teal Islamic theme matching reference landing page */
+  --islamic-primary: hsl(194 100% 60%);
+  --islamic-primary-light: hsl(194 100% 70%);
+  --islamic-primary-dark: hsl(194 100% 50%);
+  --islamic-secondary: hsl(194 100% 85%);
   --islamic-accent: hsl(45 100% 70%);
   --islamic-gold: hsl(45 100% 70%);
   --islamic-gold-light: hsl(45 100% 80%);
   --islamic-gold-dark: hsl(45 100% 60%);
-  --islamic-navy: hsl(210 100% 35%);
-  --islamic-navy-dark: hsl(210 100% 25%);
+  --islamic-navy: hsl(194 100% 40%);
+  --islamic-navy-dark: hsl(194 100% 30%);
   
-  /* Light teal/blue gradient definitions matching reference design */
-  --islamic-gradient-main: linear-gradient(135deg, hsl(194 85% 56%) 0%, hsl(210 100% 45%) 100%);
-  --islamic-gradient-deep: linear-gradient(135deg, hsl(194 85% 50%) 0%, hsl(210 100% 40%) 100%);
-  --islamic-gradient-sky: linear-gradient(135deg, hsl(194 85% 65%) 0%, hsl(210 100% 55%) 100%);
+  /* Bright teal gradient definitions matching reference landing page */
+  --islamic-gradient-main: linear-gradient(135deg, hsl(194 100% 60%) 0%, hsl(194 100% 50%) 100%);
+  --islamic-gradient-deep: linear-gradient(135deg, hsl(194 100% 50%) 0%, hsl(194 100% 40%) 100%);
+  --islamic-gradient-sky: linear-gradient(135deg, hsl(194 100% 70%) 0%, hsl(194 100% 60%) 100%);
   --islamic-gradient-gold: linear-gradient(135deg, hsl(45 100% 70%) 0%, hsl(45 100% 80%) 100%);
-  --islamic-gradient-subtle: linear-gradient(135deg, hsl(194 85% 96%) 0%, hsl(194 85% 98%) 100%);
+  --islamic-gradient-subtle: linear-gradient(135deg, hsl(194 100% 96%) 0%, hsl(194 100% 98%) 100%);
   
   /* Islamic geometric patterns with teal theme */
   --islamic-pattern-light: radial-gradient(circle at 25% 25%, hsl(203 39% 90%) 2px, transparent 2px),
