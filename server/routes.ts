@@ -36,8 +36,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   }
   */
 
-  // Create test user for authentication testing
+  // Create test users for authentication testing
   try {
+    // Regular user
     const existingUser = await storage.getUserByUsername("test001");
     if (!existingUser) {
       await storage.createUser({
@@ -49,9 +50,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
         lastName: "User",
         signupMethod: "username",
         isVerified: true,
-        country: "Bangladesh"
+        country: "Bangladesh",
+        userType: "regular"
       });
-      console.log("Created test user: test001/Pw001");
+      console.log("Created regular test user: test001/Pw001");
+    }
+    
+    // Organization user
+    const existingOrg = await storage.getUserByUsername("testorg001");
+    if (!existingOrg) {
+      await storage.createUser({
+        id: "testorg001-user-id",
+        username: "testorg001",
+        password: "Pw001",
+        email: "testorg001@example.com",
+        firstName: "Test",
+        lastName: "Organization",
+        signupMethod: "username",
+        isVerified: true,
+        country: "Bangladesh",
+        userType: "organization",
+        organizationName: "Test Islamic Center",
+        organizationDescription: "A test organization for Islamic competitions"
+      });
+      console.log("Created organization test user: testorg001/Pw001");
     }
   } catch (error) {
     console.log("Test user creation skipped:", (error as Error).message);
@@ -166,16 +188,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(401).json({ message: "Not authenticated" });
       }
       
-      // Return test user for now
-      const testUser = {
-        id: "test-user-123",
-        firstName: "Test",
-        lastName: "User",
-        email: "test@example.com",
-        userType: "user"
-      };
+      if (req.session?.user) {
+        // Get actual user data from storage
+        const user = await storage.getUser(req.session.user.id);
+        if (user) {
+          return res.json(user);
+        }
+      }
       
-      res.json(testUser);
+      // If no session, return 401
+      return res.status(401).json({ message: "Not authenticated" });
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });

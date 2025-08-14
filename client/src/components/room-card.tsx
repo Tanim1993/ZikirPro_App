@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 interface RoomCardProps {
   room: any;
   isPublic?: boolean;
+  isOwner?: boolean;
+  isOrganization?: boolean;
 }
 
-export default function RoomCard({ room, isPublic = false }: RoomCardProps) {
+export default function RoomCard({ room, isPublic = false, isOwner = false, isOrganization = false }: RoomCardProps) {
   const daysRemaining = room.endDate ? Math.max(0, Math.ceil((new Date(room.endDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))) : room.duration;
   const progress = room.duration ? Math.min(100, ((room.duration - daysRemaining) / room.duration) * 100) : 0;
 

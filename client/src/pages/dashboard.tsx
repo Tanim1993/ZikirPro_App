@@ -221,15 +221,15 @@ export default function Dashboard() {
         <Tabs defaultValue="my-rooms" className="w-full">
           <TabsList className={cn(
             "bg-gray-100 p-1 rounded-lg w-full",
-            user?.userType === 'organization' 
+(user as any)?.userType === 'organization' 
               ? "grid grid-cols-2" 
               : "grid grid-cols-3"
           )}>
             <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
               <Home className="w-4 h-4 mr-2" />
-              {user?.userType === 'organization' ? 'My Competitions' : 'My Rooms'}
+{(user as any)?.userType === 'organization' ? 'My Competitions' : 'My Rooms'}
             </TabsTrigger>
-            {user?.userType !== 'organization' && (
+{(user as any)?.userType !== 'organization' && (
               <TabsTrigger value="org-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
                 <Building2 className="w-4 h-4 mr-2" />
                 Org
@@ -247,7 +247,7 @@ export default function Dashboard() {
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <Home className="w-8 h-8 text-gray-400" />
                 </div>
-                {user?.userType === 'organization' ? (
+{(user as any)?.userType === 'organization' ? (
                   <>
                     <h3 className="text-lg font-medium text-gray-900 mb-2">No competitions created</h3>
                     <p className="text-gray-600 mb-4">Create your first competition to engage your community</p>
@@ -274,7 +274,7 @@ export default function Dashboard() {
                     key={room.id} 
                     room={room} 
                     isOwner={room.role === "owner"}
-                    isOrganization={user?.userType === 'organization'}
+                    isOrganization={(user as any)?.userType === 'organization'}
                   />
                 ))}
               </div>
@@ -283,7 +283,7 @@ export default function Dashboard() {
 
 
 
-          {user?.userType !== 'organization' && (
+{(user as any)?.userType !== 'organization' && (
             <TabsContent value="org-rooms" className="space-y-4">
               {!Array.isArray(orgRooms) || orgRooms.length === 0 ? (
                 <div className="text-center py-12">
