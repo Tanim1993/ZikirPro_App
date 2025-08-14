@@ -10,7 +10,7 @@ import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2 } from "lucide-react";
 
 export default function Dashboard() {
   // All useState hooks at the top - NEVER move these after any conditional returns
@@ -31,6 +31,10 @@ export default function Dashboard() {
 
   const { data: publicRooms = [], isLoading: publicRoomsLoading } = useQuery({
     queryKey: ["/api/rooms/public"],
+  });
+
+  const { data: orgRooms = [], isLoading: orgRoomsLoading } = useQuery({
+    queryKey: ["/api/rooms/organizations"],
   });
 
   const { data: userAnalytics = {}, isLoading: analyticsLoading } = useQuery({
@@ -216,17 +220,21 @@ export default function Dashboard() {
       {/* Clean Content Section */}
       <div className="max-w-md mx-auto px-4">
         <Tabs defaultValue="my-rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
-            <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
-              <Home className="w-4 h-4 mr-2" />
+          <TabsList className="grid w-full grid-cols-4 bg-gray-100 p-1 rounded-lg">
+            <TabsTrigger value="my-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
+              <Home className="w-3 h-3 mr-1" />
               My Rooms
             </TabsTrigger>
-            <TabsTrigger value="public-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-public-rooms">
-              <Globe className="w-4 h-4 mr-2" />
+            <TabsTrigger value="public-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-public-rooms">
+              <Globe className="w-3 h-3 mr-1" />
               Public
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
-              <Trophy className="w-4 h-4 mr-2" />
+            <TabsTrigger value="org-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
+              <Building2 className="w-3 h-3 mr-1" />
+              Org
+            </TabsTrigger>
+            <TabsTrigger value="leaderboard" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
+              <Trophy className="w-3 h-3 mr-1" />
               Leaders
             </TabsTrigger>
           </TabsList>
@@ -261,6 +269,24 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {(publicRooms as any[]).map((room: any) => (
+                  <RoomCard key={room.id} room={room} isPublic={true} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="org-rooms" className="space-y-4">
+            {!Array.isArray(orgRooms) || orgRooms.length === 0 ? (
+              <div className="text-center py-12">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <Building2 className="w-8 h-8 text-gray-400" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">No organization rooms</h3>
+                <p className="text-gray-600">Organization competitions will appear here</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {(orgRooms as any[]).map((room: any) => (
                   <RoomCard key={room.id} room={room} isPublic={true} />
                 ))}
               </div>

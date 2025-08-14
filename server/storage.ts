@@ -47,6 +47,7 @@ export interface IStorage {
   getRoomWithDetails(id: number): Promise<any>;
   getPublicRooms(country?: string): Promise<any[]>;
   getUserRooms(userId: string): Promise<any[]>;
+  getOrganizationRooms(userId: string): Promise<any[]>;
   updateRoom(id: number, updates: Partial<Room>): Promise<Room>;
   deleteRoom(id: number): Promise<void>;
   
@@ -288,6 +289,38 @@ export class DatabaseStorage implements IStorage {
       .where(and(
         eq(roomMembers.userId, userId),
         eq(roomMembers.isActive, true)
+      ))
+      .orderBy(desc(rooms.createdAt));
+  }
+
+  async getOrganizationRooms(userId: string): Promise<any[]> {
+    return await db
+      .select({
+        id: rooms.id,
+        name: rooms.name,
+        description: rooms.description,
+        targetCount: rooms.targetCount,
+        duration: rooms.duration,
+        pictureUrl: rooms.pictureUrl,
+        startDate: rooms.startDate,
+        endDate: rooms.endDate,
+        zikirName: zikirs.name,
+        ownerId: rooms.ownerId,
+        isPublic: rooms.isPublic,
+        organizationName: users.organizationName,
+        memberCount: sql<number>`(
+          SELECT COUNT(*) 
+          FROM ${roomMembers} rm 
+          WHERE rm.room_id = ${rooms.id} 
+          AND rm.is_active = true
+        )`,
+      })
+      .from(rooms)
+      .leftJoin(users, eq(rooms.ownerId, users.id))
+      .leftJoin(zikirs, eq(rooms.zikirId, zikirs.id))
+      .where(and(
+        eq(users.userType, 'organization'),
+        eq(rooms.isPublic, true)
       ))
       .orderBy(desc(rooms.createdAt));
   }
@@ -582,23 +615,7 @@ export class DatabaseStorage implements IStorage {
     };
   }
 
-  async getGlobalLeaderboard(limit: number): Promise<any[]> {
-    return await db
-      .select({
-        userId: users.id,
-        firstName: users.firstName,
-        lastName: users.lastName,
-        profileImageUrl: users.profileImageUrl,
-        country: users.country,
-        totalCount: sql<number>`coalesce(sum(${liveCounters.totalCount}), 0)`,
-        rank: sql<number>`ROW_NUMBER() OVER (ORDER BY sum(${liveCounters.totalCount}) DESC)`
-      })
-      .from(users)
-      .leftJoin(liveCounters, eq(users.id, liveCounters.userId))
-      .groupBy(users.id)
-      .orderBy(sql`sum(${liveCounters.totalCount}) DESC`)
-      .limit(limit);
-  }
+
 
   // Report operations
   async createReport(reportData: Omit<Report, 'id' | 'createdAt'>): Promise<Report> {
@@ -648,16 +665,7 @@ export class DatabaseStorage implements IStorage {
     await db.delete(rooms).where(eq(rooms.id, id));
   }
 
-  async getUserCounter(roomId: number, userId: string): Promise<any> {
-    const [counter] = await db
-      .select()
-      .from(liveCounters)
-      .where(and(
-        eq(liveCounters.roomId, roomId),
-        eq(liveCounters.userId, userId)
-      ));
-    return counter;
-  }
+
 
   // Organization-specific methods
   async searchOrganizationRooms(query: string): Promise<any[]> {
@@ -685,7 +693,7 @@ export class DatabaseStorage implements IStorage {
     }));
   }
 
-  async getGlobalLeaderboard(): Promise<Array<{
+  async getGlobalLeaderboard(limit: number = 50): Promise<Array<{
     userId: string;
     firstName?: string;
     lastName?: string;
@@ -703,7 +711,8 @@ export class DatabaseStorage implements IStorage {
       })
       .from(countEntries)
       .groupBy(countEntries.userId)
-      .orderBy(sql`SUM(${countEntries.count}) DESC`);
+      .orderBy(sql`SUM(${countEntries.count}) DESC`)
+      .limit(limit);
 
     // Get user details and calculate additional stats
     const leaderboard = [];
