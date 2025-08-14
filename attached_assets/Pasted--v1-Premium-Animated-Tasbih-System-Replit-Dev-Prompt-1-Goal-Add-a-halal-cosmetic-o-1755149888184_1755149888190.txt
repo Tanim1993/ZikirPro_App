@@ -1,0 +1,159 @@
+# (v1) Premium Animated Tasbih System — Replit Dev Prompt
+
+## 1) Goal
+
+Add a **halal, cosmetic-only** premium tasbih system. Every room shows a **Tasbih Type** with a **“Change Tasbih”** button. Tapping it opens a **Premium Tasbih Gallery** showing animated tasbih styles with **gold coin** prices. If user lacks coins, show **“Purchase Gold Coins”** (no gambling/loot-boxes; direct purchase only).
+
+---
+
+## 2) Tasbih Packs (10 animated styles)
+
+Each has: `id`, `name`, `animation`, `rarity`, `priceCoins`, `previewLottie/mp4`, `thumbnail`.
+
+1. `classic_wood` — Polished walnut beads, subtle shine on tap — **Common** — 200
+2. `emerald_glow` — Deep green beads, soft radial glow on increment — **Uncommon** — 400
+3. `noor_pearl` — Pearl-white beads, gentle bloom + haptic ping — **Uncommon** — 400
+4. `sands_of_haram` — Sand-texture beads, dust-mote shimmer — **Rare** — 600
+5. `sabah_misbah` — Amber beads, sunrise sweep on combo taps — **Rare** — 600
+6. `zulfiqar_black` — Matte onyx beads, minimal ring ripple — **Rare** — 800
+7. `barakah_gold` — Brushed gold beads, halo ring on milestones (33/99) — **Epic** — 1000
+8. `ayatul_noor` — Calligraphy micro-etch, light trace follows bead — **Epic** — 1200
+9. `rawdah_garden` — Olive green + rose separators, leaf-petal burst — **Legendary** — 1500
+10. `lailatul_qadr` — Night-sky beads, star sparkle trail on tap — **Legendary** — 1800
+
+> All effects **tasteful & low-key**, no music by default; sound/haptics toggles in Settings.
+
+---
+
+## 3) UI/Flows
+
+### A) Room Screen (all rooms)
+
+* `Tasbih Type: <currentName>` + **\[Change Tasbih]** button.
+* On press → **Premium Tasbih Gallery** (grid: thumb, name, rarity, price).
+* Cards:
+
+  * If **owned** → button **\[Equip]**.
+  * If **not owned** → button **\[Buy for X 🪙]** + small **\[Preview]**.
+* If `wallet.coins < price` → show **inline banner**: “Not enough coins.” + **\[Purchase Gold Coins]**.
+
+### B) Coins Purchase (Halal)
+
+* Simple, transparent packs (example):
+
+  * 300 🪙 — \$1.99
+  * 800 🪙 — \$4.99
+  * 1800 🪙 — \$9.99
+* **No loot boxes**, **no gambling**, **no randomized rewards**.
+* Add **Parental gate** (confirm age) and **Spending limit** toggle in Settings.
+
+### C) Equip Logic
+
+* Equipping a tasbih changes **only the user’s client tasbih** in that room (cosmetic).
+* Room detail design stays identical for everyone; others see your equipped skin in leaderboard rows/tap popups.
+
+---
+
+## 4) Copy (strings)
+
+* Buttons: `Change Tasbih`, `Buy for {X} 🪙`, `Equip`, `Preview`, `Purchase Gold Coins`, `Restore Purchases`.
+* Banners:
+
+  * Success: “MashaAllah — **{name}** equipped.”
+  * Insufficient: “Not enough coins.”
+  * Purchase: “Coins added: {X} 🪙.”
+* Halal notice (modal footer): “Cosmetic only. No chance-based rewards.”
+
+---
+
+## 5) Data Model (additions)
+
+```json
+User { id, wallet: { coins:int, updatedAt }, inventory: [tasbihSkinId...] }
+
+TasbihSkin {
+  id, name, rarity:"common|uncommon|rare|epic|legendary",
+  priceCoins:int, previewUrl, thumbUrl, status:"active|retired"
+}
+
+UserPurchase {
+  id, userId, type:"coins|skin",
+  sku:"coins_300"|"coins_800"|..., coinsDelta:int,
+  amountCurrency:"USD", amountCents:int, provider:"Play|AppStore|Stripe",
+  createdAt
+}
+
+RoomSetting { roomId, defaultTasbihSkinId }  // optional; user override wins
+
+UserRoomConfig { roomId, userId, equippedTasbihSkinId } // current equip per room
+```
+
+---
+
+## 6) APIs / Security
+
+* `GET /store/tasbih-skins` → list active skins.
+* `POST /store/buy-skin` `{skinId}` → checks `wallet.coins >= price`, **server-side** owns + deducts, writes inventory atomically.
+* `POST /wallet/buy-coins` `{sku}` → verify receipt (AppStore/Play/Stripe webhook) → credit coins.
+* `POST /room/{id}/equip` `{skinId}` → checks ownership → set `UserRoomConfig`.
+* `GET /user/inventory` → owned skin ids + coins.
+
+**Rules:** all mutations **server-authoritative**; no client coin math. Rate limit purchase & equip endpoints. Audit logs.
+
+---
+
+## 7) Store Config (seed example)
+
+```json
+[
+  {"id":"classic_wood","priceCoins":200,"rarity":"common"},
+  {"id":"emerald_glow","priceCoins":400,"rarity":"uncommon"},
+  {"id":"noor_pearl","priceCoins":400,"rarity":"uncommon"},
+  {"id":"sands_of_haram","priceCoins":600,"rarity":"rare"},
+  {"id":"sabah_misbah","priceCoins":600,"rarity":"rare"},
+  {"id":"zulfiqar_black","priceCoins":800,"rarity":"rare"},
+  {"id":"barakah_gold","priceCoins":1000,"rarity":"epic"},
+  {"id":"ayatul_noor","priceCoins":1200,"rarity":"epic"},
+  {"id":"rawdah_garden","priceCoins":1500,"rarity":"legendary"},
+  {"id":"lailatul_qadr","priceCoins":1800,"rarity":"legendary"}
+]
+```
+
+---
+
+## 8) Animation/Asset Specs
+
+* **Format:** Lottie JSON preferred (fallback MP4/WebM, <2–3MB).
+* **States:** idle (loop), tap (150–280ms), milestone burst (33/66/99).
+* **Performance:** 60fps target; memory-safe for mid-range Android.
+* **Accessibility:** color-contrast OK; motion-reduced mode (fade instead of burst).
+
+---
+
+## 9) Halal Compliance
+
+* No jackpots, no spins, no random odds.
+* Clear pricing, refunds via store policy.
+* Daily limit control, purchase history, “Disable purchases” toggle.
+* Cosmetic-only; **no pay-to-win** on counts/leaderboard.
+
+---
+
+## 10) Telemetry & QA
+
+Events (with `roomId`, `skinId`, `coinsBefore/After`):
+
+* `store_opened`, `preview_viewed`, `skin_purchased`, `skin_equipped`, `coins_pack_viewed`, `coins_purchased`, `purchase_failed`, `insufficient_coins_shown`.
+  QA checklist: purchase → inventory → equip → persist across app restarts and devices; receipt replay protection.
+
+---
+
+## 11) Definition of Done
+
+* Gallery renders 10 skins with previews & prices.
+* Buying coins updates wallet; buying skin deducts coins and adds to inventory (server-side).
+* Equip persists per room; others see your equipped skin.
+* No randomized mechanics; parental/spend controls present.
+* All writes audited; basic rate limits in place.
+
+> If you want, I can also generate **seed JSON** + placeholder Lottie file names and a **minimal Flutter UI stub** for the gallery/equip flow.

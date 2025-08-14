@@ -5,10 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import type { User as UserType } from "../../shared/schema";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  
+  // Type assertion for user data
+  const typedUser = user as UserType;
 
   const { data: analytics } = useQuery({
     queryKey: ["/api/user/analytics"],
@@ -54,7 +58,7 @@ export default function Profile() {
       'female-2': '👩‍🦱',
       'female-3': '🧕'
     };
-    return avatarMap[user.avatarType || 'male-1'] || '👤';
+    return avatarMap[typedUser?.avatarType || 'male-1'] || '👤';
   };
 
   const getBgColorClass = () => {
@@ -66,7 +70,7 @@ export default function Profile() {
       'pink': 'bg-pink-100',
       'teal': 'bg-teal-100'
     };
-    return colorMap[user.bgColor || 'green'] || 'bg-green-100';
+    return colorMap[typedUser?.bgColor || 'green'] || 'bg-green-100';
   };
 
   return (
@@ -84,30 +88,30 @@ export default function Profile() {
             <div className={`w-20 h-20 ${getBgColorClass()} rounded-full flex items-center justify-center text-3xl mx-auto mb-4`}>
               {getAvatarDisplay()}
             </div>
-            <CardTitle className="text-xl">{user.firstName} {user.lastName}</CardTitle>
-            <CardDescription>@{user.username}</CardDescription>
-            <Badge variant={user.isVerified ? "default" : "secondary"} className="w-fit mx-auto mt-2">
-              {user.isVerified ? "Verified" : "Unverified"}
+            <CardTitle className="text-xl">{typedUser?.firstName} {typedUser?.lastName}</CardTitle>
+            <CardDescription>@{typedUser?.username}</CardDescription>
+            <Badge variant={typedUser?.isVerified ? "default" : "secondary"} className="w-fit mx-auto mt-2">
+              {typedUser?.isVerified ? "Verified" : "Unverified"}
             </Badge>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3 text-gray-600">
               <Mail className="h-4 w-4" />
-              <span>{user.email || "No email provided"}</span>
+              <span>{typedUser?.email || "No email provided"}</span>
             </div>
-            {user.phone && (
+            {typedUser?.phone && (
               <div className="flex items-center gap-3 text-gray-600">
                 <Phone className="h-4 w-4" />
-                <span>{user.phone}</span>
+                <span>{typedUser.phone}</span>
               </div>
             )}
             <div className="flex items-center gap-3 text-gray-600">
               <MapPin className="h-4 w-4" />
-              <span>{user.country || "Not specified"}</span>
+              <span>{typedUser?.country || "Not specified"}</span>
             </div>
             <div className="flex items-center gap-3 text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span>Joined {new Date(user.createdAt).toLocaleDateString()}</span>
+              <span>Joined {typedUser?.createdAt ? new Date(typedUser.createdAt).toLocaleDateString() : 'Unknown'}</span>
             </div>
           </CardContent>
         </Card>
@@ -120,19 +124,19 @@ export default function Profile() {
             </CardHeader>
             <CardContent className="grid grid-cols-2 gap-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{analytics.currentStreak}</div>
+                <div className="text-2xl font-bold text-green-600">{(analytics as any)?.currentStreak || 0}</div>
                 <div className="text-sm text-gray-600">Current Streak</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-blue-600">{analytics.longestStreak}</div>
+                <div className="text-2xl font-bold text-blue-600">{(analytics as any)?.longestStreak || 0}</div>
                 <div className="text-sm text-gray-600">Best Streak</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-purple-600">{analytics.totalZikir}</div>
+                <div className="text-2xl font-bold text-purple-600">{(analytics as any)?.totalZikir || 0}</div>
                 <div className="text-sm text-gray-600">Total Zikir</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-orange-600">{analytics.totalRooms}</div>
+                <div className="text-2xl font-bold text-orange-600">{(analytics as any)?.totalRooms || 0}</div>
                 <div className="text-sm text-gray-600">Rooms Joined</div>
               </div>
             </CardContent>
@@ -174,9 +178,9 @@ export default function Profile() {
             <div className="flex items-center justify-between">
               <span className="text-gray-600">Signup Method</span>
               <Badge variant="outline">
-                {user.signupMethod === 'username' ? 'Username' : 
-                 user.signupMethod === 'google' ? 'Google' : 
-                 user.signupMethod === 'otp' ? 'Phone OTP' : 'Unknown'}
+                {typedUser?.signupMethod === 'username' ? 'Username' : 
+                 typedUser?.signupMethod === 'google' ? 'Google' : 
+                 typedUser?.signupMethod === 'otp' ? 'Phone OTP' : 'Unknown'}
               </Badge>
             </div>
           </CardContent>

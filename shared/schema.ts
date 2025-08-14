@@ -198,6 +198,69 @@ export const liveCountersRelations = relations(liveCounters, ({ one }) => ({
 export type UpsertUser = typeof users.$inferInsert;
 export type User = typeof users.$inferSelect;
 
+// Tasbih Skins table
+export const tasbihSkins = pgTable("tasbih_skins", {
+  id: varchar("id").primaryKey(), // e.g., "classic_wood", "emerald_glow"
+  name: varchar("name").notNull(),
+  rarity: varchar("rarity").notNull(), // "common|uncommon|rare|epic|legendary"
+  priceCoins: integer("price_coins").notNull(),
+  previewUrl: varchar("preview_url"),
+  thumbUrl: varchar("thumb_url"),
+  status: varchar("status").notNull().default("active"), // "active|retired"
+  animationType: varchar("animation_type"), // describes the animation style
+  description: text("description"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Wallet
+export const userWallets = pgTable("user_wallets", {
+  userId: varchar("user_id").primaryKey(),
+  coins: integer("coins").notNull().default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Inventory (owned tasbih skins)
+export const userInventory = pgTable("user_inventory", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  tasbihSkinId: varchar("tasbih_skin_id").notNull(),
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+});
+
+// User Purchase History
+export const userPurchases = pgTable("user_purchases", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  type: varchar("type").notNull(), // "coins|skin"
+  sku: varchar("sku"), // "coins_300", "coins_800", etc.
+  coinsDelta: integer("coins_delta"), // coins added or deducted
+  amountCurrency: varchar("amount_currency"), // "USD"
+  amountCents: integer("amount_cents"), // price in cents
+  provider: varchar("provider"), // "Play|AppStore|Stripe"
+  itemId: varchar("item_id"), // for skin purchases, the skin ID
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User Room Config (equipped tasbih per room)
+export const userRoomConfigs = pgTable("user_room_configs", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  roomId: integer("room_id").notNull(),
+  equippedTasbihSkinId: varchar("equipped_tasbih_skin_id"),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export type TasbihSkin = typeof tasbihSkins.$inferSelect;
+export type InsertTasbihSkin = typeof tasbihSkins.$inferInsert;
+export type UserWallet = typeof userWallets.$inferSelect;
+export type InsertUserWallet = typeof userWallets.$inferInsert;
+export type UserInventoryItem = typeof userInventory.$inferSelect;
+export type InsertUserInventoryItem = typeof userInventory.$inferInsert;
+export type UserPurchase = typeof userPurchases.$inferSelect;
+export type InsertUserPurchase = typeof userPurchases.$inferInsert;
+export type UserRoomConfig = typeof userRoomConfigs.$inferSelect;
+export type InsertUserRoomConfig = typeof userRoomConfigs.$inferInsert;
+
 export type InsertZikir = typeof zikirs.$inferInsert;
 export type Zikir = typeof zikirs.$inferSelect;
 
