@@ -37,6 +37,8 @@ Preferred communication style: Simple, everyday language.
 - **Islamic Content**: Master list of authentic zikir with Arabic text, transliteration, and translations
 - **Room Management**: Deletion system for owners (when sole member) and reporting system for inappropriate content
 - **Auto-Membership**: Room creators automatically become members with owner role
+- **Verified Organizations**: Complete institutional competition system with organization accounts, prize management, and verified badges
+- **Unified Login System**: Single login page supporting both regular users and organization accounts with user-type-based feature display
 
 ## Component Structure
 - **Modular Components**: Reusable UI components for tasbih counter, room cards, leaderboards

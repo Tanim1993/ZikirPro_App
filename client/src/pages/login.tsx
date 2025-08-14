@@ -9,7 +9,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
-import { Eye, EyeOff, Mail, Lock, ArrowRight } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, ArrowRight, Building2 } from "lucide-react";
+import { OrganizationSignupModal } from "@/components/organization-signup-modal";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -20,6 +21,7 @@ export default function Login() {
     rememberMe: false
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showOrgSignup, setShowOrgSignup] = useState(false);
 
   const loginMutation = useMutation({
     mutationFn: async (data: { username: string; password: string; rememberMe: boolean }) => {
@@ -175,7 +177,7 @@ export default function Login() {
             </Button>
           </form>
 
-          <div className="text-center space-y-2">
+          <div className="text-center space-y-3">
             <p className="text-sm text-muted-foreground">
               Don't have an account?{" "}
               <Link href="/signup">
@@ -184,6 +186,19 @@ export default function Login() {
                 </span>
               </Link>
             </p>
+            
+            <Separator />
+            
+            <Button
+              variant="outline"
+              onClick={() => setShowOrgSignup(true)}
+              className="w-full h-11 border-green-200 hover:bg-green-50 text-green-700 hover:text-green-800"
+              data-testid="button-create-org"
+            >
+              <Building2 className="w-4 h-4 mr-2" />
+              Create Organization Account
+            </Button>
+            
             <Link href="/forgot-password">
               <span className="text-sm text-muted-foreground hover:text-foreground cursor-pointer">
                 Forgot your password?
@@ -192,6 +207,11 @@ export default function Login() {
           </div>
         </CardContent>
       </Card>
+      
+      <OrganizationSignupModal 
+        open={showOrgSignup}
+        onOpenChange={setShowOrgSignup}
+      />
     </div>
   );
 }
