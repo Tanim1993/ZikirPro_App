@@ -44,7 +44,6 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'allahu akbar',
     'allah akbar', 
     'allahuakbar',
-    'allahu akbar',
     'god is great',
     'الله أكبر',
     'اللّٰهُ أَكْبَرُ'
@@ -134,29 +133,34 @@ export function useVoiceRecognition({
     // First check if it matches the target phrase
     const matchesTarget = targetVariations.some(variation => {
       const normalizedVariation = normalizeText(variation);
-      // More strict matching - exact match or very close substring
+      // Balanced matching - exact match or reasonable substring for Arabic
       return normalizedDetected === normalizedVariation || 
-             (normalizedVariation.length > 4 && normalizedDetected.includes(normalizedVariation)) ||
-             (normalizedDetected.length > 4 && normalizedVariation.includes(normalizedDetected));
+             (normalizedVariation.length > 3 && normalizedDetected.includes(normalizedVariation)) ||
+             (normalizedDetected.length > 3 && normalizedVariation.includes(normalizedDetected));
     });
     
-    // If it matches target, make sure it doesn't ALSO match other phrases (to prevent cross-matching)
+    // If it matches target, apply lighter cross-validation (only for very specific conflicts)
     if (matchesTarget) {
-      // Check if this text could belong to OTHER zikir phrases
-      const otherPhrases = Object.keys(ZIKIR_PHRASES).filter(phrase => phrase !== targetPhrase);
+      // Only check for very specific cross-matching issues, not all phrases
+      const problematicCrosses = {
+        'SubhanAllah': ['Allahu Akbar'], // Only check against Allahu Akbar if needed
+        'La ilaha illallah': [], // Don't cross-check this phrase
+        'Allahu Akbar': ['SubhanAllah', 'La ilaha illallah'] // Check Allahu Akbar against others
+      };
       
-      for (const otherPhrase of otherPhrases) {
+      const phrasesToCheck = problematicCrosses[targetPhrase] || [];
+      
+      for (const otherPhrase of phrasesToCheck) {
         const otherVariations = ZIKIR_PHRASES[otherPhrase] || [];
         const alsoMatchesOther = otherVariations.some(variation => {
           const normalizedOtherVariation = normalizeText(variation);
-          return normalizedDetected === normalizedOtherVariation || 
-                 (normalizedOtherVariation.length > 4 && normalizedDetected.includes(normalizedOtherVariation)) ||
-                 (normalizedDetected.length > 4 && normalizedOtherVariation.includes(normalizedDetected));
+          // Only exact matches are considered cross-matches
+          return normalizedDetected === normalizedOtherVariation;
         });
         
         if (alsoMatchesOther) {
-          console.log(`❌ CROSS-MATCH REJECTED: "${detectedText}" matches both "${targetPhrase}" and "${otherPhrase}"`);
-          return false; // Reject ambiguous matches
+          console.log(`❌ SPECIFIC CROSS-MATCH REJECTED: "${detectedText}" matches both "${targetPhrase}" and "${otherPhrase}"`);
+          return false;
         }
       }
     }
