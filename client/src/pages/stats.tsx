@@ -32,28 +32,28 @@ export default function Stats() {
     {
       icon: Target,
       label: "Total Zikir",
-      value: userAnalytics?.totalZikir || 0,
+      value: (userAnalytics as any)?.totalCount || 0,
       color: "text-islamic-primary",
       bg: "bg-islamic-secondary/10"
     },
     {
       icon: Flame,
       label: "Current Streak",
-      value: `${userAnalytics?.currentStreak || 0} days`,
+      value: `${(userAnalytics as any)?.currentStreak || 0} days`,
       color: "text-orange-600",
       bg: "bg-orange-50"
     },
     {
       icon: Trophy,
       label: "Best Streak",
-      value: `${userAnalytics?.longestStreak || 0} days`,
+      value: `${(userAnalytics as any)?.longestStreak || 0} days`,
       color: "text-yellow-600",
       bg: "bg-yellow-50"
     },
     {
       icon: Calendar,
       label: "Days Active",
-      value: userAnalytics?.daysActive || 0,
+      value: (userAnalytics as any)?.daysActive || 0,
       color: "text-blue-600",
       bg: "bg-blue-50"
     }
@@ -63,28 +63,28 @@ export default function Stats() {
     {
       icon: Users,
       label: "Total Users",
-      value: globalStats?.totalUsers || 0,
+      value: (globalStats as any)?.totalUsers || 0,
       color: "text-purple-600",
       bg: "bg-purple-50"
     },
     {
       icon: Target,
       label: "Global Zikir Count",
-      value: globalStats?.totalZikir || 0,
+      value: (globalStats as any)?.totalZikir || 0,
       color: "text-islamic-primary",
       bg: "bg-islamic-secondary/10"
     },
     {
       icon: Globe,
       label: "Active Rooms",
-      value: globalStats?.activeRooms || 0,
+      value: (globalStats as any)?.activeRooms || 0,
       color: "text-blue-600",
       bg: "bg-blue-50"
     },
     {
       icon: TrendingUp,
       label: "Today's Count",
-      value: globalStats?.todayCount || 0,
+      value: (globalStats as any)?.todayCount || 0,
       color: "text-indigo-600",
       bg: "bg-indigo-50"
     }

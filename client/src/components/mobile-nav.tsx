@@ -54,23 +54,10 @@ export default function MobileNav() {
       active: location === "/rooms" || location?.startsWith("/room/")
     },
     {
-      href: "#create",
-      emoji: "➕",
-      label: "Create",
-      active: false,
-      onClick: () => setShowCreateModal(true)
-    },
-    {
       href: "/stats",
       emoji: "📊",
       label: "Stats",
       active: location === "/stats"
-    },
-    {
-      href: "/organizations",
-      emoji: "🏢", 
-      label: "Orgs",
-      active: location === "/organizations"
     },
     {
       href: "/profile",

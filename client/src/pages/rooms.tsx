@@ -58,13 +58,13 @@ export default function Rooms() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-islamic-gradient p-4">
+      <div className="min-h-screen bg-white p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 text-white">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-white"></div>
+            <div className="w-16 h-16 mx-auto mb-4">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-islamic-primary"></div>
             </div>
-            <p className="text-white/80">Loading rooms...</p>
+            <p className="text-gray-600">Loading rooms...</p>
           </div>
         </div>
       </div>
@@ -72,59 +72,65 @@ export default function Rooms() {
   }
 
   return (
-    <div className="min-h-screen bg-islamic-gradient p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-white mb-2 drop-shadow-lg">Browse Rooms</h1>
-          <p className="text-white/80">Join active Zikir competitions from around the world</p>
-        </div>
-
-        {/* Search and Filters */}
-        <div className="mb-6 space-y-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-            <Input
-              placeholder="Search rooms, zikir, or description..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 islamic-glass text-white placeholder:text-white/60"
-              data-testid="input-search-rooms"
-            />
+    <div className="min-h-screen bg-white">
+      {/* Clean Blue Header */}
+      <div className="bg-islamic-gradient px-4 py-6 mb-6">
+        <div className="max-w-4xl mx-auto">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Browse Rooms</h1>
+            <p className="text-white/80">Join active Zikir competitions from around the world</p>
           </div>
           
-          <div className="flex flex-wrap gap-2">
-            {countries.map((country) => (
-              <Button
-                key={country}
-                variant={selectedCountry === country ? "default" : "outline"}
-                size="sm"
-                onClick={() => setSelectedCountry(country)}
-                className={cn(
-                  "text-xs",
-                  selectedCountry === country 
-                    ? "bg-islamic-gradient text-white shadow-xl" 
-                    : "islamic-glass text-white hover:bg-white/20"
-                )}
-                data-testid={`button-filter-${country.toLowerCase()}`}
-              >
-                {country === "all" ? "All Countries" : country}
-              </Button>
-            ))}
+          {/* Search and Filters */}
+          <div className="mt-6 space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search rooms, zikir, or description..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/60 backdrop-blur-sm"
+                data-testid="input-search-rooms"
+              />
+            </div>
+            
+            <div className="flex flex-wrap gap-2">
+              {countries.map((country) => (
+                <Button
+                  key={country}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setSelectedCountry(country)}
+                  className={cn(
+                    "text-xs border-white/30",
+                    selectedCountry === country 
+                      ? "bg-white text-islamic-primary" 
+                      : "bg-white/10 text-white hover:bg-white/20"
+                  )}
+                  data-testid={`button-filter-${country.toLowerCase()}`}
+                >
+                  {country === "all" ? "All Countries" : country}
+                </Button>
+              ))}
+            </div>
+            
+            {/* Results Count */}
+            <div>
+              <p className="text-sm text-white/80">
+                Found {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''}
+              </p>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Results Count */}
-        <div className="mb-4">
-          <p className="text-sm text-white/80">
-            Found {filteredRooms.length} room{filteredRooms.length !== 1 ? 's' : ''}
-          </p>
-        </div>
+      {/* White Content Area */}
+      <div className="max-w-4xl mx-auto px-4">
 
         {/* Rooms Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
           {filteredRooms.map((room: Room) => (
-            <Card key={room.id} className="overflow-hidden islamic-glass hover:shadow-2xl transition-all duration-300 hover:scale-105">
+            <Card key={room.id} className="overflow-hidden bg-white border border-gray-200 hover:shadow-lg transition-all duration-200">
               <CardHeader className="pb-3">
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
