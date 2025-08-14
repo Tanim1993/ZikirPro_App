@@ -74,6 +74,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Set session with extended duration if rememberMe is checked
       req.session.user = { id: user.id };
+      // Clear logout flag if it exists
+      req.session.loggedOut = false;
       
       if (rememberMe) {
         // Extend session to 30 days
@@ -127,6 +129,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Set session
       req.session.user = { id: newUser.id };
+      // Clear logout flag if it exists
+      req.session.loggedOut = false;
       
       res.json({ message: "Signup successful", user: newUser });
     } catch (error) {
