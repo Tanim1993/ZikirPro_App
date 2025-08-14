@@ -25,8 +25,8 @@ function Router() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 text-islamic-green">
-            <i className="fas fa-prayer-beads text-4xl animate-pulse"></i>
+          <div className="w-16 h-16 mx-auto mb-4 animate-spin">
+            <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
           </div>
           <p className="text-gray-600">Loading...</p>
         </div>

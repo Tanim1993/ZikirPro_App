@@ -101,7 +101,7 @@ export default function Dashboard() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
+            <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
           </div>
           <p className="text-gray-600">Loading dashboard...</p>
         </div>
@@ -110,7 +110,7 @@ export default function Dashboard() {
   }
 
   const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
-    <Card className="mb-3 border border-green-200 shadow-lg bg-gradient-to-r from-white to-green-50">
+    <Card className="mb-3 border border-islamic-secondary/30 shadow-lg bg-gradient-to-r from-white to-islamic-secondary/10">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
@@ -126,7 +126,7 @@ export default function Dashboard() {
                 </div>
               )}
             </div>
-            <p className="text-green-700 font-medium text-sm mb-1">{room.zikirName}</p>
+            <p className="text-islamic-primary font-medium text-sm mb-1">{room.zikirName}</p>
             {room.description && (
               <p className="text-gray-600 text-sm mb-2 line-clamp-2">{room.description}</p>
             )}
@@ -134,9 +134,9 @@ export default function Dashboard() {
         </div>
         
         <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-          <div className="bg-green-100 rounded-lg p-2 border border-green-200">
-            <div className="text-lg font-bold text-green-700">{room.memberCount || 0}</div>
-            <div className="text-xs text-green-600">Members</div>
+          <div className="bg-islamic-secondary/20 rounded-lg p-2 border border-islamic-secondary/30">
+            <div className="text-lg font-bold text-islamic-primary">{room.memberCount || 0}</div>
+            <div className="text-xs text-islamic-primary/70">Members</div>
           </div>
           <div className="bg-blue-100 rounded-lg p-2 border border-blue-200">
             <div className="text-lg font-bold text-blue-700">{room.totalCount || 0}</div>
@@ -204,15 +204,15 @@ export default function Dashboard() {
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 0}</div>
-              <div className="text-xs text-blue-100">Total Zikir</div>
+              <div className="text-xs text-islamic-secondary/80">Total Zikir</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 0}</div>
-              <div className="text-xs text-blue-100">Day Streak</div>
+              <div className="text-xs text-islamic-secondary/80">Day Streak</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
               <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 0}</div>
-              <div className="text-xs text-blue-100">My Rooms</div>
+              <div className="text-xs text-islamic-secondary/80">My Rooms</div>
             </div>
           </div>
         </div>

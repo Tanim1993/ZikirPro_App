@@ -37,19 +37,19 @@
   --sidebar-border: hsl(214 32% 91%);
   --sidebar-ring: hsl(213 78% 50%);
   
-  /* Islamic theme colors */
-  --islamic-primary: hsl(213 78% 50%);
-  --islamic-primary-light: hsl(213 78% 60%);
-  --islamic-primary-dark: hsl(213 78% 40%);
-  --islamic-secondary: hsl(197 71% 52%);
+  /* Islamic theme colors - Updated to match user's preferred blue */
+  --islamic-primary: hsl(210 100% 56%);
+  --islamic-primary-light: hsl(210 100% 66%);
+  --islamic-primary-dark: hsl(210 100% 46%);
+  --islamic-secondary: hsl(210 100% 76%);
   --islamic-accent: hsl(42 92% 56%);
   --islamic-gold: hsl(42 92% 56%);
   --islamic-gold-light: hsl(42 92% 66%);
   --islamic-gold-dark: hsl(42 92% 46%);
-  --islamic-navy: hsl(213 78% 25%);
-  --islamic-navy-dark: hsl(213 78% 15%);
-  --islamic-gradient-start: hsl(213 78% 50%);
-  --islamic-gradient-end: hsl(197 71% 52%);
+  --islamic-navy: hsl(210 100% 25%);
+  --islamic-navy-dark: hsl(210 100% 15%);
+  --islamic-gradient-start: hsl(210 100% 56%);
+  --islamic-gradient-end: hsl(210 100% 76%);
   
   --font-sans: Inter, sans-serif;
   --font-serif: Georgia, serif;

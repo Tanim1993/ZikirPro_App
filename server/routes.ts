@@ -834,13 +834,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const { registerStoreRoutes } = await import("./storeRoutes");
   registerStoreRoutes(app);
 
-  // Seed tasbih data on startup
-  try {
-    const { seedTasbihSkins } = await import("./seedTasbihData");
-    await seedTasbihSkins();
-  } catch (error) {
-    console.log("Tasbih seeding error (may already be seeded):", (error as Error).message);
-  }
+  // Seed tasbih data on startup (temporarily disabled)
+  // try {
+  //   const { seedTasbihSkins } = await import("./seedTasbihData");
+  //   await seedTasbihSkins();
+  // } catch (error) {
+  //   console.log("Tasbih seeding error (may already be seeded):", (error as Error).message);
+  // }
 
   app.post('/api/auth/signup', async (req, res) => {
     try {
