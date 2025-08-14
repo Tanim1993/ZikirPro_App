@@ -52,7 +52,7 @@ export default function Room() {
   // Get room member count for deletion check
   const { data: memberCount = 0 } = useQuery({
     queryKey: [`/api/rooms/${roomId}/member-count`],
-    enabled: !!roomId && !!user?.id,
+    enabled: !!roomId && !!user,
   }) as { data: number };
 
   // Optimized count mutation with immediate UI feedback
@@ -422,7 +422,7 @@ export default function Room() {
                     </Button>
 
                     {/* Delete Room Button - Only for owner if sole member */}
-                    {user?.id === room?.ownerId && (
+                    {user && user.id === room?.ownerId && (
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>

@@ -527,7 +527,11 @@ export class DatabaseStorage implements IStorage {
 
   // Report operations
   async createReport(reportData: Omit<Report, 'id' | 'createdAt'>): Promise<Report> {
-    const [report] = await db.insert(reports).values(reportData).returning();
+    const dbData = {
+      ...reportData,
+      type: reportData.kind // Add type field for database compatibility
+    };
+    const [report] = await db.insert(reports).values(dbData).returning();
     return report;
   }
 
