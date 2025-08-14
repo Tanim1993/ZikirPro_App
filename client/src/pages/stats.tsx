@@ -91,46 +91,36 @@ export default function Stats() {
   ];
 
   return (
-    <div className="min-h-screen bg-islamic-gradient-subtle islamic-pattern-bg pb-20">
-      {/* Header with Original Bright Green Design */}
-      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-lg relative overflow-hidden">
-        {/* Islamic geometric pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="islamic-pattern-stats" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <polygon points="10,1 4,7 10,13 16,7" fill="white" />
-                <polygon points="4,7 10,13 10,19 1,19 1,10" fill="white" />
-                <polygon points="16,7 19,10 19,19 10,19 10,13" fill="white" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#islamic-pattern-stats)" />
-          </svg>
-        </div>
-        
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white drop-shadow-lg">Statistics</h1>
-            <p className="text-white/80 font-medium">Your spiritual journey & achievements</p>
-          </div>
-          <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-            <BarChart3 className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-white pb-20">
+      {/* Clean Blue Header */}
+      <div className="bg-islamic-gradient px-4 py-6 mb-4">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/90 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-islamic-primary" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">Statistics</h1>
+                <p className="text-white/80 text-xs">Your spiritual journey & achievements</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 py-6">
+      <div className="max-w-md mx-auto px-4">
         <Tabs defaultValue="personal" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="personal">Personal Stats</TabsTrigger>
-            <TabsTrigger value="global">Global Stats</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 mb-6 bg-gray-100 p-1 rounded-lg">
+            <TabsTrigger value="personal" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm">Personal Stats</TabsTrigger>
+            <TabsTrigger value="global" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm">Global Stats</TabsTrigger>
           </TabsList>
 
           <TabsContent value="personal" className="space-y-6">
             {/* Personal Stats Cards */}
             <div className="grid grid-cols-2 gap-4">
               {stats.map((stat, index) => (
-                <Card key={index} className="bg-white/20 rounded-xl backdrop-blur-sm border border-white/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105">
+                <Card key={index} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200">
                   <CardContent className="p-4">
                     <div className={`w-10 h-10 rounded-lg ${stat.bg} flex items-center justify-center mb-3`}>
                       <stat.icon className={`w-5 h-5 ${stat.color}`} />

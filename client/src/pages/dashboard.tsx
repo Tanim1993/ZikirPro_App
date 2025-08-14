@@ -171,69 +171,61 @@ export default function Dashboard() {
   );
 
   return (
-    <div className="min-h-screen bg-islamic-gradient-subtle islamic-pattern-bg">
-      {/* Enhanced Header with Islamic Gradient Design */}
-      <div className="bg-islamic-gradient rounded-b-3xl p-6 mb-6 shadow-lg relative overflow-hidden">
-        {/* Islamic geometric pattern overlay */}
-        <div className="absolute inset-0 opacity-10">
-          <svg className="w-full h-full" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="islamic-star-pattern" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
-                <circle cx="10" cy="10" r="2" fill="white"/>
-                <path d="M10,5 L12,8 L15,8 L13,11 L14,14 L10,12 L6,14 L7,11 L5,8 L8,8 Z" fill="white" fillOpacity="0.3"/>
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#islamic-star-pattern)"/>
-          </svg>
-        </div>
-        
-        <div className="max-w-md mx-auto relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h1 className="text-3xl font-bold text-white drop-shadow-lg">Zikir Amol</h1>
-              <p className="text-white/80 text-sm font-medium">Islamic Prayer Counter & Competition</p>
+    <div className="min-h-screen bg-white">
+      {/* Clean Blue Header */}
+      <div className="bg-islamic-gradient px-4 py-6">
+        <div className="max-w-md mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-white/90 rounded-lg flex items-center justify-center">
+                <div className="text-lg font-bold text-islamic-primary font-amiri">ج</div>
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">Zikir Amol</h1>
+                <p className="text-white/80 text-xs">Islamic Prayer Counter & Competition</p>
+              </div>
             </div>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm border border-white/30 shadow-lg"
+              className="bg-white text-islamic-primary hover:bg-white/90 shadow-sm px-4 py-2 text-sm font-medium rounded-lg"
               data-testid="button-create-room"
             >
-              <Plus className="w-4 h-4 mr-2" />
+              <Plus className="w-4 h-4 mr-1" />
               Create Room
             </Button>
           </div>
           
-          {/* Enhanced Quick Stats with Islamic Glass Design */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
-              <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
-              <div className="text-sm text-white/90 font-medium">Total Zikir</div>
+          {/* Clean Stats Cards */}
+          <div className="grid grid-cols-3 gap-3">
+            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
+              <div className="text-xs text-white/80">Total Zikir</div>
             </div>
-            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
-              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 1}</div>
-              <div className="text-sm text-white/90 font-medium">Day Streak</div>
+            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 1}</div>
+              <div className="text-xs text-white/80">Day Streak</div>
             </div>
-            <div className="text-center bg-white/20 rounded-xl p-4 shadow-lg backdrop-blur-sm border border-white/30">
-              <div className="text-2xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
-              <div className="text-sm text-white/90 font-medium">My Rooms</div>
+            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
+              <div className="text-xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
+              <div className="text-xs text-white/80">My Rooms</div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Content */}
-      <div className="max-w-md mx-auto p-4">
+      {/* Clean Content Section */}
+      <div className="max-w-md mx-auto px-4">
         <Tabs defaultValue="my-rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="my-rooms" data-testid="tab-my-rooms">
+          <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+            <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
               <Home className="w-4 h-4 mr-2" />
               My Rooms
             </TabsTrigger>
-            <TabsTrigger value="public-rooms" data-testid="tab-public-rooms">
+            <TabsTrigger value="public-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-public-rooms">
               <Globe className="w-4 h-4 mr-2" />
               Public
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" data-testid="tab-leaderboard">
+            <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
               <Trophy className="w-4 h-4 mr-2" />
               Leaders
             </TabsTrigger>

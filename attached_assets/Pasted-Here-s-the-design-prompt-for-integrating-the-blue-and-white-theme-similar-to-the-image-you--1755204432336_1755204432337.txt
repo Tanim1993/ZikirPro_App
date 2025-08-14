@@ -1,0 +1,176 @@
+Here’s the **design prompt** for integrating the **blue and white theme** (similar to the image you uploaded) into your app, and allowing users to **choose and establish this theme** across all pages:
+
+---
+
+### **Feature: Blue & White Theme Integration + User Customization**
+
+**Goal:**
+Integrate a modern **blue & white theme** for your app, inspired by the image provided. Allow users to choose this theme across all app screens. The theme should be consistent across **Home**, **Prayer**, **Profile**, **Library**, and **Room screens**.
+
+---
+
+### **1. Color Palette**
+
+* **Primary Colors**:
+
+  * **Blue**: #1D4ED8 (for headers, buttons, active states)
+  * **White**: #FFFFFF (background, card sections)
+  * **Light Blue**: #EFF6FF (lighter backgrounds, subtle containers)
+  * **Gray**: #D1D5DB (text color for subtle sections)
+  * **Dark Blue**: #1E3A8A (for secondary action buttons and less prominent areas)
+* **Secondary Colors**:
+
+  * **Accent Green**: #10B981 (for success, confirmation, or positive actions)
+  * **Accent Red**: #DC2626 (for alerts or errors)
+
+---
+
+### **2. UI Elements**
+
+#### **Header Bar (Blue with white text)**
+
+* The header should have a **deep blue** background (#1D4ED8), with **white text**.
+* **Icons** in the header: White icons for navigation (e.g., back, menu, search).
+
+#### **Navigation Bar (White with Blue Icons)**
+
+* Background should be **white**, with icons and text in **blue** (#1D4ED8).
+* Active page should have an **accent underline** or border in blue for clear navigation.
+
+#### **Cards and Containers**
+
+* **Background**: Keep most containers **white**, with subtle **light blue** shadows or borders to separate sections. This can be used for room lists, Quran challenge cards, etc.
+* For action cards (e.g., buttons), use **solid blue** with **white text** or icons. When hovered or pressed, they change to a lighter blue or accent green.
+
+#### **Button Styles**
+
+* **Primary Buttons**: Blue background with white text.
+* **Secondary Buttons**: White background with blue text and border.
+* **Disabled Buttons**: Light gray background with gray text.
+
+---
+
+### **3. User Interface Components**
+
+1. **Theme Toggle Option (For User Customization)**
+   Provide a toggle option in **Settings** so users can choose between the blue & white theme and another potential default theme (e.g., light or dark mode).
+
+   * The toggle should change the app’s primary color scheme and apply it across all pages.
+   * The theme toggle can be located in the **Settings** > **Appearance** section. Users can choose to **apply this theme universally** or just for certain pages.
+
+2. **User Customization Flow**:
+
+   * Upon opening the app, offer a **prompt** that asks users if they want to **apply the blue and white theme**.
+   * If they accept, this theme should be stored in their user settings and applied to all pages (rooms, leaderboard, profile, prayer schedule, etc.).
+   * Save the user’s theme preference in their settings (using **local storage**, **profile preferences**, or **user settings API**).
+
+3. **Navigation & Search Bars**:
+
+   * **Search bar**: The search bar should have a **white background** with blue text/icons and a subtle blue underline when focused.
+   * **Bottom Navigation Bar**: Keep the bottom nav bar **white** with blue icons, and the active page should show an **underline or accent blue**.
+
+---
+
+### **4. Typography**
+
+* **Primary Text**: Use **dark gray/blue** for readability, with clear differentiation between headings and body text.
+* **Secondary Text**: Use **lighter gray** or **subtle blue** text for less important elements (e.g., subheaders, dates).
+
+  Example:
+
+  * Headings: **Bold**, dark blue text
+  * Body Text: Regular weight, dark gray/blue text
+  * Small text: Light gray for less important details (e.g., timestamps, non-actionable items)
+
+---
+
+### **5. Implementing across Pages**
+
+1. **Home Page**:
+
+   * Header with blue background and white icons.
+   * Display featured **rooms, reciters**, and **upcoming challenges** in card format with a subtle blue border or shadow effect.
+   * The **Quran Engagement Time** section should use a **white background** with **blue and green highlights** for progress.
+
+2. **Prayer Page**:
+
+   * Clean white background with **blue** icons for prayer times.
+   * Use blue text for prayer names and **light blue** for the countdown to the next prayer.
+
+3. **Profile Page**:
+
+   * Profile card with **blue accents** and **white background**.
+   * Allow users to upload a **profile picture**, and apply the blue-white theme to their username and bio area.
+
+4. **Library Page**:
+
+   * Organize Quran-related content, **weekly programs**, or **donation options** in **blue-bordered cards** with **white backgrounds**.
+   * Icons should be **blue** with hover effects (changing to green or darker blue on focus).
+
+5. **Room Pages**:
+
+   * For **competition rooms**, ensure that the **leaderboard** has a clean, blue-themed **header and progress bars**.
+   * Display room details in **white cards** with blue borders and prize information clearly marked in **accent blue**.
+
+---
+
+### **6. Additional Considerations**
+
+* **Consistency**: Ensure consistency across all pages and components. Use the **blue** and **white** theme for cards, buttons, modals, and headers.
+* **Accessibility**: Make sure that color contrasts meet WCAG standards for readability (blue text on white background). Avoid overuse of blue that could lead to **visual fatigue**.
+* **Performance**: Use **CSS Variables** for theming to make switching colors easy and efficient across the app. Consider **lightweight animations** or transitions (e.g., button hover) using **Tailwind’s transition classes** for smooth, subtle changes.
+
+---
+
+### **7. Example Tailwind Classes for the Blue & White Theme**
+
+```html
+<!-- Blue and White Theme Button -->
+<button class="bg-blue-600 text-white hover:bg-blue-700 border-0 rounded-xl p-2">Join Room</button>
+
+<!-- Navigation Bar -->
+<nav class="bg-white text-blue-600 border-b border-blue-300">
+  <ul class="flex">
+    <li class="p-4">Home</li>
+    <li class="p-4">Rooms</li>
+    <li class="p-4">Profile</li>
+  </ul>
+</nav>
+
+<!-- Header Bar -->
+<header class="bg-blue-600 text-white p-4">
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold">Zikir App</h1>
+    <button class="bg-white text-blue-600 p-2 rounded-xl">Settings</button>
+  </div>
+</header>
+
+<!-- Content Section (Cards) -->
+<div class="bg-white shadow-lg rounded-xl p-6">
+  <h2 class="text-blue-600 font-semibold">Join Zikir Challenge</h2>
+  <p class="text-gray-700">Start your daily Zikir challenge now and win exciting prizes!</p>
+</div>
+```
+
+---
+
+### **8. Key Tasks for Your Developer:**
+
+1. **Design Theme Toggle**:
+
+   * Implement a theme toggle option under **Settings** > **Appearance**.
+   * Ensure theme selection persists across sessions.
+
+2. **Consistency Across Pages**:
+
+   * Apply blue & white theme styling to all major components (header, footer, buttons, forms, etc.).
+
+3. **Custom Logo Upload**:
+
+   * For verified organizations, enable them to upload their logo and display it consistently on all relevant pages (e.g., room cards, profile).
+
+---
+
+This approach provides your users with a **clean, modern design** and flexibility to switch to a visually appealing blue-white theme while maintaining **user personalization** and **brand consistency**.
+
+If you want, I can help you with **UI mockups** for specific screens like **home**, **profile**, and **rooms** with this theme!
