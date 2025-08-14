@@ -42,6 +42,7 @@ Design approach: Minimal, modern, professional look with blue gradients and whit
 - **Auto-Membership**: Room creators automatically become members with owner role
 - **Verified Organizations**: Complete institutional competition system with organization accounts, prize management, and verified badges
 - **Unified Login System**: Single login page supporting both regular users and organization accounts with user-type-based feature display
+- **Islamic Features Suite**: Comprehensive external features accessible via "More" button including Salah Tracker, Quran Reader, Hadith Collection, Zakat Calculator, Qiblah Direction, and Donations platform - all maintaining consistent blue gradient theme
 
 ## Component Structure
 - **Modular Components**: Reusable UI components for tasbih counter, room cards, leaderboards

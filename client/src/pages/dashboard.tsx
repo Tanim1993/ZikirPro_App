@@ -10,7 +10,7 @@ import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator } from "lucide-react";
 
 export default function Dashboard() {
   // All useState hooks at the top - NEVER move these after any conditional returns
@@ -271,6 +271,44 @@ export default function Dashboard() {
             <GlobalLeaderboard />
           </TabsContent>
         </Tabs>
+
+        {/* Islamic Features Section */}
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-gray-900">Islamic Features</h2>
+            <Link href="/more">
+              <Button variant="outline" className="text-islamic-primary border-islamic-primary hover:bg-islamic-primary hover:text-white">
+                More Features
+              </Button>
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/salah-tracker">
+              <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-sm">Salah Tracker</h3>
+                    <p className="text-xs text-white/80 mt-1">Daily prayers</p>
+                  </div>
+                  <Clock className="w-6 h-6" />
+                </div>
+              </div>
+            </Link>
+            
+            <Link href="/zakat-calculator">
+              <div className="bg-gradient-to-br from-teal-500 to-teal-600 text-white p-4 rounded-lg hover:shadow-lg transition-all duration-200 cursor-pointer">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-sm">Zakat Calculator</h3>
+                    <p className="text-xs text-white/80 mt-1">Calculate Zakat</p>
+                  </div>
+                  <Calculator className="w-6 h-6" />
+                </div>
+              </div>
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Create Room Modal */}

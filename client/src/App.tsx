@@ -17,6 +17,13 @@ import Rooms from "./pages/rooms";
 import Leaderboard from "./pages/leaderboard";
 import MobileNav from "./components/mobile-nav";
 import OrganizationSearch from "./pages/organization-search";
+import More from "./pages/more";
+import SalahTracker from "./pages/salah-tracker";
+import Quran from "./pages/quran";
+import Hadith from "./pages/hadith";
+import ZakatCalculator from "./pages/zakat-calculator";
+import Qiblah from "./pages/qiblah";
+import Donations from "./pages/donations";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -63,6 +70,13 @@ function Router() {
             <Route path="/rooms" component={Rooms} />
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/organizations" component={OrganizationSearch} />
+            <Route path="/more" component={More} />
+            <Route path="/salah-tracker" component={SalahTracker} />
+            <Route path="/quran" component={Quran} />
+            <Route path="/hadith" component={Hadith} />
+            <Route path="/zakat-calculator" component={ZakatCalculator} />
+            <Route path="/qiblah" component={Qiblah} />
+            <Route path="/donations" component={Donations} />
           </>
         )}
         <Route component={NotFound} />

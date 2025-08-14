@@ -1,0 +1,162 @@
+Here’s a complete prompt for integrating the external features into your app, using the **current blue-white gradient theme**, as well as adding a **"More" button** on the home page with navigation to the additional features like **Salah time, Quran, Hadith, Zakat calculator**, and **Qiblah direction**. These external features will be seamlessly integrated into your app for a unified user experience.
+
+---
+
+### **Feature: External Features Section with Seamless Navigation**
+
+**Goal**:
+Create a **"More" button** on the home screen for easy access to **external features** (Salah time, Quran, Hadith, Zakat calculator, Qiblah) while maintaining a consistent **blue-white gradient theme** across all features.
+
+---
+
+### **1. Home Page UI (Main Screen)**
+
+**1.1 Add "More" Button:**
+
+* Place the **"More" button** below the Salah time tracker on the home page.
+* This will open a new screen (see **first image** for reference) where the user can access the external features.
+
+**1.2 Salah Time Tracker:**
+
+* Keep the **Salah time section** as the main highlight on the home screen with **current Salah times** based on location.
+* After displaying the time, add the **Salah tracker** that shows a check for each prayer (like in the second image).
+
+**1.3 External Features Overview**:
+
+* Display all the external features in the **Explore Features** section (similar to the "Explore Features" box seen in the first image), with clickable icons for each section:
+
+  * **Quran**
+  * **Hadith**
+  * **Zakat Calculator**
+  * **Qiblah**
+  * **Donations**
+
+---
+
+### **2. More Screen UI (External Features Page)**
+
+**2.1 External Features Layout**:
+
+* On click of the **"More" button**, navigate the user to the **"More" page**, where they will see a list of **external features** like:
+
+  * **Quran**
+  * **Hadith**
+  * **Zakat Calculator**
+  * **Qiblah Direction**
+  * **Salah Tracker**
+* Use a clean, minimalist layout with **blue gradient buttons** for each external feature to match the app’s overall theme.
+
+**2.2 Features Displayed on "More" Page:**
+
+* **Salah Tracker**: Track the user’s daily prayers in a checklist format similar to the second image. Show prayers like Fajr, Dhuhr, Asr, Maghrib, Isha, and mark them off as completed.
+
+* **Quran**: Display the **Quran progress** like in the last image.
+
+  * Show **last read surah** and **overall completion percentage**.
+  * The Quran content should be categorized (Surah, Juzz, Hadith, etc.), just like the **third image**.
+
+* **Zakat Calculator**: Display a simple **form-based** input for users to calculate their Zakat.
+
+  * **Income**: Allow users to enter their income, other income, and debt amounts.
+  * **Calculate Zakat**: Show a button for calculating and displaying the result, just like the **last image**.
+
+* **Qiblah Direction**: Show the **compass** with the Qiblah direction based on the user’s current location.
+
+  * Include the **distance to Ka'bah** and the **Qiblah direction** (similar to the Qiblah compass in the fifth image).
+
+---
+
+### **3. Feature: Consistent Blue & White Gradient Theme**
+
+* Maintain a consistent **blue-white gradient** theme across all these screens, ensuring all elements such as:
+
+  * **Buttons** for each feature (e.g., "Quran", "Adzan", "Qiblah") are styled with the **gradient background**.
+  * **Headers and Titles** are **white text** on the gradient background.
+  * **Cards** (for Quran, Zakat Calculator, etc.) have a **white background** with blue gradient accents.
+  * **Icons** inside each card (e.g., a Quran icon, Zakat icon) should match the overall theme and be **blue or white**.
+
+### **4. Interactive Elements & Design Consistency**
+
+**4.1 Buttons**:
+
+* Buttons like **"Calculate Zakat"** or **"Join Quran Room"** should have **blue gradient backgrounds** with **white text**.
+
+  ```css
+  .btn-blue-gradient {
+    background-image: linear-gradient(105.9deg, rgba(0,122,184,1) 24.4%, rgba(46,0,184,0.88) 80.5%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-blue-gradient:hover {
+    background-image: linear-gradient(105.9deg, rgba(0,122,184,1) 20%, rgba(46,0,184,0.88) 85%);
+  }
+  ```
+
+**4.2 Icons**:
+
+* Use **clean, minimalistic icons** in blue for each feature (e.g., Quran icon, prayer tracker, Zakat calculator).
+* These icons should have a **white background** and be slightly rounded to match the modern feel of the app.
+
+**4.3 Header & Footer**:
+
+* The header and footer should follow the same **gradient design**:
+
+  * Header text: **White text** on the blue gradient background.
+  * Footer navigation: Same gradient buttons/icons for smooth transitions between pages.
+
+---
+
+### **5. User Flow Example**
+
+**1. Home Page**:
+
+* User opens the app and sees the **Salah time tracker** with prayer times.
+* Below that, they see a **"More"** button for external features (like Quran, Hadith, Zakat, Qiblah).
+* They click on the **"More"** button to explore these external features.
+
+**2. More Page**:
+
+* The page displays the following features in an organized way with gradient buttons:
+
+  * **Quran**: Shows their progress.
+  * **Zakat Calculator**: Shows a form with income and debt details.
+  * **Qiblah**: Shows the Qiblah direction.
+  * **Prayer Tracker**: Marks the prayers as completed once performed.
+
+**3. Completion**:
+
+* Each feature behaves interactively, keeping the user engaged with daily challenges, progress tracking, and educational content.
+
+---
+
+### **6. Final Implementation Considerations**
+
+* Ensure **responsive design** so the app works seamlessly across mobile screens.
+* All **external features** should be easily accessible via the **"More" button** without cluttering the main UI.
+* Allow for **future scaling**—add more features like **donations, Ramadan events**, etc., with the same theme consistency.
+
+---
+
+### **7. Example Tailwind Classes for Gradient Theme**
+
+```html
+<!-- Button with Gradient Background -->
+<button class="bg-gradient-to-r from-blue-600 to-indigo-800 text-white p-3 rounded-xl">
+  Join Quran Room
+</button>
+
+<!-- Gradient Background for Cards -->
+<div class="bg-white shadow-lg rounded-lg p-4 border-t-4 border-blue-600">
+  <h3 class="text-blue-600">Quran Completion</h3>
+  <p class="text-gray-700">Last Read: Surah Al-Baqarah 117</p>
+  <div class="h-2 bg-blue-300 w-4/5 rounded-full"></div>
+</div>
+```
+
+---
+
+This approach ensures that the app **remains consistent with its blue and white gradient theme** while offering a rich set of external features for the user. The **"More" button** serves as the gateway to more **engaging, informative, and interactive** experiences for users.
