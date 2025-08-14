@@ -9,6 +9,7 @@ import Landing from "./pages/landing";
 import Login from "./pages/login";
 import Signup from "./pages/signup";
 import Dashboard from "./pages/dashboard";
+import OrganizationDashboard from "./pages/organization-dashboard";
 import Room from "./pages/room";
 import Profile from "./pages/profile";
 import Stats from "./pages/stats";
@@ -18,7 +19,7 @@ import MobileNav from "./components/mobile-nav";
 import OrganizationSearch from "./pages/organization-search";
 
 function Router() {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -41,6 +42,14 @@ function Router() {
             <Route path="/" component={Landing} />
             <Route path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
+            <Route path="/organizations" component={OrganizationSearch} />
+          </>
+        ) : user?.userType === 'organization' ? (
+          <>
+            <Route path="/" component={OrganizationDashboard} />
+            <Route path="/dashboard" component={OrganizationDashboard} />
+            <Route path="/room/:id" component={Room} />
+            <Route path="/profile" component={Profile} />
             <Route path="/organizations" component={OrganizationSearch} />
           </>
         ) : (

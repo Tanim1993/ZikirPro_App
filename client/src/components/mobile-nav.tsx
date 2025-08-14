@@ -2,12 +2,45 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { cn } from "../lib/utils";
 import CreateRoomModal from "./create-room-modal";
+import { CreateCompetitionModal } from "./create-competition-modal";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function MobileNav() {
   const [location] = useLocation();
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const { user } = useAuth();
+  
+  const isOrganization = user?.userType === 'organization';
 
-  const navItems = [
+  const organizationNavItems = [
+    {
+      href: "/dashboard",
+      emoji: "🏢",
+      label: "Dashboard",
+      active: location === "/dashboard" || location === "/"
+    },
+    {
+      href: "#create",
+      emoji: "🏆",
+      label: "Create",
+      active: false,
+      onClick: () => setShowCreateModal(true)
+    },
+    {
+      href: "/organizations",
+      emoji: "🌟", 
+      label: "Browse",
+      active: location === "/organizations"
+    },
+    {
+      href: "/profile",
+      emoji: "👤", 
+      label: "Profile",
+      active: location === "/profile"
+    }
+  ];
+
+  const userNavItems = [
     {
       href: "/dashboard",
       emoji: "🏠",
@@ -46,6 +79,8 @@ export default function MobileNav() {
       active: location === "/profile"
     }
   ];
+
+  const navItems = isOrganization ? organizationNavItems : userNavItems;
 
   return (
     <>
@@ -87,11 +122,18 @@ export default function MobileNav() {
         </div>
       </nav>
       
-      {/* Create Room Modal */}
-      <CreateRoomModal 
-        open={showCreateModal} 
-        onOpenChange={setShowCreateModal} 
-      />
+      {/* Create Modals */}
+      {isOrganization ? (
+        <CreateCompetitionModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+        />
+      ) : (
+        <CreateRoomModal
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+        />
+      )}
     </>
   );
 }
