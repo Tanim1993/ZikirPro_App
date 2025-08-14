@@ -44,8 +44,10 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'allahu akbar',
     'allah akbar', 
     'allahuakbar',
+    'allahu akbar',
     'god is great',
-    'الله أكبر'
+    'الله أكبر',
+    'اللّٰهُ أَكْبَرُ'
   ],
   'SubhanAllah': [
     'subhanallah',
@@ -59,7 +61,6 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'سُبْحَانَ اللَّهِ',
     'سبحان',
     'سُبْحَانَ',
-    'سيتضح', // Adding the detected text
     'صبحان الله',
     'صبحان'
   ],
@@ -69,12 +70,15 @@ const ZIKIR_PHRASES: Record<string, string[]> = {
     'praise be to god',
     'الحمد لله'
   ],
-  'La ilaha illa Allah': [
+  'La ilaha illallah': [
     'la ilaha illa allah',
     'la ilaha illallah',
     'lailahaillallah',
+    'la ilaha illa',
     'there is no god but allah',
-    'لا إله إلا الله'
+    'لا إله إلا الله',
+    'لا اله الا الله',
+    'لااله الا الله'
   ],
   'Astaghfirullah': [
     'astaghfirullah',
@@ -122,17 +126,42 @@ export function useVoiceRecognition({
       .trim();
   };
 
-  // Check if detected text matches target phrase
+  // Check if detected text matches target phrase EXACTLY
   const isMatchingPhrase = useCallback((detectedText: string): boolean => {
     const normalizedDetected = normalizeText(detectedText);
     const targetVariations = ZIKIR_PHRASES[targetPhrase] || [targetPhrase.toLowerCase()];
     
-    return targetVariations.some(variation => {
+    // First check if it matches the target phrase
+    const matchesTarget = targetVariations.some(variation => {
       const normalizedVariation = normalizeText(variation);
-      // Check for exact match or substring match (for longer phrases)
-      return normalizedDetected.includes(normalizedVariation) || 
-             normalizedVariation.includes(normalizedDetected);
+      // More strict matching - exact match or very close substring
+      return normalizedDetected === normalizedVariation || 
+             (normalizedVariation.length > 4 && normalizedDetected.includes(normalizedVariation)) ||
+             (normalizedDetected.length > 4 && normalizedVariation.includes(normalizedDetected));
     });
+    
+    // If it matches target, make sure it doesn't ALSO match other phrases (to prevent cross-matching)
+    if (matchesTarget) {
+      // Check if this text could belong to OTHER zikir phrases
+      const otherPhrases = Object.keys(ZIKIR_PHRASES).filter(phrase => phrase !== targetPhrase);
+      
+      for (const otherPhrase of otherPhrases) {
+        const otherVariations = ZIKIR_PHRASES[otherPhrase] || [];
+        const alsoMatchesOther = otherVariations.some(variation => {
+          const normalizedOtherVariation = normalizeText(variation);
+          return normalizedDetected === normalizedOtherVariation || 
+                 (normalizedOtherVariation.length > 4 && normalizedDetected.includes(normalizedOtherVariation)) ||
+                 (normalizedDetected.length > 4 && normalizedOtherVariation.includes(normalizedDetected));
+        });
+        
+        if (alsoMatchesOther) {
+          console.log(`❌ CROSS-MATCH REJECTED: "${detectedText}" matches both "${targetPhrase}" and "${otherPhrase}"`);
+          return false; // Reject ambiguous matches
+        }
+      }
+    }
+    
+    return matchesTarget;
   }, [targetPhrase]);
 
   // Check if detected text matches any other zikir phrase
@@ -182,7 +211,8 @@ export function useVoiceRecognition({
             // Debug logging
             console.log(`Voice detected: "${detectedText}" (confidence: ${confidence})`);
             console.log(`Target phrase: "${targetPhrase}"`);
-            console.log(`Is matching: ${isMatchingPhrase(detectedText)}`);
+            const isMatching = isMatchingPhrase(detectedText);
+            console.log(`Is matching: ${isMatching}`);
             
             // Debounce to prevent rapid counting
             if (debounceRef.current) {
@@ -191,7 +221,7 @@ export function useVoiceRecognition({
             
             debounceRef.current = setTimeout(() => {
               // Check if it matches target phrase first
-              if (isMatchingPhrase(detectedText)) {
+              if (isMatching) {
                 console.log('✅ Perfect match detected - counting!');
                 onPhraseDetected();
                 onFeedback?.('correct', detectedText);
