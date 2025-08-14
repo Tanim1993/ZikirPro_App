@@ -37,28 +37,28 @@
   --sidebar-border: hsl(214 32% 91%);
   --sidebar-ring: hsl(213 78% 50%);
   
-  /* Enhanced Islamic theme with gradients */
-  --islamic-primary: hsl(210 100% 56%);
-  --islamic-primary-light: hsl(210 100% 66%);
-  --islamic-primary-dark: hsl(210 100% 46%);
-  --islamic-secondary: hsl(210 100% 76%);
+  /* Enhanced Islamic theme with Replit-style deep teal gradients */
+  --islamic-primary: hsl(203 39% 44%);
+  --islamic-primary-light: hsl(203 39% 54%);
+  --islamic-primary-dark: hsl(203 39% 34%);
+  --islamic-secondary: hsl(203 39% 64%);
   --islamic-accent: hsl(42 92% 56%);
   --islamic-gold: hsl(42 92% 56%);
   --islamic-gold-light: hsl(42 92% 66%);
   --islamic-gold-dark: hsl(42 92% 46%);
-  --islamic-navy: hsl(210 100% 25%);
-  --islamic-navy-dark: hsl(210 100% 15%);
+  --islamic-navy: hsl(203 39% 24%);
+  --islamic-navy-dark: hsl(203 39% 14%);
   
-  /* Enhanced gradient definitions */
-  --islamic-gradient-main: linear-gradient(135deg, hsl(210 100% 56%) 0%, hsl(210 100% 66%) 50%, hsl(210 100% 76%) 100%);
-  --islamic-gradient-deep: linear-gradient(135deg, hsl(210 100% 36%) 0%, hsl(210 100% 56%) 100%);
-  --islamic-gradient-sky: linear-gradient(135deg, hsl(210 100% 66%) 0%, hsl(200 100% 76%) 100%);
+  /* Enhanced gradient definitions with deep teal theme */
+  --islamic-gradient-main: linear-gradient(135deg, hsl(203 39% 44%) 0%, hsl(203 39% 54%) 50%, hsl(203 39% 64%) 100%);
+  --islamic-gradient-deep: linear-gradient(135deg, hsl(203 39% 24%) 0%, hsl(203 39% 44%) 100%);
+  --islamic-gradient-sky: linear-gradient(135deg, hsl(203 39% 54%) 0%, hsl(193 39% 64%) 100%);
   --islamic-gradient-gold: linear-gradient(135deg, hsl(42 92% 56%) 0%, hsl(45 92% 66%) 100%);
-  --islamic-gradient-subtle: linear-gradient(135deg, hsl(210 100% 96%) 0%, hsl(210 100% 98%) 100%);
+  --islamic-gradient-subtle: linear-gradient(135deg, hsl(203 39% 96%) 0%, hsl(203 39% 98%) 100%);
   
-  /* Islamic geometric patterns */
-  --islamic-pattern-light: radial-gradient(circle at 25% 25%, hsl(210 100% 90%) 2px, transparent 2px),
-                          radial-gradient(circle at 75% 75%, hsl(210 100% 90%) 2px, transparent 2px);
+  /* Islamic geometric patterns with teal theme */
+  --islamic-pattern-light: radial-gradient(circle at 25% 25%, hsl(203 39% 90%) 2px, transparent 2px),
+                          radial-gradient(circle at 75% 75%, hsl(203 39% 90%) 2px, transparent 2px);
   --islamic-pattern-size: 20px 20px;
   
   --font-sans: Inter, sans-serif;
@@ -137,21 +137,21 @@ body {
 /* Islamic card styling */
 .islamic-card {
   background: white;
-  border: 1px solid hsl(214 32% 91%);
+  border: 1px solid hsl(203 39% 91%);
   border-radius: 16px;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(79, 109, 120, 0.1);
 }
 
 .islamic-card-gradient {
   background: var(--islamic-gradient-main);
   color: white;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(59, 130, 246, 0.3);
+  box-shadow: 0 8px 32px rgba(79, 109, 120, 0.3);
 }
 
 .islamic-card-subtle {
   background: var(--islamic-gradient-subtle);
-  border: 1px solid hsl(210 100% 86%);
+  border: 1px solid hsl(203 39% 86%);
   border-radius: 16px;
   backdrop-filter: blur(10px);
 }

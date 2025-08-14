@@ -44,7 +44,7 @@ function Router() {
             <Route path="/signup" component={Signup} />
             <Route path="/organizations" component={OrganizationSearch} />
           </>
-        ) : user?.userType === 'organization' ? (
+        ) : (user as any)?.userType === 'organization' ? (
           <>
             <Route path="/" component={OrganizationDashboard} />
             <Route path="/dashboard" component={OrganizationDashboard} />
