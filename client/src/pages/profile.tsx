@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Badge } from "../components/ui/badge";
 import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
 import type { User as UserType } from "@shared/schema";
 
 export default function Profile() {
@@ -45,8 +46,23 @@ export default function Profile() {
     );
   }
 
-  const handleLogout = () => {
-    window.location.href = '/api/logout';
+  const handleLogout = async () => {
+    try {
+      // Call logout endpoint
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
+      
+      // Clear query cache
+      queryClient.clear();
+      
+      // Redirect to home
+      window.location.href = '/';
+    } catch (error) {
+      // Fallback - still redirect to root
+      window.location.href = '/';
+    }
   };
 
   const getAvatarDisplay = () => {
