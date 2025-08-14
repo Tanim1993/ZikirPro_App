@@ -30,28 +30,28 @@ export default function Landing() {
                 <span className="text-gray-700 font-medium">Join Zikir competitions</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-islamic-primary/10 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-islamic-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M7 4V2C7 1.45 7.45 1 8 1S9 1.45 9 2V4H7ZM12 11H11V6H13V7.08C14.84 7.29 16.38 8.56 16.93 10.23C17.65 12.49 16.46 14.94 14.2 15.66C13.76 15.8 13.3 15.87 12.83 15.87V17H14C14.55 17 15 17.45 15 18S14.55 19 14 19H10C9.45 19 9 18.55 9 18S9.45 17 10 17H11V15.87C8.73 15.59 7 13.67 7 11.37V11H12Z"/>
                   </svg>
                 </div>
-                <span className="text-white/90 font-medium">Real-time leaderboards</span>
+                <span className="text-gray-700 font-medium">Real-time leaderboards</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-islamic-primary/10 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-islamic-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M16,6L18.29,8.29L13.41,13.17L9.41,9.17L2,16.59L3.41,18L9.41,12L13.41,16L19.71,9.71L22,12V6H16Z" />
                   </svg>
                 </div>
-                <span className="text-white/90 font-medium">Track your progress</span>
+                <span className="text-gray-700 font-medium">Track your progress</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm shadow-lg">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                <div className="w-8 h-8 bg-islamic-primary/10 rounded-full flex items-center justify-center">
+                  <svg className="w-4 h-4 text-islamic-primary" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12,2A10,10 0 0,1 22,12A10,10 0 0,1 12,22A10,10 0 0,1 2,12A10,10 0 0,1 12,2M12,4A8,8 0 0,0 4,12A8,8 0 0,0 12,20A8,8 0 0,0 20,12A8,8 0 0,0 12,4M12,6A6,6 0 0,1 18,12A6,6 0 0,1 12,18A6,6 0 0,1 6,12A6,6 0 0,1 12,6M12,8A4,4 0 0,0 8,12A4,4 0 0,0 12,16A4,4 0 0,0 16,12A4,4 0 0,0 12,8Z" />
                   </svg>
                 </div>
-                <span className="text-white/90 font-medium">Authentic Islamic content</span>
+                <span className="text-gray-700 font-medium">Authentic Islamic content</span>
               </div>
             </div>
             
