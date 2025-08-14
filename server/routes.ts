@@ -54,7 +54,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log("Created test user: test001/Pw001");
     }
   } catch (error) {
-    console.log("Test user creation skipped:", error.message);
+    console.log("Test user creation skipped:", (error as Error).message);
   }
 
   // Login endpoint
@@ -509,11 +509,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const { type, targetId, reason } = req.body;
 
       const report = await storage.createReport({
-        type,
+        kind: type,
         targetId,
-        reportedById: userId,
+        byUserId: userId,
         reason,
         status: 'pending',
+        details: null,
+        adminNotes: null,
         resolvedAt: null,
       });
 
@@ -655,7 +657,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
 
       // Add owner as a member
-      await storage.addUserToRoom(room.id, userId, 'owner');
+      await storage.createRoomMember({
+        roomId: room.id,
+        userId: userId,
+        role: 'owner'
+      });
 
       res.status(201).json(room);
     } catch (error) {
