@@ -20,7 +20,7 @@ export default function Stats() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
+            <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
           </div>
           <p className="text-gray-600">Loading stats...</p>
         </div>
@@ -33,8 +33,8 @@ export default function Stats() {
       icon: Target,
       label: "Total Zikir",
       value: userAnalytics?.totalZikir || 0,
-      color: "text-green-600",
-      bg: "bg-green-50"
+      color: "text-islamic-primary",
+      bg: "bg-islamic-secondary/10"
     },
     {
       icon: Flame,
@@ -71,8 +71,8 @@ export default function Stats() {
       icon: Target,
       label: "Global Zikir Count",
       value: globalStats?.totalZikir || 0,
-      color: "text-green-600",
-      bg: "bg-green-50"
+      color: "text-islamic-primary",
+      bg: "bg-islamic-secondary/10"
     },
     {
       icon: Globe,
@@ -93,14 +93,14 @@ export default function Stats() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <header className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-6">
+      <header className="bg-gradient-to-r from-islamic-primary to-islamic-primary-dark text-white px-4 py-6">
         <div className="flex items-center space-x-3 mb-4">
           <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
             <BarChart3 className="w-6 h-6" />
           </div>
           <div>
             <h1 className="text-xl font-bold">Statistics</h1>
-            <p className="text-sm text-green-100">Your progress & achievements</p>
+            <p className="text-sm text-islamic-secondary/80">Your progress & achievements</p>
           </div>
         </div>
       </header>

@@ -58,11 +58,11 @@ export default function Rooms() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-8">
-            <div className="w-16 h-16 mx-auto mb-4 text-green-600">
-              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-green-600"></div>
+            <div className="w-16 h-16 mx-auto mb-4 text-islamic-primary">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-islamic-primary"></div>
             </div>
             <p className="text-gray-600">Loading rooms...</p>
           </div>
@@ -72,7 +72,7 @@ export default function Rooms() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 p-4">
+    <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 p-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-6">
@@ -103,8 +103,8 @@ export default function Rooms() {
                 className={cn(
                   "text-xs",
                   selectedCountry === country 
-                    ? "bg-green-600 hover:bg-green-700" 
-                    : "hover:bg-green-50"
+                    ? "bg-islamic-primary hover:bg-islamic-primary-dark" 
+                    : "hover:bg-islamic-secondary/10"
                 )}
                 data-testid={`button-filter-${country.toLowerCase()}`}
               >
@@ -131,7 +131,7 @@ export default function Rooms() {
                     <CardTitle className="text-lg font-semibold text-gray-900 mb-1" data-testid={`text-room-name-${room.id}`}>
                       {room.name || `${room.zikirName} Challenge`}
                     </CardTitle>
-                    <p className="text-sm text-green-600 font-medium" data-testid={`text-zikir-${room.id}`}>
+                    <p className="text-sm text-islamic-primary font-medium" data-testid={`text-zikir-${room.id}`}>
                       {room.zikirName}
                     </p>
                   </div>
@@ -139,7 +139,7 @@ export default function Rooms() {
                     variant={room.isPrivate ? "secondary" : "default"}
                     className={cn(
                       "text-xs",
-                      !room.isPrivate && "bg-green-100 text-green-800"
+                      !room.isPrivate && "bg-islamic-secondary/20 text-islamic-primary"
                     )}
                   >
                     {room.isPrivate ? "Private" : "Public"}
@@ -180,7 +180,7 @@ export default function Rooms() {
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div 
-                      className="bg-gradient-to-r from-green-500 to-blue-500 h-2 rounded-full transition-all duration-300"
+                      className="bg-gradient-to-r from-islamic-primary to-islamic-secondary h-2 rounded-full transition-all duration-300"
                       style={{ width: "30%" }}
                     ></div>
                   </div>
@@ -194,7 +194,7 @@ export default function Rooms() {
                   <Link href={`/room/${room.id}`}>
                     <Button 
                       size="sm" 
-                      className="bg-green-600 hover:bg-green-700"
+                      className="bg-islamic-primary hover:bg-islamic-primary-dark text-white"
                       data-testid={`button-join-room-${room.id}`}
                     >
                       Join Room

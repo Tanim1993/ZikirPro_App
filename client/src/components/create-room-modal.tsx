@@ -204,7 +204,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                         onChange={(e) => field.onChange(parseInt(e.target.value) || undefined)}
                         disabled={form.watch("unlimited")}
                         placeholder="1000"
-                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green disabled:bg-gray-100"
+                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-primary disabled:bg-gray-100"
                         data-testid="input-target-count"
                       />
                     </FormControl>
@@ -262,7 +262,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
                       onChange={(e) => field.onChange(parseInt(e.target.value))}
                       min="1"
                       max="40"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-green"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-islamic-primary"
                       data-testid="input-duration"
                     />
                   </FormControl>
@@ -340,7 +340,7 @@ export default function CreateRoomModal({ open, onOpenChange }: CreateRoomModalP
               </Button>
               <Button 
                 type="submit" 
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-islamic-primary hover:bg-islamic-primary-dark text-white"
                 disabled={createRoomMutation.isPending}
                 data-testid="button-create"
               >

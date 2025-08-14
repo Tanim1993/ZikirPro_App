@@ -190,7 +190,7 @@ export default function Room() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-green-200 border-t-green-600 rounded-full"></div>
+            <div className="w-full h-full border-4 border-islamic-secondary/30 border-t-islamic-primary rounded-full"></div>
           </div>
           <p className="text-gray-600">Loading room...</p>
         </div>
@@ -216,9 +216,9 @@ export default function Room() {
   const currentUserRank = leaderboard.findIndex((entry: any) => entry.userId === (user as any)?.id) + 1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 pb-20">
+    <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 pb-20">
       {/* Header */}
-      <header className="bg-gradient-to-r from-green-600 to-green-700 text-white px-4 py-4 sticky top-0 z-50">
+      <header className="bg-gradient-to-r from-islamic-primary to-islamic-primary-dark text-white px-4 py-4 sticky top-0 z-50">
         <div className="flex items-center justify-between">
           <Link href="/dashboard">
             <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
@@ -229,7 +229,7 @@ export default function Room() {
           
           <div className="text-center flex-1">
             <h1 className="text-lg font-bold truncate">{room?.name || `${room?.zikirName} Room`}</h1>
-            <p className="text-sm text-green-100">
+            <p className="text-sm text-islamic-secondary/80">
               Room #{roomId.toString().padStart(6, '0')}
             </p>
           </div>
@@ -266,7 +266,7 @@ export default function Room() {
               <Users className="w-4 h-4" />
             </div>
             <div className="text-sm font-bold">{leaderboard.length}</div>
-            <div className="text-xs text-green-100">Members</div>
+            <div className="text-xs text-islamic-secondary/80">Members</div>
           </div>
           <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
             <div className="flex items-center justify-center mb-1">
