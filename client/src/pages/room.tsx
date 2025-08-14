@@ -42,13 +42,13 @@ export default function Room() {
   const { data: userCount = 0 } = useQuery({
     queryKey: [`/api/rooms/${roomId}/user-count`],
     enabled: !!roomId,
-    refetchInterval: 5000,
+    refetchInterval: 10000, // Reduced from 5s to 10s
   }) as { data: number };
 
   const { data: leaderboard = [] } = useQuery({
     queryKey: [`/api/rooms/${roomId}/leaderboard`],
     enabled: !!roomId,
-    refetchInterval: 3000,
+    refetchInterval: 8000, // Reduced from 3s to 8s
   }) as { data: any[] };
 
   // Get room member count for deletion check

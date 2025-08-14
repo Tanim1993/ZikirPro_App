@@ -190,20 +190,16 @@ export function useVoiceRecognition({
             }
             
             debounceRef.current = setTimeout(() => {
-              // More lenient matching - check phrase first, then confidence
-              if (isMatchingPhrase(detectedText) && confidence >= confidenceThreshold) {
-                console.log('✅ Match with good confidence - counting!');
-                onPhraseDetected();
-                onFeedback?.('correct', detectedText);
-              } else if (isMatchingPhrase(detectedText) && confidence >= 0.1) {
-                // Lower confidence but still matching - count it!
-                console.log('✅ Match with low confidence - still counting!');
+              // Check if it matches target phrase first
+              if (isMatchingPhrase(detectedText)) {
+                console.log('✅ Perfect match detected - counting!');
                 onPhraseDetected();
                 onFeedback?.('correct', detectedText);
               } else if (isOtherZikirPhrase(detectedText)) {
                 console.log('❌ Wrong zikir phrase detected');
                 onFeedback?.('wrong', detectedText);
               } else if (detectedText.trim().length > 0) {
+                console.log('❓ Unclear speech detected');
                 onFeedback?.('unclear', detectedText);
               }
               
