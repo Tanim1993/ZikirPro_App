@@ -117,14 +117,14 @@ export default function MobileNav() {
       
       {/* Create Modals */}
       {isOrganization ? (
-        <CreateCompetitionModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
+        <CreateRoomModal
+          open={showCreateModal}
+          onOpenChange={setShowCreateModal}
         />
       ) : (
         <CreateRoomModal
-          isOpen={showCreateModal}
-          onClose={() => setShowCreateModal(false)}
+          open={showCreateModal}
+          onOpenChange={setShowCreateModal}
         />
       )}
     </>

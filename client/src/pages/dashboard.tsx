@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   // All useState hooks at the top - NEVER move these after any conditional returns
