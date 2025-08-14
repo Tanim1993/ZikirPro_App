@@ -1,16 +1,22 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CreateRoomModal from "@/components/create-room-modal";
 import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
+import { isUnauthorizedError } from "@/lib/authUtils";
 import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star } from "lucide-react";
 
 export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { data: userRooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["/api/rooms/my"],
@@ -45,7 +51,62 @@ export default function Dashboard() {
     return `${Math.floor(days / 30)} month${Math.floor(days / 30) > 1 ? 's' : ''}`;
   };
 
-  const RoomCard = ({ room, isOwner = false }: { room: any, isOwner?: boolean }) => (
+  const [showJoinConfirm, setShowJoinConfirm] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState<any>(null);
+
+  // Join room mutation
+  const joinRoomMutation = useMutation({
+    mutationFn: async (roomId: number) => {
+      const response = await fetch(`/api/rooms/${roomId}/join`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return await response.json();
+    },
+    onSuccess: (data, roomId) => {
+      toast({
+        title: "Joined Room!",
+        description: `You have successfully joined the room`,
+      });
+      // Invalidate and refresh user rooms to show the new joined room
+      queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
+      setShowJoinConfirm(false);
+      // Navigate to the room
+      setTimeout(() => {
+        window.location.href = `/room/${roomId}`;
+      }, 1000);
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Session Expired",
+          description: "Please log in again",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/api/login", 1000);
+        return;
+      }
+      toast({
+        title: "Failed to Join",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleJoinRoom = () => {
+    if (selectedRoom) {
+      joinRoomMutation.mutate(selectedRoom.id);
+    }
+  };
+
+  const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
     <Card className="mb-3 border border-gray-200 shadow-sm">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
@@ -62,9 +123,13 @@ export default function Dashboard() {
               <p className="text-sm text-gray-600 mb-2">{room.description}</p>
             )}
           </div>
-          {isOwner && (
+          {isOwner ? (
             <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
               Owner
+            </span>
+          ) : (
+            <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">
+              Global
             </span>
           )}
         </div>
@@ -95,11 +160,23 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <Link href={`/room/${room.id}`}>
-          <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-            {isOwner ? 'Manage Room' : 'Join Room'}
+        {isPublic ? (
+          <Button 
+            onClick={() => {
+              setSelectedRoom(room);
+              setShowJoinConfirm(true);
+            }}
+            className="w-full bg-green-600 hover:bg-green-700 text-white"
+          >
+            Tap to Join Room
           </Button>
-        </Link>
+        ) : (
+          <Link href={`/room/${room.id}`}>
+            <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
+              {isOwner ? 'Manage Room' : 'Enter Room'}
+            </Button>
+          </Link>
+        )}
       </CardContent>
     </Card>
   );
@@ -213,7 +290,7 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {(userRooms as any[]).map((room: any) => (
-                  <RoomCard key={room.id} room={room} isOwner={true} />
+                  <RoomCard key={room.id} room={room} isOwner={room.role === "owner"} />
                 ))}
               </div>
             )}
@@ -231,7 +308,7 @@ export default function Dashboard() {
             ) : (
               <div className="space-y-3">
                 {(publicRooms as any[]).map((room: any) => (
-                  <RoomCard key={room.id} room={room} />
+                  <RoomCard key={room.id} room={room} isPublic={true} />
                 ))}
               </div>
             )}
@@ -254,6 +331,56 @@ export default function Dashboard() {
         open={showCreateModal} 
         onOpenChange={setShowCreateModal} 
       />
+
+      {/* Join Room Confirmation Dialog */}
+      <Dialog open={showJoinConfirm} onOpenChange={setShowJoinConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-green-600">Join Room?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedRoom && (
+              <div className="space-y-2">
+                <h3 className="font-semibold">{selectedRoom.name}</h3>
+                <p className="text-sm text-gray-600">
+                  Zikir: <span className="font-medium">{selectedRoom.zikirName}</span>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Duration: <span className="font-medium">{selectedRoom.duration} days</span>
+                </p>
+                <p className="text-sm text-gray-600">
+                  Members: <span className="font-medium">{selectedRoom.memberCount}</span>
+                </p>
+                {selectedRoom.description && (
+                  <p className="text-sm text-gray-600">
+                    {selectedRoom.description}
+                  </p>
+                )}
+              </div>
+            )}
+            <p className="text-gray-600">
+              Tap confirm to join this room and start competing with other members!
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowJoinConfirm(false)}
+                data-testid="button-cancel-join"
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleJoinRoom}
+                disabled={joinRoomMutation.isPending}
+                className="bg-green-600 hover:bg-green-700"
+                data-testid="button-confirm-join"
+              >
+                {joinRoomMutation.isPending ? "Joining..." : "Confirm Join"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

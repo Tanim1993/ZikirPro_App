@@ -31,6 +31,7 @@ export default function Room() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: [`/api/rooms/${roomId}`],
@@ -112,6 +113,56 @@ export default function Room() {
     countMutation.mutate();
   }, [countMutation]);
 
+  // Leave room mutation
+  const leaveRoomMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/rooms/${roomId}/leave`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({})
+      });
+      if (!response.ok) {
+        throw new Error(`${response.status}: ${response.statusText}`);
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Left Room",
+        description: "You have successfully left the room",
+      });
+      // Invalidate and refresh user rooms
+      queryClient.invalidateQueries({ queryKey: ['/api/rooms/my'] });
+      // Redirect to dashboard
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 1000);
+    },
+    onError: (error) => {
+      if (isUnauthorizedError(error)) {
+        toast({
+          title: "Session Expired",
+          description: "Please log in again",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/api/login", 1000);
+        return;
+      }
+      toast({
+        title: "Failed to Leave",
+        description: "Please try again",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleLeaveRoom = () => {
+    leaveRoomMutation.mutate();
+    setShowLeaveConfirm(false);
+  };
+
   const shareRoom = () => {
     const shareUrl = `${window.location.origin}/room/${roomId}`;
     const roomCode = `ROOM-${roomId.toString().padStart(6, '0')}`;
@@ -180,14 +231,29 @@ export default function Room() {
             </p>
           </div>
           
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={shareRoom}
-            className="text-white hover:bg-white/20"
-          >
-            <Share2 className="w-4 h-4" />
-          </Button>
+          <div className="flex gap-2">
+            {/* Leave button for non-owners */}
+            {room?.ownerId !== (user as any)?.id && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowLeaveConfirm(true)}
+                className="text-white hover:bg-red-500/20"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Leave
+              </Button>
+            )}
+            
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={shareRoom}
+              className="text-white hover:bg-white/20"
+            >
+              <Share2 className="w-4 h-4" />
+            </Button>
+          </div>
         </div>
         
         {/* Room Stats */}
@@ -472,6 +538,37 @@ export default function Room() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
       />
+
+      {/* Leave Room Confirmation Dialog */}
+      <Dialog open={showLeaveConfirm} onOpenChange={setShowLeaveConfirm}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600">Leave Room?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-gray-600">
+              Are you sure you want to leave this room? You will no longer receive updates and your progress will be saved.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowLeaveConfirm(false)}
+                data-testid="button-cancel-leave"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={handleLeaveRoom}
+                disabled={leaveRoomMutation.isPending}
+                data-testid="button-confirm-leave"
+              >
+                {leaveRoomMutation.isPending ? "Leaving..." : "Leave Room"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
