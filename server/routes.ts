@@ -23,8 +23,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
   }));
 
-  // Auth middleware - temporarily disabled to fix authentication error
-  // await setupAuth(app);
+  // Auth middleware
+  await setupAuth(app);
 
   // Seed database with initial data - temporarily disabled for faster startup
   // Uncomment the following lines to enable database seeding:
@@ -148,17 +148,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error("Logout error:", error);
       res.status(500).json({ message: "Logout failed" });
     }
-  });
-
-  // Handle GET logout (for direct browser navigation)
-  app.get('/api/logout', (req: any, res) => {
-    req.session.destroy((err: any) => {
-      if (err) {
-        console.error("Logout error:", err);
-      }
-      // Redirect to landing page after logout
-      res.redirect('/');
-    });
   });
 
   // Handle GET logout (for direct browser navigation)

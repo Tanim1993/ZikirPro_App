@@ -10,8 +10,8 @@ export default function Landing() {
         <Card className="w-full max-w-md bg-white shadow-xl border border-gray-200">
           <CardContent className="p-8 text-center">
             {/* Islamic Logo */}
-            <div className="w-16 h-16 mx-auto mb-6 bg-islamic-gradient rounded-full flex items-center justify-center shadow-lg">
-              <div className="text-2xl text-white font-bold font-amiri">ج</div>
+            <div className="w-20 h-20 mx-auto mb-6 bg-islamic-gradient rounded-full flex items-center justify-center shadow-xl">
+              <div className="text-3xl text-white font-bold font-amiri">ج</div>
             </div>
             
             {/* App Title */}
@@ -56,22 +56,22 @@ export default function Landing() {
             </div>
             
             {/* Login Button */}
-            <Link href="/login">
+            <a href="/api/login">
               <Button 
-                className="w-full bg-islamic-gradient text-white font-semibold py-3 text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="w-full primary-btn py-4 text-lg font-semibold rounded-xl"
                 data-testid="button-login"
               >
                 Start Your Zikir Journey
               </Button>
-            </Link>
+            </a>
             
             {/* Sign Up Link */}
             <div className="mt-4 text-center">
               <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <Link href="/signup" className="text-islamic-primary hover:text-islamic-primary-dark font-semibold">
-                  Sign Up
-                </Link>
+                New to Zikir Amol?{" "}
+                <a href="/api/login" className="text-islamic-primary hover:text-islamic-primary-dark font-semibold">
+                  Join Today
+                </a>
               </p>
             </div>
             
