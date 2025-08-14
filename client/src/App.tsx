@@ -20,6 +20,7 @@ import OrganizationSearch from "./pages/organization-search";
 import More from "./pages/more";
 import SalahTracker from "./pages/salah-tracker";
 import Quran from "./pages/quran";
+import QuranReader from "./pages/quran-reader";
 import Hadith from "./pages/hadith";
 import ZakatCalculator from "./pages/zakat-calculator";
 import Qiblah from "./pages/qiblah";
@@ -73,6 +74,7 @@ function Router() {
             <Route path="/more" component={More} />
             <Route path="/salah-tracker" component={SalahTracker} />
             <Route path="/quran" component={Quran} />
+            <Route path="/quran/reader/:surahId?" component={QuranReader} />
             <Route path="/hadith" component={Hadith} />
             <Route path="/zakat-calculator" component={ZakatCalculator} />
             <Route path="/qiblah" component={Qiblah} />

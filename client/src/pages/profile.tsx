@@ -3,14 +3,17 @@ import { useAuth } from "../hooks/useAuth";
 import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
-import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2 } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
+import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2, Settings } from "lucide-react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { User as UserType } from "@shared/schema";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const { toast } = useToast();
   
   // Type assertion for user data
   const typedUser = user as UserType;
@@ -18,6 +21,37 @@ export default function Profile() {
   const { data: analytics } = useQuery({
     queryKey: ["/api/user/analytics"],
     enabled: !!user,
+  });
+
+  // Update Mazhab mutation
+  const updateMazhabMutation = useMutation({
+    mutationFn: async (mazhab: string) => {
+      const response = await fetch('/api/user/mazhab', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ mazhab }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update mazhab');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      toast({
+        title: "Mazhab Updated",
+        description: "Your Mazhab preference has been saved successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update Mazhab preference",
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -158,6 +192,39 @@ export default function Profile() {
             </CardContent>
           </Card>
         )}
+
+        {/* Islamic Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center">
+              <Settings className="h-5 w-5 mr-2" />
+              Islamic Settings
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Mazhab (School of Jurisprudence)</label>
+              <Select
+                value={(user as any)?.mazhab || 'Hanafi'}
+                onValueChange={(value) => updateMazhabMutation.mutate(value)}
+                disabled={updateMazhabMutation.isPending}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select your Mazhab" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Hanafi">Hanafi</SelectItem>
+                  <SelectItem value="Shafi">Shafi'i</SelectItem>
+                  <SelectItem value="Maliki">Maliki</SelectItem>
+                  <SelectItem value="Hanbali">Hanbali</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-gray-500">
+                This affects prayer time calculations in Salah Tracker
+              </p>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Account Settings */}
         <Card>

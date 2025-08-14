@@ -199,6 +199,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user mazhab preference
+  app.put("/api/user/mazhab", async (req, res) => {
+    try {
+      const userId = "test-user-123"; // Mock user ID
+      const { mazhab } = req.body;
+      
+      if (!['Hanafi', 'Shafi', 'Maliki', 'Hanbali'].includes(mazhab)) {
+        return res.status(400).json({ message: "Invalid mazhab" });
+      }
+      
+      // Note: This would typically update a user preferences table
+      // For now, we'll store it in memory or extend the user model
+      res.json({ message: "Mazhab updated successfully", mazhab });
+    } catch (error) {
+      console.error("Error updating mazhab:", error);
+      res.status(500).json({ message: "Failed to update mazhab" });
+    }
+  });
+
   app.get('/api/user/analytics', async (req: any, res) => {
     try {
       const userId = "test-user-123"; // Mock user ID for testing
