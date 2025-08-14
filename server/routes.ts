@@ -470,7 +470,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Get user's current count in this room
-      const userCounter = await storage.getUserCounter(roomId, userId);
+      const userCounter = await storage.getUserCountInRoom(roomId, userId);
       res.json(userCounter?.currentCount || 0);
     } catch (error) {
       console.error("Error fetching user count:", error);
@@ -753,6 +753,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         isPublic,
         country,
         maxParticipants,
+        levelRequired,
       } = req.body;
 
       // Validate required fields
@@ -776,6 +777,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         competitionStartDate: new Date(competitionStartDate),
         competitionEndDate: new Date(competitionEndDate),
         maxParticipants: maxParticipants ? parseInt(maxParticipants) : null,
+        levelRequired: levelRequired ? parseInt(levelRequired) : 1,
       });
 
       // Add owner as a member
@@ -896,6 +898,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   }
+
+  // Organization Levels API routes
+  
+  // Get organizations list
+  app.get('/api/organizations', async (req, res) => {
+    try {
+      const organizations = await storage.getOrganizations();
+      res.json(organizations);
+    } catch (error) {
+      console.error('Error fetching organizations:', error);
+      res.status(500).json({ message: 'Failed to fetch organizations' });
+    }
+  });
+
+  // Get organization level schema
+  app.get('/api/organizations/:orgId/levels', async (req, res) => {
+    try {
+      const { orgId } = req.params;
+      const schema = await storage.getOrgLevelSchema(orgId);
+      
+      if (!schema) {
+        // Return default schema if none exists
+        const defaultLevels = [
+          { level: 1, name: 'Darajah 1', description: 'Beginner level', color: '#10B981' },
+          { level: 2, name: 'Darajah 2', description: 'Intermediate level', color: '#3B82F6' },
+          { level: 3, name: 'Darajah 3', description: 'Advanced level', color: '#8B5CF6' },
+          { level: 4, name: 'Darajah 4', description: 'Expert level', color: '#F59E0B' },
+          { level: 5, name: 'Darajah 5', description: 'Master level', color: '#EF4444' },
+        ];
+        const defaultRules = [
+          { fromLevel: 1, toLevel: 2, anyOf: [{ top3: 3 }, { top10: 5 }] },
+          { fromLevel: 2, toLevel: 3, anyOf: [{ top3: 5 }, { top5: 8 }] },
+          { fromLevel: 3, toLevel: 4, anyOf: [{ top3: 8 }, { top5: 12 }] },
+          { fromLevel: 4, toLevel: 5, anyOf: [{ top3: 12 }, { top5: 20 }] },
+        ];
+        
+        return res.json({ levels: defaultLevels, promotionRules: defaultRules });
+      }
+      
+      res.json({
+        levels: JSON.parse(schema.levels as string),
+        promotionRules: JSON.parse(schema.promotionRules as string)
+      });
+    } catch (error) {
+      console.error('Error fetching organization levels:', error);
+      res.status(500).json({ message: 'Failed to fetch organization levels' });
+    }
+  });
+
+  // Check user eligibility for competition
+  app.get('/api/competitions/:compId/eligibility', async (req, res) => {
+    try {
+      const compId = parseInt(req.params.compId);
+      const userId = "test001-user-id"; // Mock user ID
+      
+      // Get competition details
+      const competition = await storage.getRoomById(compId);
+      if (!competition) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Check eligibility
+      const eligibility = await storage.checkEligibility(userId, competition.createdBy, competition.levelRequired || 1);
+      res.json(eligibility);
+    } catch (error) {
+      console.error('Error checking eligibility:', error);
+      res.status(500).json({ message: 'Failed to check eligibility' });
+    }
+  });
+
+  // Get user's promotion progress in an organization
+  app.get('/api/organizations/:orgId/promotion-progress', async (req, res) => {
+    try {
+      const { orgId } = req.params;
+      const userId = "test001-user-id"; // Mock user ID
+      
+      const progress = await storage.getPromotionProgress(userId, orgId);
+      res.json(progress);
+    } catch (error) {
+      console.error('Error fetching promotion progress:', error);
+      res.status(500).json({ message: 'Failed to fetch promotion progress' });
+    }
+  });
+
+  // Join competition with level gating
+  app.post('/api/competitions/:compId/join', async (req, res) => {
+    try {
+      const compId = parseInt(req.params.compId);
+      const userId = "test001-user-id"; // Mock user ID
+      
+      // Get competition details
+      const competition = await storage.getRoomById(compId);
+      if (!competition) {
+        return res.status(404).json({ message: 'Competition not found' });
+      }
+      
+      // Check eligibility
+      const eligibility = await storage.checkEligibility(userId, competition.createdBy, competition.levelRequired || 1);
+      if (!eligibility.eligible) {
+        return res.status(403).json({ 
+          message: eligibility.reason || 'Not eligible to join this competition',
+          userLevel: eligibility.userLevel
+        });
+      }
+      
+      // Join the competition
+      const participation = await storage.joinCompetition(compId, userId, eligibility.userLevel);
+      res.json(participation);
+    } catch (error) {
+      console.error('Error joining competition:', error);
+      res.status(500).json({ message: 'Failed to join competition' });
+    }
+  });
+
+  // Accept competition rules
+  app.post('/api/participations/:participationId/accept', async (req, res) => {
+    try {
+      const { participationId } = req.params;
+      
+      const participation = await storage.acceptRules(participationId);
+      res.json(participation);
+    } catch (error) {
+      console.error('Error accepting rules:', error);
+      res.status(500).json({ message: 'Failed to accept rules' });
+    }
+  });
 
   // Seed initial data
   // Authentication routes

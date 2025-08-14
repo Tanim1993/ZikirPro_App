@@ -44,6 +44,9 @@ export const users = pgTable("users", {
   organizationName: varchar("organization_name"),
   organizationLogo: varchar("organization_logo"),
   organizationDescription: text("organization_description"),
+  // Organization level settings
+  allowJoinLowerLevels: boolean("allow_join_lower_levels").default(true),
+  verified: boolean("verified").default(false), // verified organization status
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -82,6 +85,8 @@ export const rooms = pgTable("rooms", {
   competitionStartDate: timestamp("competition_start_date"),
   competitionEndDate: timestamp("competition_end_date"),
   maxParticipants: integer("max_participants"),
+  // Level-based access control
+  levelRequired: integer("level_required").default(1),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
@@ -144,6 +149,73 @@ export const reports = pgTable("reports", {
   adminNotes: text("admin_notes"), // Admin-only notes
   resolvedAt: timestamp("resolved_at"),
   createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Organization Level Schemas (Darajah system)
+export const orgLevelSchemas = pgTable("org_level_schemas", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orgId: varchar("org_id").notNull(),
+  levels: jsonb("levels").notNull(), // [{ level: 1, label: "Darajah 1", description: "..." }]
+  promotionRules: jsonb("promotion_rules").notNull(), // PromotionRule[]
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Organization Profiles (tracks user level per org)
+export const userOrgProfiles = pgTable("user_org_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  orgId: varchar("org_id").notNull(),
+  level: integer("level").default(1),
+  stats: jsonb("stats").default('{"wins":0,"podiums":0,"top10":0,"comps":0}'),
+  history: jsonb("history").default('[]'), // [{ compId, rank, levelAtEntry, placedAt }]
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Competition Participations (enhanced with level tracking)
+export const participations = pgTable("participations", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  compId: integer("comp_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  status: varchar("status").default("view_only"), // "view_only", "active", "finished", "disqualified"
+  joinedAt: timestamp("joined_at").defaultNow(),
+  acceptedRulesAt: timestamp("accepted_rules_at"),
+  levelAtEntry: integer("level_at_entry").default(1),
+});
+
+// Competition Statistics
+export const competitionStats = pgTable("competition_stats", {
+  compId: integer("comp_id").primaryKey(),
+  totalParticipants: integer("total_participants").default(0),
+  joinedToday: integer("joined_today").default(0),
+  activeParticipants: integer("active_participants").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Competition Results (for promotion tracking)
+export const competitionResults = pgTable("competition_results", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  compId: integer("comp_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  rank: integer("rank").notNull(),
+  levelAtEntry: integer("level_at_entry").notNull(),
+  finalCount: integer("final_count").default(0),
+  placedAt: timestamp("placed_at").defaultNow(),
+});
+
+// User Promotion Counters (materialized view for fast promotion checks)
+export const userPromotionCounters = pgTable("user_promotion_counters", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  orgId: varchar("org_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  level: integer("level").notNull(),
+  top3: integer("top3").default(0),
+  top5: integer("top5").default(0),
+  top10: integer("top10").default(0),
+  totalComps: integer("total_comps").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Relations
@@ -301,6 +373,25 @@ export type LiveCounter = typeof liveCounters.$inferSelect;
 export type InsertUserAnalytics = typeof userAnalytics.$inferInsert;
 export type UserAnalytics = typeof userAnalytics.$inferSelect;
 
+// Organization Levels types
+export type OrgLevelSchema = typeof orgLevelSchemas.$inferSelect;
+export type InsertOrgLevelSchema = typeof orgLevelSchemas.$inferInsert;
+
+export type UserOrgProfile = typeof userOrgProfiles.$inferSelect;
+export type InsertUserOrgProfile = typeof userOrgProfiles.$inferInsert;
+
+export type Participation = typeof participations.$inferSelect;
+export type InsertParticipation = typeof participations.$inferInsert;
+
+export type CompetitionResult = typeof competitionResults.$inferSelect;
+export type InsertCompetitionResult = typeof competitionResults.$inferInsert;
+
+export type CompetitionStat = typeof competitionStats.$inferSelect;
+export type InsertCompetitionStat = typeof competitionStats.$inferInsert;
+
+export type UserPromotionCounter = typeof userPromotionCounters.$inferSelect;
+export type InsertUserPromotionCounter = typeof userPromotionCounters.$inferInsert;
+
 // Zod schemas
 export const insertRoomSchema = createInsertSchema(rooms).omit({
   id: true,
@@ -325,3 +416,49 @@ export const updateUserProfileSchema = z.object({
   avatarType: z.string().optional(),
   bgColor: z.string().optional(),
 });
+
+// Organization Levels schemas
+export const insertOrgLevelSchemaSchema = createInsertSchema(orgLevelSchemas).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserOrgProfileSchema = createInsertSchema(userOrgProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertParticipationSchema = createInsertSchema(participations).omit({
+  id: true,
+  joinedAt: true,
+});
+
+export const insertCompetitionResultSchema = createInsertSchema(competitionResults).omit({
+  id: true,
+  placedAt: true,
+});
+
+export const insertPromotionCounterSchema = createInsertSchema(userPromotionCounters).omit({
+  id: true,
+  updatedAt: true,
+});
+
+// Level and promotion rule types
+export interface LevelDefinition {
+  level: number;
+  label: string;
+  description: string;
+}
+
+export interface PromotionCondition {
+  rankAtMost: number;
+  occurrences: number;
+}
+
+export interface PromotionRule {
+  fromLevel: number;
+  toLevel: number;
+  anyOf: PromotionCondition[];
+}

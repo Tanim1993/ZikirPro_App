@@ -1,0 +1,308 @@
+Here’s a polished, end‑to‑end **dev prompt** to implement **Organization Levels + Gated Competitions** (with BO configuration, entry checks, promotions, and UI). It plugs into your current Create Competition form and org dashboard.
+
+---
+
+# Feature Set: Organization Levels, Gated Entry, and Auto‑Promotion
+
+## 0) Goals
+
+* Organizations define **levels** (e.g., Level 1 = easy, Level 2 = medium…).
+* Each competition belongs to **one level**.
+* A user’s **level is per‑organization**.
+* Users may **join rooms at their level (and lower if allowed)**; **blocked** from higher levels with a clear upgrade message + “see requirements”.
+* Auto‑promotion when a user meets configurable **rank‑based criteria** across multiple competitions.
+* All screens use the **current app theme**.
+
+---
+
+## 1) Islamic‑themed Level Labels (instead of “Beginner/Expert”)
+
+Pick one set, or let each org choose labels per level:
+
+**Set A (short, respectful):**
+
+* **Level 1:** *Talib* (Seeker)
+* **Level 2:** *Mutadhakkir* (One who remembers)
+* **Level 3:** *Sabiq* (Fore‑runner)
+* **Level 4:** *Mujahid an‑Nafs* (Striver of the self)
+* **Level 5:** *Muhsin* (Doer of excellence)
+
+**Set B (neutral Arabic vibe):**
+
+* **Darajah 1–5** (Darajah = rank)
+
+> Default: **Darajah 1–5** to avoid fiqh/jurisprudential implications.
+
+---
+
+## 2) Data Model (additions)
+
+```ts
+// Organization & Levels
+Organization {
+  id, name, verified: boolean, logoUrl, ...
+  allowJoinLowerLevels: boolean,   // default true
+  levelSchemaId: string            // links to a set of labels & rules
+}
+
+OrgLevelSchema {
+  id, orgId,
+  levels: [
+    { level: 1, label: "Darajah 1", description: "Starter/easy" },
+    { level: 2, label: "Darajah 2", description: "Intermediate" },
+    ...
+  ],
+  promotionRules: [ PromotionRule ] // see below
+}
+
+// Rank→Promotion rules (ANY condition met promotes)
+PromotionRule {
+  fromLevel: number,
+  toLevel: number,
+  anyOf: [
+    { rankAtMost: 10, occurrences: 5 },  // top 10 in 5 competitions
+    { rankAtMost: 5,  occurrences: 3 },
+    { rankAtMost: 3,  occurrences: 2 }
+  ]
+}
+
+UserOrgProfile {
+  userId, orgId,
+  level: number,                  // starts at 1 on first join
+  stats: { wins:number, podiums:number, top10:number, comps:number },
+  history: [{compId, rank, levelAtEntry, placedAt}]
+}
+
+Competition {
+  id, orgId,
+  levelRequired: number,          // selected at creation
+  name, description, zikirId,
+  prizeDescription,
+  startAt, endAt,
+  public: boolean,
+  maxParticipants?: number|null,
+  unlimitedCounting: boolean
+}
+
+Participation {
+  compId, userId,
+  status: "view_only"|"active"|"finished"|"disqualified",
+  joinedAt, acceptedRulesAt?: timestamp
+}
+
+CompetitionStats {
+  compId,
+  totalParticipants: number,
+  joinedToday: number,          // last 24h window
+  createdAt, updatedAt
+}
+
+RoomInsightsDaily { compId, date, joinedCount, activeCount }
+```
+
+---
+
+## 3) Create Competition — form updates (ORG)
+
+**Existing fields** (keep):
+
+* Name, Description, Zikir/Prayer, Prize Description, Start/End, Max Participants, Unlimited counting, Public.
+
+**Add these fields:**
+
+* **Select Level** *(dropdown)*: values from org’s level schema (e.g., Darajah 1–5).
+* **Eligibility preview** (read‑only): “Only users at **Darajah {n}** (and lower if allowed) can join.”
+* **Rules link** (checkbox before submit): “I confirm this competition follows org rules & prize terms.”
+* **Optional target** (if not unlimited): target count integer.
+
+**Validation:**
+
+* Start must be ≥ now; End > Start.
+* If **Public**, show “Org rules will be shown on join”.
+
+---
+
+## 4) ORG Tab → Flow
+
+1. **Org List** (when user taps **ORG** tab)
+
+   * Card per organization: logo, verified tick, active competitions, your level badge (e.g., “Darajah 2”), and **View**.
+2. **Org Detail**
+
+   * **My Level**: badge + progress to next level (e.g., “Top‑10 finishes needed: 2/5”).
+   * **Levels & Rules** section: show schema and promotion rules in human text.
+   * **Competitions**: grouped by level (chips: Darajah 1, 2…).
+   * Metrics per competition card: *Total participants*, *Joined today*, *Ends in…*
+   * **Create Competition** button (org owners only).
+
+---
+
+## 5) Join / Entry Gate
+
+* On open competition tap:
+
+  * If **user level < levelRequired** → block with modal:
+
+    * “This is **Darajah {n}**. You’re **Darajah {m}**.
+      To upgrade: achieve any of: top10×5, top5×3, top3×2 in **Darajah {m}** competitions.”
+    * CTA: **View Eligible Competitions** (filters by your level).
+  * Else → **Rules consent modal** (see §6).
+  * If org `allowJoinLowerLevels=true` and user above required, allow joining lower levels; else block with: “This room is limited to **Darajah {n}** participants only.”
+
+---
+
+## 6) Rules Consent Modal (before counting)
+
+* Show **Basic Rules** (tap/voice etiquette, anti‑cheat, prize terms, respectful conduct).
+* Two buttons: **Agree & Start** (enables active participation), **Read later** (joins as **view\_only** → can see progress/leaderboard but **cannot count**).
+* Store `acceptedRulesAt` when agreed.
+
+---
+
+## 7) Promotions Engine
+
+**At competition end (or periodic cron):**
+
+1. Compute **final rank** for all participants.
+2. Update `UserOrgProfile.stats` and append to `history`.
+3. For each `PromotionRule` where `fromLevel == user.level`:
+
+   * Count occurrences matching `rankAtMost` in comps at that level.
+   * If **any** condition satisfied → promote user to `toLevel`, record `promotedAt` and surface toast/banner next time they open org.
+4. Emit events: `promotion_awarded`, `promotion_progress_updated`.
+
+**Edge cases:**
+
+* Ties → both get same `rank`.
+* DQ removes the result from promotion counters.
+* Retroactive promotions allowed (recalculate on schema changes via maintenance job).
+
+---
+
+## 8) Room/Competition Detail — owner & public
+
+**Owner sees:**
+
+* Live: total participants, **joined today (24h)**, currently active, reports, remove/ban.
+* Button: **View level eligibility** (who’s blocked/eligible).
+* Exports: CSV of standings.
+
+**Public sees:**
+
+* Level badge, prize, ends in X, rules short, participants count, joined today, your eligibility state.
+
+---
+
+## 9) BO / Org Settings (configuration UI)
+
+* **Levels** tab:
+
+  * Reorder/add/remove levels (min 1).
+  * Rename labels (default “Darajah N”).
+* **Promotion Rules** tab:
+
+  * For each `fromLevel`, a list of **OR** conditions:
+
+    * “Top **≤ \[10]** in **\[5]** competitions”
+    * “Top **≤ \[5]** in **\[3]** competitions”
+    * “Top **≤ \[3]** in **\[2]** competitions”
+  * Add/Remove condition rows.
+* **Policy** tab:
+
+  * `allowJoinLowerLevels` toggle (default **on**).
+  * Anti‑cheat sensitivity (normal/strict).
+  * Prize terms default text.
+* **Preview** panel shows human‑readable summary of current rules.
+
+---
+
+## 10) API Endpoints (BFF)
+
+```http
+GET  /orgs                          -> list orgs (+ your level)
+GET  /orgs/:orgId                   -> org detail, schema, promotion rules
+GET  /orgs/:orgId/competitions?level=1
+
+POST /orgs/:orgId/competitions      -> create (org owners)
+PATCH/DELETE /competitions/:id       -> manage (owner/admin)
+
+POST /competitions/:id/join         -> checks eligibility & rules; creates Participation (status=view_only|active)
+POST /competitions/:id/agree-rules   -> set acceptedRulesAt, flip to active
+
+GET  /user/orgs/:orgId/profile      -> your level, stats, progress bars
+POST /admin/orgs/:orgId/schema      -> update levels & labels (BO)
+POST /admin/orgs/:orgId/promotion-rules -> update rules
+POST /cron/competitions/:id/finalize -> compute ranks & promotions
+```
+
+**Eligibility check (pseudocode):**
+
+```ts
+if (userLevel === null) userLevel = 1;
+if (userLevel < comp.levelRequired) block;
+if (!org.allowJoinLowerLevels && userLevel > comp.levelRequired) block;
+```
+
+---
+
+## 11) Ranking & Promotion Counters
+
+* On finalize, write a `CompetitionResult{userId, rank, levelAtEntry}`.
+* Promotion counters query **results where `levelAtEntry == fromLevel`** only.
+* Maintain materialized counters for speed:
+
+  * `UserPromotionCounters{orgId,userId,level,top3,top5,top10,comps}` updated on finalize.
+
+---
+
+## 12) UI Text (copy)
+
+* **Blocked modal:**
+  “This competition is for **Darajah {n}**. You’re **Darajah {m}**.
+  Upgrade by achieving any of: **Top‑10 ×5**, **Top‑5 ×3**, **Top‑3 ×2** in Darajah {m} competitions.”
+* **Promotion toast:**
+  “MashaAllah! You’ve been promoted to **Darajah {n}** in **{OrgName}**.”
+* **Rules modal CTA:** `Agree & Start` / `Read later (view only)`
+
+---
+
+## 13) Org Dashboard (like your screenshot)
+
+Add KPI cards:
+
+* **Total Competitions**, **Active**, **Total Participants**, **Total Prizes** (sum of prize values if provided).
+* **My Competitions** list → each card shows: level badge, joined today, total participants, status (upcoming/live/ended), **Manage**.
+
+---
+
+## 14) Validation & Anti‑abuse
+
+* A user cannot join **multiple** teams/slots in same competition.
+* If `view_only`, block `/count` events.
+* Rate limiting and server‑authoritative counting remain enforced.
+* Admin can **revoke** a promotion (rare cases) → recalc counters.
+
+---
+
+## 15) Acceptance Criteria (DoD)
+
+* Org owner can **create a competition** with a **level**.
+* Users see **org list**, tap org → see **levels, rules, their level**, and **competitions by level**.
+* Join flow blocks/permits based on **eligibility**; rules must be **accepted** to start counting.
+* **Joined today** is visible on each competition detail.
+* After finalize, **ranks** saved; **promotion engine** updates user levels according to configured rules.
+* BO allows editing **labels**, **rules**, and `allowJoinLowerLevels`.
+* All views respect the **current app theme**.
+
+---
+
+## 16) Nice‑to‑Have (later)
+
+* **Per‑level badges** on profile.
+* **Auto‑DM** to promoted users with “eligible competitions at new level”.
+* **CSV export** of rankings & promotions.
+* **Org‑specific referral codes** that unlock a starter competition at your level.
+
+---
+
+If you want, I can convert this into **tickets** (GitHub Issues) with clear task owners and acceptance tests, or provide a **TypeScript types + JSON samples** for `OrgLevelSchema` and `PromotionRule` so your dev can seed BO quickly.

@@ -32,7 +32,8 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
     duration: "30",
     isPublic: true,
     country: "Bangladesh",
-    maxParticipants: ""
+    maxParticipants: "",
+    levelRequired: "1"
   });
   
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -54,6 +55,7 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
           targetCount: data.unlimited ? null : parseInt(data.targetCount),
           duration: parseInt(data.duration),
           maxParticipants: data.maxParticipants ? parseInt(data.maxParticipants) : null,
+          levelRequired: parseInt(data.levelRequired),
         }),
       });
     },
@@ -80,7 +82,8 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
         duration: "30",
         isPublic: true,
         country: "Bangladesh",
-        maxParticipants: ""
+        maxParticipants: "",
+        levelRequired: "1"
       });
       setErrors({});
     },
@@ -300,6 +303,24 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
               Competition Settings
             </h3>
             
+            <div>
+              <Label htmlFor="levelRequired">Required Level</Label>
+              <select
+                id="levelRequired"
+                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                value={formData.levelRequired}
+                onChange={(e) => setFormData({ ...formData, levelRequired: e.target.value })}
+                data-testid="select-level-required"
+              >
+                <option value="1">Darajah 1 (Beginner)</option>
+                <option value="2">Darajah 2 (Intermediate)</option>
+                <option value="3">Darajah 3 (Advanced)</option>
+                <option value="4">Darajah 4 (Expert)</option>
+                <option value="5">Darajah 5 (Master)</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">Only users at this level (and lower if allowed) can join</p>
+            </div>
+
             <div>
               <Label htmlFor="maxParticipants">Max Participants (Optional)</Label>
               <Input

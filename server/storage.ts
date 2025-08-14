@@ -8,6 +8,12 @@ import {
   userAnalytics,
   reports,
   userRoomConfigs,
+  orgLevelSchemas,
+  userOrgProfiles,
+  participations,
+  competitionStats,
+  competitionResults,
+  userPromotionCounters,
   type UpsertUser,
   type User,
   type Zikir,
@@ -22,6 +28,14 @@ import {
   type InsertCountEntry,
   type InsertLiveCounter,
   type InsertReport,
+  type OrgLevelSchema,
+  type UserOrgProfile,
+  type Participation,
+  type CompetitionStat,
+  type CompetitionResult,
+  type UserPromotionCounter,
+  type LevelDefinition,
+  type PromotionRule,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, asc, gte, lte, gt, not } from "drizzle-orm";
@@ -78,6 +92,22 @@ export interface IStorage {
   // Additional room operations
   getRoom(id: number): Promise<Room | undefined>;
   getRoomMemberCount(roomId: number): Promise<number>;
+  
+  // Organization Levels operations
+  getOrganizations(): Promise<User[]>;
+  getOrgLevelSchema(orgId: string): Promise<OrgLevelSchema | undefined>;
+  createOrgLevelSchema(orgId: string, levels: LevelDefinition[], rules: PromotionRule[]): Promise<OrgLevelSchema>;
+  updateOrgLevelSchema(orgId: string, levels: LevelDefinition[], rules: PromotionRule[]): Promise<OrgLevelSchema>;
+  getUserOrgProfile(userId: string, orgId: string): Promise<UserOrgProfile | undefined>;
+  createUserOrgProfile(userId: string, orgId: string, level?: number): Promise<UserOrgProfile>;
+  updateUserOrgProfile(id: string, updates: Partial<UserOrgProfile>): Promise<UserOrgProfile>;
+  joinCompetition(compId: number, userId: string, level: number): Promise<Participation>;
+  acceptRules(participationId: string): Promise<Participation>;
+  getCompetitionStats(compId: number): Promise<CompetitionStat | undefined>;
+  updateCompetitionStats(compId: number, updates: Partial<CompetitionStat>): Promise<CompetitionStat>;
+  checkEligibility(userId: string, orgId: string, levelRequired: number): Promise<{ eligible: boolean; userLevel: number; reason?: string }>;
+  getPromotionProgress(userId: string, orgId: string): Promise<any>;
+  processPromotions(compId: number): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -779,6 +809,211 @@ export class DatabaseStorage implements IStorage {
     }
 
     return leaderboard;
+  }
+
+  // Organization Levels operations
+  async getOrganizations(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.userType, 'organization'))
+      .orderBy(asc(users.organizationName));
+  }
+
+  async getOrgLevelSchema(orgId: string): Promise<OrgLevelSchema | undefined> {
+    const [schema] = await db
+      .select()
+      .from(orgLevelSchemas)
+      .where(eq(orgLevelSchemas.orgId, orgId));
+    return schema;
+  }
+
+  async createOrgLevelSchema(orgId: string, levels: LevelDefinition[], rules: PromotionRule[]): Promise<OrgLevelSchema> {
+    const [schema] = await db
+      .insert(orgLevelSchemas)
+      .values({
+        orgId,
+        levels: JSON.stringify(levels),
+        promotionRules: JSON.stringify(rules),
+      })
+      .returning();
+    return schema;
+  }
+
+  async updateOrgLevelSchema(orgId: string, levels: LevelDefinition[], rules: PromotionRule[]): Promise<OrgLevelSchema> {
+    const [schema] = await db
+      .update(orgLevelSchemas)
+      .set({
+        levels: JSON.stringify(levels),
+        promotionRules: JSON.stringify(rules),
+        updatedAt: new Date(),
+      })
+      .where(eq(orgLevelSchemas.orgId, orgId))
+      .returning();
+    return schema;
+  }
+
+  async getUserOrgProfile(userId: string, orgId: string): Promise<UserOrgProfile | undefined> {
+    const [profile] = await db
+      .select()
+      .from(userOrgProfiles)
+      .where(and(
+        eq(userOrgProfiles.userId, userId),
+        eq(userOrgProfiles.orgId, orgId)
+      ));
+    return profile;
+  }
+
+  async createUserOrgProfile(userId: string, orgId: string, level: number = 1): Promise<UserOrgProfile> {
+    const [profile] = await db
+      .insert(userOrgProfiles)
+      .values({
+        userId,
+        orgId,
+        level,
+      })
+      .returning();
+    return profile;
+  }
+
+  async updateUserOrgProfile(id: string, updates: Partial<UserOrgProfile>): Promise<UserOrgProfile> {
+    const [profile] = await db
+      .update(userOrgProfiles)
+      .set({
+        ...updates,
+        updatedAt: new Date(),
+      })
+      .where(eq(userOrgProfiles.id, id))
+      .returning();
+    return profile;
+  }
+
+  async joinCompetition(compId: number, userId: string, level: number): Promise<Participation> {
+    const [participation] = await db
+      .insert(participations)
+      .values({
+        compId,
+        userId,
+        levelAtEntry: level,
+        status: 'view_only',
+      })
+      .returning();
+    return participation;
+  }
+
+  async acceptRules(participationId: string): Promise<Participation> {
+    const [participation] = await db
+      .update(participations)
+      .set({
+        status: 'active',
+        acceptedRulesAt: new Date(),
+      })
+      .where(eq(participations.id, participationId))
+      .returning();
+    return participation;
+  }
+
+  async getCompetitionStats(compId: number): Promise<CompetitionStat | undefined> {
+    const [stats] = await db
+      .select()
+      .from(competitionStats)
+      .where(eq(competitionStats.compId, compId));
+    return stats;
+  }
+
+  async updateCompetitionStats(compId: number, updates: Partial<CompetitionStat>): Promise<CompetitionStat> {
+    const [stats] = await db
+      .insert(competitionStats)
+      .values({
+        compId,
+        ...updates,
+      })
+      .onConflictDoUpdate({
+        target: competitionStats.compId,
+        set: {
+          ...updates,
+          updatedAt: new Date(),
+        },
+      })
+      .returning();
+    return stats;
+  }
+
+  async checkEligibility(userId: string, orgId: string, levelRequired: number): Promise<{ eligible: boolean; userLevel: number; reason?: string }> {
+    // Get user's level in this organization
+    let userProfile = await this.getUserOrgProfile(userId, orgId);
+    
+    // If no profile exists, create one at level 1
+    if (!userProfile) {
+      userProfile = await this.createUserOrgProfile(userId, orgId, 1);
+    }
+
+    const userLevel = userProfile.level || 1;
+    
+    // Get organization settings
+    const [org] = await db.select().from(users).where(eq(users.id, orgId));
+    const allowJoinLowerLevels = org?.allowJoinLowerLevels ?? true;
+
+    // Check eligibility
+    if (userLevel < levelRequired) {
+      return {
+        eligible: false,
+        userLevel,
+        reason: `This competition requires Darajah ${levelRequired}. You are Darajah ${userLevel}.`
+      };
+    }
+
+    if (!allowJoinLowerLevels && userLevel > levelRequired) {
+      return {
+        eligible: false,
+        userLevel,
+        reason: `This competition is limited to Darajah ${levelRequired} participants only.`
+      };
+    }
+
+    return { eligible: true, userLevel };
+  }
+
+  async getPromotionProgress(userId: string, orgId: string): Promise<any> {
+    const profile = await this.getUserOrgProfile(userId, orgId);
+    if (!profile) return null;
+
+    const schema = await this.getOrgLevelSchema(orgId);
+    if (!schema) return null;
+
+    const promotionRules = JSON.parse(schema.promotionRules as string) as PromotionRule[];
+    const currentLevel = profile.level || 1;
+    const nextLevelRule = promotionRules.find(rule => rule.fromLevel === currentLevel);
+    
+    if (!nextLevelRule) return null;
+
+    // Get current promotion counters
+    const [counters] = await db
+      .select()
+      .from(userPromotionCounters)
+      .where(and(
+        eq(userPromotionCounters.userId, userId),
+        eq(userPromotionCounters.orgId, orgId),
+        eq(userPromotionCounters.level, currentLevel || 1)
+      ));
+
+    return {
+      currentLevel,
+      nextLevel: nextLevelRule.toLevel,
+      requirements: nextLevelRule.anyOf,
+      progress: {
+        top3: counters?.top3 ?? 0,
+        top5: counters?.top5 ?? 0,
+        top10: counters?.top10 ?? 0,
+        totalComps: counters?.totalComps ?? 0,
+      }
+    };
+  }
+
+  async processPromotions(compId: number): Promise<void> {
+    // This would be implemented to process promotions after competition ends
+    // For now, we'll implement basic promotion logic
+    console.log(`Processing promotions for competition ${compId}`);
   }
 }
 
