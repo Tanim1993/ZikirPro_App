@@ -94,15 +94,15 @@ export default function MobileNav() {
             
             return (
               <Link key={item.href} href={item.href}>
-                <a className={cn(
-                  "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px] no-underline",
+                <div className={cn(
+                  "flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-colors min-w-[60px] cursor-pointer",
                   item.active
                     ? "text-islamic-primary bg-islamic-primary/10"
                     : "text-gray-500 hover:text-gray-700"
                 )}>
                   <span className="text-lg mb-1">{item.emoji}</span>
                   <span className="text-xs font-medium">{item.label}</span>
-                </a>
+                </div>
               </Link>
             );
           })}
