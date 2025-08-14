@@ -660,6 +660,90 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Room deletion endpoint (only owner if sole member)
+  app.delete('/api/rooms/:roomId', async (req, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      const userId = (req.session as any).user?.id;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      // Get room and check ownership
+      const room = await storage.getRoom(roomId);
+      if (!room) {
+        return res.status(404).json({ error: 'Room not found' });
+      }
+
+      if (room.ownerId !== userId) {
+        return res.status(403).json({ error: 'Only room owner can delete room' });
+      }
+
+      // Check if owner is sole member
+      const memberCount = await storage.getRoomMemberCount(roomId);
+      if (memberCount > 1) {
+        return res.status(400).json({ error: 'Room cannot be deleted after members join' });
+      }
+
+      // Delete room and all related data
+      await storage.deleteRoom(roomId);
+      res.json({ message: 'Room deleted successfully' });
+    } catch (error) {
+      console.error('Room deletion error:', error);
+      res.status(500).json({ error: 'Failed to delete room' });
+    }
+  });
+
+  // Get room member count
+  app.get('/api/rooms/:roomId/member-count', async (req, res) => {
+    try {
+      const roomId = parseInt(req.params.roomId);
+      const count = await storage.getRoomMemberCount(roomId);
+      res.json(count);
+    } catch (error) {
+      console.error('Error getting member count:', error);
+      res.status(500).json({ error: 'Failed to get member count' });
+    }
+  });
+
+  // Room reporting endpoint
+  app.post('/api/rooms/:roomId/report', async (req, res) => {
+    try {
+      const roomId = req.params.roomId;
+      const userId = (req.session as any).user?.id;
+      const { reason, details } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ error: 'Unauthorized' });
+      }
+
+      if (!reason) {
+        return res.status(400).json({ error: 'Reason is required' });
+      }
+
+      // Create report
+      const report = await storage.createReport({
+        kind: 'room',
+        targetId: roomId,
+        byUserId: userId,
+        reason,
+        details: details || null,
+        status: 'open',
+        adminNotes: null,
+        resolvedAt: null
+      });
+
+      res.json({ 
+        message: 'Report submitted. Admin will review shortly.',
+        reportId: report.id 
+      });
+    } catch (error) {
+      console.error('Room reporting error:', error);
+      res.status(500).json({ error: 'Failed to submit report' });
+    }
+  });
+
   app.post('/api/auth/send-otp', async (req, res) => {
     try {
       const { phone } = req.body;

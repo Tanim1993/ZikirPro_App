@@ -7,6 +7,7 @@ import {
   liveCounters,
   userAnalytics,
   reports,
+  userRoomConfigs,
   type UpsertUser,
   type User,
   type Zikir,
@@ -20,6 +21,7 @@ import {
   type InsertRoomMember,
   type InsertCountEntry,
   type InsertLiveCounter,
+  type InsertReport,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and, sql, asc, gte, lte } from "drizzle-orm";
@@ -70,7 +72,11 @@ export interface IStorage {
   // Report operations
   createReport(report: Omit<Report, 'id' | 'createdAt'>): Promise<Report>;
   getReports(): Promise<Report[]>;
-  updateReportStatus(id: number, status: string): Promise<void>;
+  updateReportStatus(id: string, status: string): Promise<void>;
+  
+  // Additional room operations
+  getRoom(id: number): Promise<Room | undefined>;
+  getRoomMemberCount(roomId: number): Promise<number>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -288,9 +294,7 @@ export class DatabaseStorage implements IStorage {
     return room;
   }
 
-  async deleteRoom(id: number): Promise<void> {
-    await db.update(rooms).set({ isActive: false }).where(eq(rooms.id, id));
-  }
+
 
   // Room member operations
   async joinRoom(membership: InsertRoomMember): Promise<RoomMember> {
@@ -530,11 +534,33 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(reports).orderBy(desc(reports.createdAt));
   }
 
-  async updateReportStatus(id: number, status: string): Promise<void> {
+  async updateReportStatus(id: string, status: string): Promise<void> {
     await db
       .update(reports)
       .set({ status, resolvedAt: new Date() })
       .where(eq(reports.id, id));
+  }
+
+  // Additional room operations
+  async getRoom(id: number): Promise<Room | undefined> {
+    return this.getRoomById(id);
+  }
+
+  async getRoomMemberCount(roomId: number): Promise<number> {
+    const [result] = await db
+      .select({ count: sql<number>`count(*)` })
+      .from(roomMembers)
+      .where(and(eq(roomMembers.roomId, roomId), eq(roomMembers.isActive, true)));
+    return result?.count || 0;
+  }
+
+  async deleteRoom(id: number): Promise<void> {
+    // Delete all related data first (foreign key constraints)
+    await db.delete(liveCounters).where(eq(liveCounters.roomId, id));
+    await db.delete(countEntries).where(eq(countEntries.roomId, id));
+    await db.delete(userRoomConfigs).where(eq(userRoomConfigs.roomId, id));
+    await db.delete(roomMembers).where(eq(roomMembers.roomId, id));
+    await db.delete(rooms).where(eq(rooms.id, id));
   }
 }
 

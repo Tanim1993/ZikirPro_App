@@ -124,14 +124,16 @@ export const userAnalytics = pgTable("user_analytics", {
 
 // Reports
 export const reports = pgTable("reports", {
-  id: serial("id").primaryKey(),
-  type: varchar("type").notNull(), // room, user
-  targetId: varchar("target_id").notNull(),
-  reportedById: varchar("reported_by_id").notNull(),
-  reason: text("reason"),
-  status: varchar("status").default("pending"), // pending, resolved, dismissed
-  createdAt: timestamp("created_at").defaultNow(),
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  kind: varchar("kind").notNull(), // "room", "user", etc.
+  targetId: varchar("target_id").notNull(), // ID of the reported entity
+  byUserId: varchar("by_user_id").notNull(), // Reporter's user ID
+  reason: varchar("reason").notNull(), // "Illegal content", "Wrong Islamic information", etc.
+  details: text("details"), // Optional additional details (max 500 chars)
+  status: varchar("status").notNull().default("open"), // "open", "reviewed", "closed"
+  adminNotes: text("admin_notes"), // Admin-only notes
   resolvedAt: timestamp("resolved_at"),
+  createdAt: timestamp("created_at").defaultNow(),
 });
 
 // Relations
@@ -140,7 +142,7 @@ export const usersRelations = relations(users, ({ many }) => ({
   roomMemberships: many(roomMembers),
   countEntries: many(countEntries),
   liveCounters: many(liveCounters),
-  reports: many(reports),
+  reportsMade: many(reports),
 }));
 
 export const zikirsRelations = relations(zikirs, ({ many }) => ({
@@ -190,6 +192,13 @@ export const liveCountersRelations = relations(liveCounters, ({ one }) => ({
   }),
   user: one(users, {
     fields: [liveCounters.userId],
+    references: [users.id],
+  }),
+}));
+
+export const reportsRelations = relations(reports, ({ one }) => ({
+  reportedBy: one(users, {
+    fields: [reports.byUserId],
     references: [users.id],
   }),
 }));
@@ -272,6 +281,11 @@ export type RoomMember = typeof roomMembers.$inferSelect;
 
 export type InsertCountEntry = typeof countEntries.$inferInsert;
 export type CountEntry = typeof countEntries.$inferSelect;
+
+export type InsertReport = typeof reports.$inferInsert;
+export type Report = typeof reports.$inferSelect;
+
+
 
 export type InsertLiveCounter = typeof liveCounters.$inferInsert;
 export type LiveCounter = typeof liveCounters.$inferSelect;

@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap } from "lucide-react";
+import { ArrowLeft, Users, Target, Clock, Crown, Share2, Copy, Settings, Zap, AlertTriangle, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
@@ -16,6 +16,9 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { DigitalTasbih } from "@/components/digital-tasbih";
 import { LeaderboardWidget } from "@/components/leaderboard-widget";
 import TasbihGallery from "@/components/tasbih-gallery";
+import { ReportRoomModal } from "@/components/report-room-modal";
+import { DeleteRoomModal } from "@/components/delete-room-modal";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Room() {
   const { id } = useParams();
@@ -26,6 +29,8 @@ export default function Room() {
   
   const [tasbihType, setTasbihType] = useState<'digital' | 'physical' | 'hand'>('digital');
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: [`/api/rooms/${roomId}`],
@@ -43,6 +48,12 @@ export default function Room() {
     enabled: !!roomId,
     refetchInterval: 3000,
   }) as { data: any[] };
+
+  // Get room member count for deletion check
+  const { data: memberCount = 0 } = useQuery({
+    queryKey: [`/api/rooms/${roomId}/member-count`],
+    enabled: !!roomId && user?.id === room?.ownerId,
+  }) as { data: number };
 
   // Optimized count mutation with immediate UI feedback
   const countMutation = useMutation({
@@ -391,9 +402,73 @@ export default function Room() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Action Buttons */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="space-y-3">
+                  <h3 className="font-semibold">Room Actions</h3>
+                  
+                  <div className="flex flex-col gap-2">
+                    {/* Report Room Button - Available to all users */}
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setShowReportModal(true)}
+                      className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+                      data-testid="button-report-room"
+                    >
+                      <AlertTriangle className="w-4 h-4 mr-2" />
+                      Report Room
+                    </Button>
+
+                    {/* Delete Room Button - Only for owner if sole member */}
+                    {user?.id === room?.ownerId && (
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <Button 
+                                variant="outline" 
+                                onClick={() => setShowDeleteModal(true)}
+                                disabled={memberCount > 1}
+                                className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                                data-testid="button-delete-room"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Room
+                              </Button>
+                            </div>
+                          </TooltipTrigger>
+                          {memberCount > 1 && (
+                            <TooltipContent>
+                              <p>Room cannot be deleted after members join</p>
+                            </TooltipContent>
+                          )}
+                        </Tooltip>
+                      </TooltipProvider>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Modals */}
+      <ReportRoomModal
+        roomId={roomId}
+        roomName={room?.name || "Room"}
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+      />
+
+      <DeleteRoomModal
+        roomId={roomId}
+        roomName={room?.name || "Room"}
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }
