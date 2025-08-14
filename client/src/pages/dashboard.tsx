@@ -25,6 +25,7 @@ export default function Dashboard() {
   // All useQuery hooks together
   const { data: userRooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["/api/rooms/my"],
+    refetchInterval: 15000, // Refresh every 15 seconds
   });
 
   const { data: publicRooms = [], isLoading: publicRoomsLoading } = useQuery({
@@ -33,6 +34,7 @@ export default function Dashboard() {
 
   const { data: userAnalytics = {}, isLoading: analyticsLoading } = useQuery({
     queryKey: ["/api/user/analytics"],
+    refetchInterval: 10000, // Refresh every 10 seconds
   });
 
   // useMutation hooks
@@ -200,7 +202,7 @@ export default function Dashboard() {
           {/* Quick Stats with Islamic Design */}
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">
-              <div className="text-2xl font-bold text-white">{(userAnalytics as any)?.totalCount || 0}</div>
+              <div className="text-2xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 0}</div>
               <div className="text-xs text-green-100">Total Zikir</div>
             </div>
             <div className="text-center bg-white/20 backdrop-blur-sm rounded-lg p-3 border border-white/30">

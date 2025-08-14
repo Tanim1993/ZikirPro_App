@@ -269,8 +269,8 @@ export class DatabaseStorage implements IStorage {
         endDate: rooms.endDate,
         zikirName: zikirs.name,
         role: roomMembers.role,
-        totalCount: liveCounters.totalCount,
-        todayCount: liveCounters.todayCount,
+        totalCount: sql<number>`COALESCE(${liveCounters.totalCount}, 0)`,
+        todayCount: sql<number>`COALESCE(${liveCounters.todayCount}, 0)`,
         memberCount: sql<number>`(
           SELECT COUNT(*) 
           FROM ${roomMembers} rm 

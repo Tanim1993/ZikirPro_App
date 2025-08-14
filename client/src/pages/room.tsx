@@ -105,8 +105,10 @@ export default function Room() {
       });
     },
     onSuccess: () => {
-      // Refresh leaderboard after successful count
+      // Refresh all related data after successful count
       queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/leaderboard`] });
+      queryClient.invalidateQueries({ queryKey: ["/api/user/analytics"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/rooms/my"] });
     },
   });
 
