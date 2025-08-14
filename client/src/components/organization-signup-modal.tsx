@@ -11,11 +11,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { Building2, Upload } from "lucide-react";
 
 interface OrganizationSignupModalProps {
-  isOpen: boolean;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function OrganizationSignupModal({ isOpen, onClose }: OrganizationSignupModalProps) {
+export function OrganizationSignupModal({ open, onOpenChange }: OrganizationSignupModalProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
@@ -53,17 +53,18 @@ export function OrganizationSignupModal({ isOpen, onClose }: OrganizationSignupM
         formDataToSend.append("organizationLogo", logoFile);
       }
       
-      const response = await fetch('/api/auth/signup-organization', {
-        method: 'POST',
-        body: formDataToSend,
+      const response = await apiRequest('POST', '/api/auth/signup-organization', {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        organizationName: data.organizationName,
+        organizationDescription: data.organizationDescription,
+        country: data.country,
+        firstName: data.username,
+        lastName: "Admin"
       });
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to create organization account');
-      }
-      
-      return response.json();
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
@@ -72,7 +73,7 @@ export function OrganizationSignupModal({ isOpen, onClose }: OrganizationSignupM
       });
       
       queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
-      onClose();
+      onOpenChange(false);
       
       // Reset form
       setFormData({
@@ -169,7 +170,7 @@ export function OrganizationSignupModal({ isOpen, onClose }: OrganizationSignupM
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
@@ -322,7 +323,7 @@ export function OrganizationSignupModal({ isOpen, onClose }: OrganizationSignupM
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
+              onClick={() => onOpenChange(false)}
               disabled={signupMutation.isPending}
               className="flex-1"
               data-testid="button-cancel-org-signup"
