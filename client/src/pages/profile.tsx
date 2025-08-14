@@ -57,11 +57,11 @@ export default function Profile() {
       // Clear query cache
       queryClient.clear();
       
-      // Redirect to home
-      window.location.href = '/';
+      // Force page reload to landing page
+      window.location.replace('/');
     } catch (error) {
       // Fallback - still redirect to root
-      window.location.href = '/';
+      window.location.replace('/');
     }
   };
 
