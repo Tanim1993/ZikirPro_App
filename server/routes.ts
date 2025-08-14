@@ -149,7 +149,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Handle GET logout (for direct browser navigation)
   app.get('/api/logout', (req: any, res) => {
-    // Since we're using mock auth, just redirect to root
+    // Set logout flag in session and redirect
+    req.session.loggedOut = true;
     res.redirect('/');
   });
 
