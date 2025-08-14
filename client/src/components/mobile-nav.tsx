@@ -10,7 +10,7 @@ export default function MobileNav() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const { user } = useAuth();
   
-  const isOrganization = user?.userType === 'organization';
+  const isOrganization = (user as any)?.userType === 'organization';
 
   const organizationNavItems = [
     {
@@ -27,10 +27,10 @@ export default function MobileNav() {
       onClick: () => setShowCreateModal(true)
     },
     {
-      href: "/organizations",
-      emoji: "🌟", 
-      label: "Browse",
-      active: location === "/organizations"
+      href: "/stats",
+      emoji: "📊",
+      label: "Analytics",
+      active: location === "/stats"
     },
     {
       href: "/profile",

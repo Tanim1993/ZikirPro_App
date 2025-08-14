@@ -218,15 +218,22 @@ export default function Dashboard() {
       {/* Clean Content Section */}
       <div className="max-w-md mx-auto px-4">
         <Tabs defaultValue="my-rooms" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-lg">
+          <TabsList className={cn(
+            "bg-gray-100 p-1 rounded-lg w-full",
+            user?.userType === 'organization' 
+              ? "grid grid-cols-2" 
+              : "grid grid-cols-3"
+          )}>
             <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
               <Home className="w-4 h-4 mr-2" />
-              My Rooms
+              {user?.userType === 'organization' ? 'My Competitions' : 'My Rooms'}
             </TabsTrigger>
-            <TabsTrigger value="org-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
-              <Building2 className="w-4 h-4 mr-2" />
-              Org
-            </TabsTrigger>
+            {user?.userType !== 'organization' && (
+              <TabsTrigger value="org-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
+                <Building2 className="w-4 h-4 mr-2" />
+                Org
+              </TabsTrigger>
+            )}
             <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
               <Trophy className="w-4 h-4 mr-2" />
               Leaders
@@ -239,13 +246,35 @@ export default function Dashboard() {
                 <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
                   <Home className="w-8 h-8 text-gray-400" />
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No rooms yet</h3>
-                <p className="text-gray-600">Use the Create Room button above to get started</p>
+                {user?.userType === 'organization' ? (
+                  <>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No competitions created</h3>
+                    <p className="text-gray-600 mb-4">Create your first competition to engage your community</p>
+                    <Button 
+                      onClick={() => setShowCreateModal(true)}
+                      className="bg-gradient-to-r from-islamic-primary to-blue-600 hover:from-islamic-primary/90 hover:to-blue-600/90"
+                      data-testid="button-create-first-competition"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Competition
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No rooms yet</h3>
+                    <p className="text-gray-600">Use the Create Room button above to get started</p>
+                  </>
+                )}
               </div>
             ) : (
               <div className="space-y-3">
                 {(userRooms as any[]).map((room: any) => (
-                  <RoomCard key={room.id} room={room} isOwner={room.role === "owner"} />
+                  <RoomCard 
+                    key={room.id} 
+                    room={room} 
+                    isOwner={room.role === "owner"}
+                    isOrganization={user?.userType === 'organization'}
+                  />
                 ))}
               </div>
             )}
@@ -253,23 +282,25 @@ export default function Dashboard() {
 
 
 
-          <TabsContent value="org-rooms" className="space-y-4">
-            {!Array.isArray(orgRooms) || orgRooms.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-                  <Building2 className="w-8 h-8 text-gray-400" />
+          {user?.userType !== 'organization' && (
+            <TabsContent value="org-rooms" className="space-y-4">
+              {!Array.isArray(orgRooms) || orgRooms.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                    <Building2 className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No organization rooms</h3>
+                  <p className="text-gray-600">Organization competitions will appear here</p>
                 </div>
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No organization rooms</h3>
-                <p className="text-gray-600">Organization competitions will appear here</p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {(orgRooms as any[]).map((room: any) => (
-                  <RoomCard key={room.id} room={room} isPublic={true} />
-                ))}
-              </div>
-            )}
-          </TabsContent>
+              ) : (
+                <div className="space-y-3">
+                  {(orgRooms as any[]).map((room: any) => (
+                    <RoomCard key={room.id} room={room} isPublic={true} />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          )}
 
           <TabsContent value="leaderboard" className="space-y-4">
             <GlobalLeaderboard />

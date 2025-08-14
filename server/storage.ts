@@ -24,7 +24,7 @@ import {
   type InsertReport,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, and, sql, asc, gte, lte, gt } from "drizzle-orm";
+import { eq, desc, and, sql, asc, gte, lte, gt, not } from "drizzle-orm";
 
 export interface IStorage {
   // User operations (required for Replit Auth)
@@ -258,6 +258,39 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserRooms(userId: string): Promise<any[]> {
+    // Check if user is organization type
+    const [user] = await db.select({ userType: users.userType }).from(users).where(eq(users.id, userId));
+    
+    if (user?.userType === 'organization') {
+      // For organizations, return competitions they created (owned by them)
+      return await db
+        .select({
+          id: rooms.id,
+          name: rooms.name,
+          description: rooms.description,
+          targetCount: rooms.targetCount,
+          duration: rooms.duration,
+          pictureUrl: rooms.pictureUrl,
+          startDate: rooms.startDate,
+          endDate: rooms.endDate,
+          zikirName: zikirs.name,
+          role: sql<string>`'owner'`, // Organizations are owners of their competitions
+          totalCount: sql<number>`0`, // Organizations don't participate in counting
+          todayCount: sql<number>`0`,
+          memberCount: sql<number>`(
+            SELECT COUNT(*) 
+            FROM ${roomMembers} rm 
+            WHERE rm.room_id = ${rooms.id} 
+            AND rm.is_active = true
+          )`,
+        })
+        .from(rooms)
+        .leftJoin(zikirs, eq(rooms.zikirId, zikirs.id))
+        .where(eq(rooms.ownerId, userId))
+        .orderBy(desc(rooms.createdAt));
+    }
+    
+    // For regular users, return rooms they joined
     return await db
       .select({
         id: rooms.id,
@@ -294,6 +327,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getOrganizationRooms(userId: string): Promise<any[]> {
+    // Only show other organization competitions (not the user's own)
     return await db
       .select({
         id: rooms.id,
@@ -320,7 +354,8 @@ export class DatabaseStorage implements IStorage {
       .leftJoin(zikirs, eq(rooms.zikirId, zikirs.id))
       .where(and(
         eq(users.userType, 'organization'),
-        eq(rooms.isPublic, true)
+        eq(rooms.isPublic, true),
+        not(eq(rooms.ownerId, userId)) // Exclude user's own competitions
       ))
       .orderBy(desc(rooms.createdAt));
   }
