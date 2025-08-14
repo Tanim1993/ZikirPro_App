@@ -62,10 +62,20 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
             </div>
             
             <div className="flex justify-between mb-6">
-              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black font-bold">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="text-white border-white bg-white/20 hover:bg-white hover:text-black font-bold opacity-100 visible"
+                data-testid="button-count-mode"
+              >
                 COUNT
               </Button>
-              <Button size="sm" variant="outline" className="text-white border-white hover:bg-white hover:text-black font-bold">
+              <Button 
+                size="sm" 
+                variant="outline" 
+                className="text-white border-white bg-white/20 hover:bg-white hover:text-black font-bold opacity-100 visible"
+                data-testid="button-reset-mode"
+              >
                 RESET
               </Button>
             </div>

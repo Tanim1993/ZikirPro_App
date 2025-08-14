@@ -565,6 +565,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Global leaderboard route
+  app.get('/api/leaderboard/global', async (req, res) => {
+    try {
+      const globalLeaderboard = await storage.getGlobalLeaderboard();
+      res.json(globalLeaderboard);
+    } catch (error) {
+      console.error('Error getting global leaderboard:', error);
+      res.status(500).json({ message: 'Failed to get global leaderboard' });
+    }
+  });
+
   // Global stats route
   app.get('/api/stats/global', async (req, res) => {
     try {

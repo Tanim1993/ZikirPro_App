@@ -658,6 +658,58 @@ export class DatabaseStorage implements IStorage {
       ));
     return counter;
   }
+
+  async getGlobalLeaderboard(): Promise<Array<{
+    userId: string;
+    firstName?: string;
+    lastName?: string;
+    totalCount: number;
+    rank: number;
+    profileImageUrl?: string;
+    streakCount: number;
+    roomsCount: number;
+  }>> {
+    // Get user totals from count entries
+    const userTotals = await db
+      .select({
+        userId: countEntries.userId,
+        totalCount: sql<number>`SUM(${countEntries.count})`.as('totalCount'),
+      })
+      .from(countEntries)
+      .groupBy(countEntries.userId)
+      .orderBy(sql`SUM(${countEntries.count}) DESC`);
+
+    // Get user details and calculate additional stats
+    const leaderboard = [];
+    for (let i = 0; i < userTotals.length; i++) {
+      const userTotal = userTotals[i];
+      
+      // Get user details
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userTotal.userId));
+
+      // Calculate streak
+      const { currentStreak } = await this.calculateUserStreak(userTotal.userId);
+
+      // Get user room count
+      const userRooms = await this.getUserRooms(userTotal.userId);
+
+      leaderboard.push({
+        userId: userTotal.userId,
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        profileImageUrl: user?.profileImageUrl,
+        totalCount: userTotal.totalCount,
+        streakCount: currentStreak,
+        roomsCount: userRooms.length,
+        rank: i + 1,
+      });
+    }
+
+    return leaderboard;
+  }
 }
 
 export const storage = new DatabaseStorage();
