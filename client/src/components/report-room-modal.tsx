@@ -44,17 +44,30 @@ export function ReportRoomModal({ roomId, roomName, isOpen, onClose }: ReportRoo
 
   const reportMutation = useMutation({
     mutationFn: async (data: { reason: string; details: string }) => {
-      await apiRequest(`/api/rooms/${roomId}/report`, "POST", data);
+      const response = await apiRequest("POST", `/api/rooms/${roomId}/report`, data);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || errorData.message || 'Failed to submit report');
+      }
+      return await response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Report submitted",
-        description: "Admin will review shortly.",
-        variant: "default",
+        description: data.message || "Admin will review your report shortly.",
       });
       handleClose();
     },
     onError: (error) => {
+      if (error.message?.includes('401') || error.message?.includes('Unauthorized')) {
+        toast({
+          title: "Session Expired",
+          description: "Please log in again to submit reports",
+          variant: "destructive",
+        });
+        setTimeout(() => window.location.href = "/login", 1000);
+        return;
+      }
       toast({
         title: "Failed to submit report",
         description: error.message || "Please try again later.",
