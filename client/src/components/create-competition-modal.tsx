@@ -39,7 +39,7 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Fetch available zikirs
-  const { data: zikirs = [] } = useQuery({
+  const { data: zikirs = [] } = useQuery<any[]>({
     queryKey: ['/api/zikirs'],
     enabled: isOpen, // Only fetch when modal is open
   });
@@ -58,10 +58,8 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
       
       console.log('Creating competition with payload:', payload);
       
-      return await apiRequest('/api/rooms/competition', {
-        method: 'POST',
-        body: JSON.stringify(payload),
-      });
+      const response = await apiRequest('POST', '/api/rooms/competition', payload);
+      return await response.json();
     },
     onSuccess: (data) => {
       toast({
