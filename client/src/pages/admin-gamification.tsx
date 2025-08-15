@@ -43,6 +43,374 @@ interface BadgeConfig {
   is_active: boolean;
 }
 
+// Quest Configuration Component
+function QuestConfiguration() {
+  const [selectedQuest, setSelectedQuest] = useState<any>(null);
+  const [editingQuest, setEditingQuest] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch quest configurations
+  const { data: quests, isLoading } = useQuery({
+    queryKey: ['/api/admin/quests'],
+  });
+
+  // Update quest mutation
+  const updateQuestMutation = useMutation({
+    mutationFn: async (data: { id: number; config: any }) => {
+      return apiRequest(`/api/admin/quests/${data.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data.config),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/quests'] });
+      toast({
+        title: "Success",
+        description: "Quest configuration updated successfully",
+      });
+      setEditingQuest(false);
+      setSelectedQuest(null);
+    },
+  });
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading quests...</div>;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center justify-between">
+          <span>🎯 Daily Quest System</span>
+          <Button data-testid="button-create-quest">Create New Quest</Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Quest List */}
+          <div>
+            <h3 className="font-semibold mb-4">Available Quests</h3>
+            <div className="space-y-2">
+              {quests?.map((quest: any) => (
+                <Button
+                  key={quest.id}
+                  variant={selectedQuest?.id === quest.id ? "default" : "outline"}
+                  className="w-full justify-start text-left h-auto p-4"
+                  onClick={() => setSelectedQuest(quest)}
+                >
+                  <div>
+                    <div className="font-semibold">{quest.name_en}</div>
+                    <div className="text-sm text-gray-500">{quest.name_ar}</div>
+                    <div className="text-xs text-gray-400">{quest.quest_type} • {quest.points_reward} pts</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Quest Configuration Form */}
+          <div>
+            {selectedQuest ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{selectedQuest.name_en}</h3>
+                  <Button 
+                    size="sm" 
+                    onClick={() => setEditingQuest(!editingQuest)}
+                  >
+                    {editingQuest ? 'Cancel' : 'Edit'}
+                  </Button>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="questNameEn">English Name</Label>
+                      <Input
+                        id="questNameEn"
+                        value={selectedQuest.name_en}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          name_en: e.target.value
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="questNameAr">Arabic Name</Label>
+                      <Input
+                        id="questNameAr"
+                        value={selectedQuest.name_ar}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          name_ar: e.target.value
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="questDesc">Description</Label>
+                    <Input
+                      id="questDesc"
+                      value={selectedQuest.description}
+                      disabled={!editingQuest}
+                      onChange={(e) => setSelectedQuest({
+                        ...selectedQuest,
+                        description: e.target.value
+                      })}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="questTarget">Target Value</Label>
+                      <Input
+                        id="questTarget"
+                        type="number"
+                        value={selectedQuest.target_value}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          target_value: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="questReward">Points Reward</Label>
+                      <Input
+                        id="questReward"
+                        type="number"
+                        value={selectedQuest.points_reward}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          points_reward: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="questMinLevel">Min Level</Label>
+                      <Input
+                        id="questMinLevel"
+                        type="number"
+                        value={selectedQuest.min_level}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          min_level: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="questMaxLevel">Max Level</Label>
+                      <Input
+                        id="questMaxLevel"
+                        type="number"
+                        value={selectedQuest.max_level}
+                        disabled={!editingQuest}
+                        onChange={(e) => setSelectedQuest({
+                          ...selectedQuest,
+                          max_level: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  {editingQuest && (
+                    <Button
+                      className="w-full"
+                      onClick={() => updateQuestMutation.mutate({ id: selectedQuest.id, config: selectedQuest })}
+                      disabled={updateQuestMutation.isPending}
+                    >
+                      {updateQuestMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                Select a quest to configure its settings
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// Islamic Practice Configuration Component
+function IslamicPracticeConfiguration() {
+  const [selectedPractice, setSelectedPractice] = useState<any>(null);
+  const [editingPractice, setEditingPractice] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch practice configurations
+  const { data: practices, isLoading } = useQuery({
+    queryKey: ['/api/admin/practices'],
+  });
+
+  // Update practice mutation
+  const updatePracticeMutation = useMutation({
+    mutationFn: async (data: { id: number; config: any }) => {
+      return apiRequest(`/api/admin/practices/${data.id}`, {
+        method: 'PUT',
+        body: JSON.stringify(data.config),
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/practices'] });
+      toast({
+        title: "Success",
+        description: "Islamic practice updated successfully",
+      });
+      setEditingPractice(false);
+      setSelectedPractice(null);
+    },
+  });
+
+  if (isLoading) {
+    return <div className="text-center py-8">Loading Islamic practices...</div>;
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>🕌 Islamic Practice Configuration</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Practice List */}
+          <div>
+            <h3 className="font-semibold mb-4">Islamic Practices</h3>
+            <div className="space-y-2">
+              {practices?.map((practice: any) => (
+                <Button
+                  key={practice.id}
+                  variant={selectedPractice?.id === practice.id ? "default" : "outline"}
+                  className="w-full justify-start text-left h-auto p-4"
+                  onClick={() => setSelectedPractice(practice)}
+                >
+                  <div>
+                    <div className="font-semibold">{practice.name_en}</div>
+                    <div className="text-sm text-gray-500">{practice.name_ar}</div>
+                    <div className="text-xs text-gray-400">{practice.points_reward} pts • {practice.recommended_time}</div>
+                  </div>
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          {/* Practice Configuration Form */}
+          <div>
+            {selectedPractice ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-semibold">{selectedPractice.name_en}</h3>
+                  <Button 
+                    size="sm" 
+                    onClick={() => setEditingPractice(!editingPractice)}
+                  >
+                    {editingPractice ? 'Cancel' : 'Edit'}
+                  </Button>
+                </div>
+                
+                <Separator />
+                
+                <div className="space-y-4">
+                  <div>
+                    <Label htmlFor="practiceDesc">Description</Label>
+                    <Input
+                      id="practiceDesc"
+                      value={selectedPractice.description}
+                      disabled
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="practicePoints">Points Reward</Label>
+                      <Input
+                        id="practicePoints"
+                        type="number"
+                        value={selectedPractice.points_reward}
+                        disabled={!editingPractice}
+                        onChange={(e) => setSelectedPractice({
+                          ...selectedPractice,
+                          points_reward: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="practiceStreak">Streak Bonus</Label>
+                      <Input
+                        id="practiceStreak"
+                        type="number"
+                        value={selectedPractice.streak_bonus}
+                        disabled={!editingPractice}
+                        onChange={(e) => setSelectedPractice({
+                          ...selectedPractice,
+                          streak_bonus: parseInt(e.target.value)
+                        })}
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="practiceTime">Recommended Time</Label>
+                    <Input
+                      id="practiceTime"
+                      value={selectedPractice.recommended_time}
+                      disabled
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="practiceActive"
+                      checked={selectedPractice.is_active}
+                      disabled={!editingPractice}
+                      onChange={(e) => setSelectedPractice({
+                        ...selectedPractice,
+                        is_active: e.target.checked
+                      })}
+                    />
+                    <Label htmlFor="practiceActive">Practice is active</Label>
+                  </div>
+
+                  {editingPractice && (
+                    <Button
+                      className="w-full"
+                      onClick={() => updatePracticeMutation.mutate({ id: selectedPractice.id, config: selectedPractice })}
+                      disabled={updatePracticeMutation.isPending}
+                    >
+                      {updatePracticeMutation.isPending ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 py-8">
+                Select a practice to configure its settings
+              </div>
+            )}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function AdminGamification() {
   const [selectedLevel, setSelectedLevel] = useState<LevelConfig | null>(null);
   const [editingLevel, setEditingLevel] = useState(false);
@@ -386,30 +754,12 @@ export default function AdminGamification() {
 
         {/* Daily Quests Configuration */}
         <TabsContent value="quests">
-          <Card>
-            <CardHeader>
-              <CardTitle>🎯 Daily Quest System</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center text-gray-500 py-8">
-                Quest configuration interface coming soon...
-              </div>
-            </CardContent>
-          </Card>
+          <QuestConfiguration />
         </TabsContent>
 
         {/* Islamic Practices Configuration */}
         <TabsContent value="practices">
-          <Card>
-            <CardHeader>
-              <CardTitle>🕌 Islamic Practice Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center text-gray-500 py-8">
-                Islamic practice configuration interface coming soon...
-              </div>
-            </CardContent>
-          </Card>
+          <IslamicPracticeConfiguration />
         </TabsContent>
       </Tabs>
     </div>

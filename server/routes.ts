@@ -1807,6 +1807,223 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update currency configuration
+  app.put('/api/admin/currency/:id', isAppFounder, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { basePoints, multiplier, seasonalBonus, isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE currency_configuration 
+        SET 
+          base_points = ${basePoints},
+          multiplier = ${multiplier},
+          seasonal_bonus = ${seasonalBonus},
+          is_active = ${isActive},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating currency config:', error);
+      res.status(500).json({ error: 'Failed to update currency configuration' });
+    }
+  });
+
+  // Get badge configurations
+  app.get('/api/admin/badges', isAppFounder, async (req, res) => {
+    try {
+      const badges = await db.execute(sql`
+        SELECT * FROM badge_configuration ORDER BY category ASC, name_en ASC
+      `);
+      res.json(badges.rows || []);
+    } catch (error) {
+      console.error('Error fetching badges:', error);
+      res.status(500).json({ error: 'Failed to fetch badges' });
+    }
+  });
+
+  // Create new badge
+  app.post('/api/admin/badges', isAppFounder, async (req, res) => {
+    try {
+      const { badgeId, nameEn, nameAr, description, category, criteriaType, targetValue, pointsReward, coinsReward } = req.body;
+      
+      const result = await db.execute(sql`
+        INSERT INTO badge_configuration 
+        (badge_id, name_en, name_ar, description, category, criteria_type, target_value, points_reward, coins_reward)
+        VALUES (${badgeId}, ${nameEn}, ${nameAr}, ${description}, ${category}, ${criteriaType}, ${targetValue}, ${pointsReward}, ${coinsReward})
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error creating badge:', error);
+      res.status(500).json({ error: 'Failed to create badge' });
+    }
+  });
+
+  // Update badge configuration
+  app.put('/api/admin/badges/:id', isAppFounder, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { nameEn, nameAr, description, targetValue, pointsReward, coinsReward, isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE badge_configuration 
+        SET 
+          name_en = ${nameEn},
+          name_ar = ${nameAr},
+          description = ${description},
+          target_value = ${targetValue},
+          points_reward = ${pointsReward},
+          coins_reward = ${coinsReward},
+          is_active = ${isActive},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating badge:', error);
+      res.status(500).json({ error: 'Failed to update badge' });
+    }
+  });
+
+  // Get quest configurations
+  app.get('/api/admin/quests', isAppFounder, async (req, res) => {
+    try {
+      const quests = await db.execute(sql`
+        SELECT * FROM quest_configuration ORDER BY quest_type ASC, name_en ASC
+      `);
+      res.json(quests.rows || []);
+    } catch (error) {
+      console.error('Error fetching quests:', error);
+      res.status(500).json({ error: 'Failed to fetch quests' });
+    }
+  });
+
+  // Create new quest
+  app.post('/api/admin/quests', isAppFounder, async (req, res) => {
+    try {
+      const { questId, nameEn, nameAr, description, questType, targetValue, timeLimit, pointsReward, minLevel, maxLevel } = req.body;
+      
+      const result = await db.execute(sql`
+        INSERT INTO quest_configuration 
+        (quest_id, name_en, name_ar, description, quest_type, target_value, time_limit, points_reward, min_level, max_level)
+        VALUES (${questId}, ${nameEn}, ${nameAr}, ${description}, ${questType}, ${targetValue}, ${timeLimit}, ${pointsReward}, ${minLevel}, ${maxLevel})
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error creating quest:', error);
+      res.status(500).json({ error: 'Failed to create quest' });
+    }
+  });
+
+  // Update quest configuration
+  app.put('/api/admin/quests/:id', isAppFounder, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { nameEn, nameAr, description, targetValue, pointsReward, minLevel, maxLevel, isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE quest_configuration 
+        SET 
+          name_en = ${nameEn},
+          name_ar = ${nameAr},
+          description = ${description},
+          target_value = ${targetValue},
+          points_reward = ${pointsReward},
+          min_level = ${minLevel},
+          max_level = ${maxLevel},
+          is_active = ${isActive},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating quest:', error);
+      res.status(500).json({ error: 'Failed to update quest' });
+    }
+  });
+
+  // Get Islamic practice configurations
+  app.get('/api/admin/practices', isAppFounder, async (req, res) => {
+    try {
+      const practices = await db.execute(sql`
+        SELECT * FROM islamic_practice_configuration ORDER BY name_en ASC
+      `);
+      res.json(practices.rows || []);
+    } catch (error) {
+      console.error('Error fetching practices:', error);
+      res.status(500).json({ error: 'Failed to fetch practices' });
+    }
+  });
+
+  // Update Islamic practice
+  app.put('/api/admin/practices/:id', isAppFounder, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { pointsReward, streakBonus, isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE islamic_practice_configuration 
+        SET 
+          points_reward = ${pointsReward},
+          streak_bonus = ${streakBonus},
+          is_active = ${isActive},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${id}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating practice:', error);
+      res.status(500).json({ error: 'Failed to update practice' });
+    }
+  });
+
+  // Gamification analytics
+  app.get('/api/admin/gamification-stats', isAppFounder, async (req, res) => {
+    try {
+      const [levelDistribution, badgeStats, practiceStats] = await Promise.all([
+        db.execute(sql`
+          SELECT user_level, COUNT(*) as user_count 
+          FROM users 
+          WHERE user_level IS NOT NULL 
+          GROUP BY user_level 
+          ORDER BY user_level
+        `),
+        db.execute(sql`
+          SELECT COUNT(*) as total_badges_earned 
+          FROM user_badges
+        `),
+        db.execute(sql`
+          SELECT practice_id, COUNT(*) as completion_count
+          FROM user_islamic_practices 
+          GROUP BY practice_id 
+          ORDER BY completion_count DESC
+        `)
+      ]);
+
+      res.json({
+        levelDistribution: levelDistribution.rows || [],
+        totalBadgesEarned: badgeStats.rows?.[0]?.total_badges_earned || 0,
+        practiceStats: practiceStats.rows || []
+      });
+    } catch (error) {
+      console.error('Error fetching gamification stats:', error);
+      res.status(500).json({ error: 'Failed to fetch gamification statistics' });
+    }
+  });
+
   return httpServer;
 }
 

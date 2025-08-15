@@ -375,6 +375,17 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Admin Gamification Button - Only for founder */}
+      {(user as any)?.username === 'admin' && (
+        <div className="fixed bottom-24 right-6 z-50">
+          <Link href="/admin-gamification">
+            <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg rounded-full p-4 w-16 h-16" data-testid="button-admin-gamification">
+              <div className="text-2xl">🎮</div>
+            </Button>
+          </Link>
+        </div>
+      )}
     </div>
   );
 }
