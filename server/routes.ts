@@ -1384,6 +1384,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   seedInitialData();
+  
+  // Seed seasonal competitions and badges (only after tables exist)
+  try {
+    const { seedSeasonalData } = await import("./seedSeasonalData");
+    await seedSeasonalData();
+  } catch (error) {
+    console.log("Note: Seasonal data seeding skipped - tables may not exist yet. Run 'npm run db:push' first.");
+  }
 
   return httpServer;
 }

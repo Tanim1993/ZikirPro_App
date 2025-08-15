@@ -1057,13 +1057,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Seasonal competitions operations
-  async createSeasonalCompetition(competition: InsertSeasonalCompetition): Promise<SeasonalCompetition> {
-    const [newCompetition] = await db.insert(seasonalCompetitions).values(competition).returning();
-    return newCompetition;
+  async createSeasonalCompetition(competition: any): Promise<any> {
+    const result = await db.execute(sql`
+      INSERT INTO seasonal_competitions (
+        name, description, season, season_year, zikir_id, target_count, unlimited,
+        prize_description, start_date, end_date, registration_start_date, registration_end_date,
+        max_participants, is_active, theme_color, background_image
+      ) VALUES (${competition.name}, ${competition.description}, ${competition.season}, ${competition.seasonYear},
+        ${competition.zikirId}, ${competition.targetCount}, ${competition.unlimited},
+        ${competition.prizeDescription}, ${competition.startDate}, ${competition.endDate},
+        ${competition.registrationStartDate}, ${competition.registrationEndDate},
+        ${competition.maxParticipants}, ${competition.isActive}, ${competition.themeColor}, ${competition.backgroundImage})
+      RETURNING *
+    `);
+    return result.rows?.[0];
   }
 
-  async getAllSeasonalCompetitions(): Promise<SeasonalCompetition[]> {
-    return await db.select().from(seasonalCompetitions).orderBy(desc(seasonalCompetitions.createdAt));
+  async getAllSeasonalCompetitions(): Promise<any[]> {
+    const result = await db.execute(sql`SELECT * FROM seasonal_competitions ORDER BY created_at DESC`);
+    return result.rows || [];
   }
 
   async getActiveSeasonalCompetitions(): Promise<SeasonalCompetition[]> {
@@ -1160,13 +1172,22 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Achievement badges operations
-  async createAchievementBadge(badge: InsertAchievementBadge): Promise<AchievementBadge> {
-    const [newBadge] = await db.insert(achievementBadges).values(badge).returning();
-    return newBadge;
+  async createAchievementBadge(badge: any): Promise<any> {
+    const result = await db.execute(sql`
+      INSERT INTO achievement_badges (
+        name, description, category, badge_type, icon_name, icon_color, background_color,
+        conditions, points, rarity, seasonal_only, available_season, is_active
+      ) VALUES (${badge.name}, ${badge.description}, ${badge.category}, ${badge.badgeType}, ${badge.iconName},
+        ${badge.iconColor}, ${badge.backgroundColor}, ${JSON.stringify(badge.conditions)}, ${badge.points},
+        ${badge.rarity}, ${badge.seasonalOnly || false}, ${badge.availableSeason || null}, ${badge.isActive})
+      RETURNING *
+    `);
+    return result.rows?.[0];
   }
 
-  async getAllAchievementBadges(): Promise<AchievementBadge[]> {
-    return await db.select().from(achievementBadges).orderBy(asc(achievementBadges.category));
+  async getAllAchievementBadges(): Promise<any[]> {
+    const result = await db.execute(sql`SELECT * FROM achievement_badges ORDER BY category ASC`);
+    return result.rows || [];
   }
 
   async getAchievementBadgesByCategory(category: string): Promise<AchievementBadge[]> {
