@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, queryClient } from '@/lib/queryClient';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,10 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
 interface LevelConfig {
@@ -83,36 +87,17 @@ function QuestConfiguration() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>🎯 Daily Quest System</span>
-          <Button data-testid="button-create-quest" onClick={() => {
-            const questId = prompt('Enter quest ID (unique):');
-            const nameEn = prompt('Enter English name:');
-            const nameAr = prompt('Enter Arabic name:');
-            const description = prompt('Enter description:');
-            const questType = prompt('Enter quest type (zikir, community, etc.):');
-            const targetValue = prompt('Enter target value:');
-            const pointsReward = prompt('Enter points reward:');
-            const minLevel = prompt('Enter minimum level (1-50):', '1');
-            const maxLevel = prompt('Enter maximum level (1-50):', '50');
-            
-            if (questId && nameEn && nameAr && description && questType && targetValue && pointsReward) {
-              fetch('/api/admin/quests', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  questId,
-                  nameEn,
-                  nameAr,
-                  description,
-                  questType,
-                  targetValue: parseInt(targetValue),
-                  timeLimit: 'all_day',
-                  pointsReward: parseInt(pointsReward),
-                  minLevel: parseInt(minLevel || '1'),
-                  maxLevel: parseInt(maxLevel || '50')
-                })
-              }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/quests'] }));
-            }
-          }}>Create New Quest</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-quest">Create New Quest</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Quest</DialogTitle>
+              </DialogHeader>
+              <CreateQuestForm />
+            </DialogContent>
+          </Dialog>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -328,32 +313,17 @@ function IslamicPracticeConfiguration() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>🕌 Islamic Practice Configuration</span>
-          <Button data-testid="button-create-practice" onClick={() => {
-            const practiceId = prompt('Enter practice ID (unique):');
-            const nameEn = prompt('Enter English name:');
-            const nameAr = prompt('Enter Arabic name:');
-            const description = prompt('Enter description:');
-            const recommendedTime = prompt('Enter recommended time (any_time, night_time, friday_only, all_day):');
-            const pointsReward = prompt('Enter points reward:');
-            const streakBonus = prompt('Enter streak bonus:');
-            
-            if (practiceId && nameEn && nameAr && description && recommendedTime && pointsReward && streakBonus) {
-              fetch('/api/admin/practices', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  practiceId,
-                  nameEn,
-                  nameAr,
-                  description,
-                  recommendedTime,
-                  pointsReward: parseInt(pointsReward),
-                  streakBonus: parseInt(streakBonus),
-                  verificationType: 'self_confirmation'
-                })
-              }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/practices'] }));
-            }
-          }}>Create New Practice</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button data-testid="button-create-practice">Create New Practice</Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Islamic Practice</DialogTitle>
+              </DialogHeader>
+              <CreatePracticeForm />
+            </DialogContent>
+          </Dialog>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -785,26 +755,19 @@ export default function AdminGamification() {
                       <Badge variant={currency.is_active ? "default" : "secondary"}>
                         {currency.is_active ? 'Active' : 'Inactive'}
                       </Badge>
-                      <Button variant="outline" size="sm" data-testid={`button-edit-currency-${currency.id}`} onClick={() => {
-                        // Create a currency edit modal or expand inline editing
-                        const newPoints = prompt(`Enter new base points for ${currency.activity_type}:`, currency.base_points.toString());
-                        const newMultiplier = prompt(`Enter new multiplier (current: ${currency.multiplier}):`, currency.multiplier.toString());
-                        if (newPoints && newMultiplier) {
-                          // Call API to update currency
-                          fetch(`/api/admin/currency/${currency.id}`, {
-                            method: 'PUT',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                              basePoints: parseInt(newPoints),
-                              multiplier: parseInt(newMultiplier),
-                              seasonalBonus: currency.seasonal_bonus,
-                              isActive: currency.is_active
-                            })
-                          }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/currency'] }));
-                        }
-                      }}>
-                        Edit
-                      </Button>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm" data-testid={`button-edit-currency-${currency.id}`}>
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Edit Currency: {currency.activity_type}</DialogTitle>
+                          </DialogHeader>
+                          <EditCurrencyForm currency={currency} />
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
                 ))}
@@ -819,33 +782,17 @@ export default function AdminGamification() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>🏆 Badge System</span>
-                <Button data-testid="button-create-badge" onClick={() => {
-                  const badgeId = prompt('Enter badge ID (unique):');
-                  const nameEn = prompt('Enter English name:');
-                  const nameAr = prompt('Enter Arabic name:');
-                  const description = prompt('Enter description:');
-                  const category = prompt('Enter category (zikir, consistency, community, etc.):');
-                  const targetValue = prompt('Enter target value:');
-                  const pointsReward = prompt('Enter points reward:');
-                  
-                  if (badgeId && nameEn && nameAr && description && category && targetValue && pointsReward) {
-                    fetch('/api/admin/badges', {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
-                        badgeId,
-                        nameEn,
-                        nameAr,
-                        description,
-                        category,
-                        criteriaType: 'count',
-                        targetValue: parseInt(targetValue),
-                        pointsReward: parseInt(pointsReward),
-                        coinsReward: parseInt(pointsReward)
-                      })
-                    }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/badges'] }));
-                  }
-                }}>Create New Badge</Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button data-testid="button-create-badge">Create New Badge</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl">
+                    <DialogHeader>
+                      <DialogTitle>Create New Badge</DialogTitle>
+                    </DialogHeader>
+                    <CreateBadgeForm />
+                  </DialogContent>
+                </Dialog>
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -882,5 +829,281 @@ export default function AdminGamification() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+// Edit Currency Form Component
+function EditCurrencyForm({ currency }: { currency: any }) {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    basePoints: currency.base_points,
+    multiplier: currency.multiplier,
+    seasonalBonus: currency.seasonal_bonus,
+    isActive: currency.is_active
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => apiRequest(`/api/admin/currency/${currency.id}`, 'PUT', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/currency'] });
+      toast({ title: 'Currency updated successfully!' });
+    }
+  });
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); updateMutation.mutate(formData); }} className="space-y-4">
+      <div>
+        <Label>Base Points</Label>
+        <Input type="number" value={formData.basePoints} onChange={(e) => setFormData({...formData, basePoints: parseInt(e.target.value)})} />
+      </div>
+      <div>
+        <Label>Multiplier</Label>
+        <Input type="number" value={formData.multiplier} onChange={(e) => setFormData({...formData, multiplier: parseInt(e.target.value)})} />
+      </div>
+      <div>
+        <Label>Seasonal Bonus</Label>
+        <Input type="number" value={formData.seasonalBonus} onChange={(e) => setFormData({...formData, seasonalBonus: parseInt(e.target.value)})} />
+      </div>
+      <div className="flex items-center space-x-2">
+        <Switch checked={formData.isActive} onCheckedChange={(checked) => setFormData({...formData, isActive: checked})} />
+        <Label>Active</Label>
+      </div>
+      <Button type="submit" disabled={updateMutation.isPending}>
+        {updateMutation.isPending ? 'Updating...' : 'Update Currency'}
+      </Button>
+    </form>
+  );
+}
+
+// Create Badge Form Component
+function CreateBadgeForm() {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    badgeId: '',
+    nameEn: '',
+    nameAr: '',
+    description: '',
+    category: 'zikir',
+    targetValue: 1,
+    pointsReward: 100,
+    coinsReward: 100
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/admin/badges', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/badges'] });
+      toast({ title: 'Badge created successfully!' });
+      setFormData({ badgeId: '', nameEn: '', nameAr: '', description: '', category: 'zikir', targetValue: 1, pointsReward: 100, coinsReward: 100 });
+    }
+  });
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({...formData, criteriaType: 'count'}); }} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Badge ID</Label>
+          <Input value={formData.badgeId} onChange={(e) => setFormData({...formData, badgeId: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Category</Label>
+          <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="zikir">Zikir</SelectItem>
+              <SelectItem value="consistency">Consistency</SelectItem>
+              <SelectItem value="community">Community</SelectItem>
+              <SelectItem value="seasonal">Seasonal</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>English Name</Label>
+          <Input value={formData.nameEn} onChange={(e) => setFormData({...formData, nameEn: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Arabic Name</Label>
+          <Input value={formData.nameAr} onChange={(e) => setFormData({...formData, nameAr: e.target.value})} required />
+        </div>
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label>Target Value</Label>
+          <Input type="number" value={formData.targetValue} onChange={(e) => setFormData({...formData, targetValue: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Points Reward</Label>
+          <Input type="number" value={formData.pointsReward} onChange={(e) => setFormData({...formData, pointsReward: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Coins Reward</Label>
+          <Input type="number" value={formData.coinsReward} onChange={(e) => setFormData({...formData, coinsReward: parseInt(e.target.value)})} />
+        </div>
+      </div>
+      <Button type="submit" disabled={createMutation.isPending}>
+        {createMutation.isPending ? 'Creating...' : 'Create Badge'}
+      </Button>
+    </form>
+  );
+}
+
+// Create Quest Form Component
+function CreateQuestForm() {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    questId: '',
+    nameEn: '',
+    nameAr: '',
+    description: '',
+    questType: 'zikir',
+    targetValue: 1,
+    pointsReward: 50,
+    minLevel: 1,
+    maxLevel: 50
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/admin/quests', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/quests'] });
+      toast({ title: 'Quest created successfully!' });
+      setFormData({ questId: '', nameEn: '', nameAr: '', description: '', questType: 'zikir', targetValue: 1, pointsReward: 50, minLevel: 1, maxLevel: 50 });
+    }
+  });
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({...formData, timeLimit: 'all_day'}); }} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Quest ID</Label>
+          <Input value={formData.questId} onChange={(e) => setFormData({...formData, questId: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Quest Type</Label>
+          <Select value={formData.questType} onValueChange={(value) => setFormData({...formData, questType: value})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="zikir">Zikir</SelectItem>
+              <SelectItem value="community">Community</SelectItem>
+              <SelectItem value="consistency">Consistency</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>English Name</Label>
+          <Input value={formData.nameEn} onChange={(e) => setFormData({...formData, nameEn: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Arabic Name</Label>
+          <Input value={formData.nameAr} onChange={(e) => setFormData({...formData, nameAr: e.target.value})} required />
+        </div>
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+      </div>
+      <div className="grid grid-cols-4 gap-4">
+        <div>
+          <Label>Target Value</Label>
+          <Input type="number" value={formData.targetValue} onChange={(e) => setFormData({...formData, targetValue: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Points Reward</Label>
+          <Input type="number" value={formData.pointsReward} onChange={(e) => setFormData({...formData, pointsReward: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Min Level</Label>
+          <Input type="number" min="1" max="50" value={formData.minLevel} onChange={(e) => setFormData({...formData, minLevel: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Max Level</Label>
+          <Input type="number" min="1" max="50" value={formData.maxLevel} onChange={(e) => setFormData({...formData, maxLevel: parseInt(e.target.value)})} />
+        </div>
+      </div>
+      <Button type="submit" disabled={createMutation.isPending}>
+        {createMutation.isPending ? 'Creating...' : 'Create Quest'}
+      </Button>
+    </form>
+  );
+}
+
+// Create Practice Form Component  
+function CreatePracticeForm() {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    practiceId: '',
+    nameEn: '',
+    nameAr: '',
+    description: '',
+    recommendedTime: 'any_time',
+    pointsReward: 100,
+    streakBonus: 10
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/admin/practices', 'POST', data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/practices'] });
+      toast({ title: 'Practice created successfully!' });
+      setFormData({ practiceId: '', nameEn: '', nameAr: '', description: '', recommendedTime: 'any_time', pointsReward: 100, streakBonus: 10 });
+    }
+  });
+
+  return (
+    <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({...formData, verificationType: 'self_confirmation'}); }} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Practice ID</Label>
+          <Input value={formData.practiceId} onChange={(e) => setFormData({...formData, practiceId: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Recommended Time</Label>
+          <Select value={formData.recommendedTime} onValueChange={(value) => setFormData({...formData, recommendedTime: value})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any_time">Any Time</SelectItem>
+              <SelectItem value="night_time">Night Time</SelectItem>
+              <SelectItem value="friday_only">Friday Only</SelectItem>
+              <SelectItem value="all_day">All Day</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>English Name</Label>
+          <Input value={formData.nameEn} onChange={(e) => setFormData({...formData, nameEn: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Arabic Name</Label>
+          <Input value={formData.nameAr} onChange={(e) => setFormData({...formData, nameAr: e.target.value})} required />
+        </div>
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Points Reward</Label>
+          <Input type="number" value={formData.pointsReward} onChange={(e) => setFormData({...formData, pointsReward: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Streak Bonus</Label>
+          <Input type="number" value={formData.streakBonus} onChange={(e) => setFormData({...formData, streakBonus: parseInt(e.target.value)})} />
+        </div>
+      </div>
+      <Button type="submit" disabled={createMutation.isPending}>
+        {createMutation.isPending ? 'Creating...' : 'Create Practice'}
+      </Button>
+    </form>
   );
 }

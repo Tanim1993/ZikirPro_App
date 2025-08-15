@@ -32,6 +32,95 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 
+// Create Organization Form Component
+function CreateOrganizationForm() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState({
+    username: '',
+    password: '',
+    organizationName: '',
+    email: '',
+    description: ''
+  });
+
+  const createOrgMutation = useMutation({
+    mutationFn: (data: any) => apiRequest('/api/auth/signup', 'POST', {
+      ...data,
+      userType: 'organization'
+    }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      toast({ title: 'Organization created successfully!' });
+      setFormData({ username: '', password: '', organizationName: '', email: '', description: '' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Error creating organization', description: error.message, variant: 'destructive' });
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createOrgMutation.mutate(formData);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="username">Username *</Label>
+          <Input
+            id="username"
+            value={formData.username}
+            onChange={(e) => setFormData({...formData, username: e.target.value})}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="password">Password *</Label>
+          <Input
+            id="password"
+            type="password"
+            value={formData.password}
+            onChange={(e) => setFormData({...formData, password: e.target.value})}
+            required
+          />
+        </div>
+      </div>
+      <div>
+        <Label htmlFor="organizationName">Organization Name *</Label>
+        <Input
+          id="organizationName"
+          value={formData.organizationName}
+          onChange={(e) => setFormData({...formData, organizationName: e.target.value})}
+          required
+        />
+      </div>
+      <div>
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={formData.email}
+          onChange={(e) => setFormData({...formData, email: e.target.value})}
+        />
+      </div>
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({...formData, description: e.target.value})}
+          placeholder="Organization description..."
+        />
+      </div>
+      <Button type="submit" disabled={createOrgMutation.isPending}>
+        {createOrgMutation.isPending ? 'Creating...' : 'Create Organization'}
+      </Button>
+    </form>
+  );
+}
+
 interface SeasonalCompetition {
   id: number;
   name: string;
@@ -525,10 +614,20 @@ export default function AdminDashboard() {
           <TabsContent value="organizations" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-semibold">Organization Management</h2>
-              <Button className="bg-gradient-to-r from-green-500 to-green-600">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Organization Account
-              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="bg-gradient-to-r from-green-500 to-green-600">
+                    <Plus className="w-4 h-4 mr-2" />
+                    Create Organization Account
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create New Organization</DialogTitle>
+                  </DialogHeader>
+                  <CreateOrganizationForm />
+                </DialogContent>
+              </Dialog>
             </div>
 
             <Card>
