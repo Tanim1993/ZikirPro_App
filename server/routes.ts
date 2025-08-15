@@ -1193,11 +1193,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin login route
+  app.post('/api/auth/admin-login', async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+      }
+
+      // Check admin credentials
+      if (username === 'admin' && password === 'Admin123!') {
+        // Set admin session
+        (req.session as any).adminUser = { 
+          id: 'founder-admin-id', 
+          username: 'admin',
+          role: 'founder' 
+        };
+        
+        res.json({ message: 'Admin login successful', user: { username: 'admin', role: 'founder' } });
+      } else {
+        res.status(401).json({ error: 'Invalid admin credentials' });
+      }
+    } catch (error) {
+      console.error('Admin login error:', error);
+      res.status(500).json({ error: 'Login failed' });
+    }
+  });
+
   // Admin routes - Only accessible by app founder
   const isAppFounder = (req: any, res: any, next: any) => {
-    const userId = req.session?.user?.id || "test001-user-id";
-    // Check if user is app founder (you can implement your own logic)
-    if (userId === "founder-admin-id" || userId === "test001-user-id") {
+    const adminUser = req.session?.adminUser;
+    const regularUserId = req.session?.user?.id;
+    
+    // Check if user is admin or test user
+    if (adminUser?.role === 'founder' || regularUserId === "test001-user-id") {
       next();
     } else {
       res.status(403).json({ error: 'Access denied. App founder only.' });
@@ -1374,9 +1404,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const [competitions, users, participants, totalZikir] = await Promise.all([
         db.execute(sql`SELECT COUNT(*) as count FROM seasonal_competitions`),
-        db.execute(sql`SELECT COUNT(*) as count FROM users WHERE is_active = true`),
+        db.execute(sql`SELECT COUNT(*) as count FROM users`),
         db.execute(sql`SELECT COUNT(*) as count FROM seasonal_competition_participants`),
-        db.execute(sql`SELECT SUM(total_zikir) as total FROM user_analytics`)
+        db.execute(sql`SELECT COALESCE(SUM(total_zikir), 0) as total FROM user_analytics`)
       ]);
       
       res.json({

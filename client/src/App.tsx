@@ -28,6 +28,7 @@ import Donations from "./pages/donations";
 import OfflineDemo from "./pages/offline-demo";
 import SeasonalCompetitions from "./pages/seasonal-competitions";
 import AdminDashboard from "./pages/admin-dashboard";
+import AdminLogin from "./pages/admin-login";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -87,6 +88,9 @@ function Router() {
             <Route path="/seasonal-competitions" component={SeasonalCompetitions} />
           </>
         )}
+        {/* Admin routes - accessible regardless of authentication status */}
+        <Route path="/admin/login" component={AdminLogin} />
+        <Route path="/admin" component={AdminDashboard} />
         <Route component={NotFound} />
       </Switch>
       

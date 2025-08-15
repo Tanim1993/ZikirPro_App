@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff, Trophy } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff, Trophy, Shield } from "lucide-react";
 
 export default function More() {
   const features = [
