@@ -1110,20 +1110,21 @@ export class DatabaseStorage implements IStorage {
     await db.delete(seasonalCompetitions).where(eq(seasonalCompetitions.id, id));
   }
 
-  async joinSeasonalCompetition(competitionId: number, userId: string): Promise<SeasonalCompetitionParticipant> {
-    const [participant] = await db.insert(seasonalCompetitionParticipants)
-      .values({ competitionId, userId })
-      .returning();
-    return participant;
+  async joinSeasonalCompetition(competitionId: number, userId: string): Promise<any> {
+    const result = await db.execute(sql`
+      INSERT INTO seasonal_competition_participants (competition_id, user_id, joined_at, total_count, current_rank)
+      VALUES (${competitionId}, ${userId}, NOW(), 0, NULL)
+      ON CONFLICT (competition_id, user_id) DO NOTHING
+      RETURNING *
+    `);
+    return result.rows?.[0];
   }
 
   async leaveSeasonalCompetition(competitionId: number, userId: string): Promise<void> {
-    await db.update(seasonalCompetitionParticipants)
-      .set({ isActive: false })
-      .where(and(
-        eq(seasonalCompetitionParticipants.competitionId, competitionId),
-        eq(seasonalCompetitionParticipants.userId, userId)
-      ));
+    await db.execute(sql`
+      DELETE FROM seasonal_competition_participants 
+      WHERE competition_id = ${competitionId} AND user_id = ${userId}
+    `);
   }
 
   async getSeasonalCompetitionParticipants(competitionId: number): Promise<SeasonalCompetitionParticipant[]> {
