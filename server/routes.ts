@@ -1242,11 +1242,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Admin routes - Only accessible by app founder
   const isAppFounder = (req: any, res: any, next: any) => {
-    const adminUser = req.session?.adminUser;
-    const regularUserId = req.session?.user?.id;
+    const adminUser = (req.session as any)?.adminUser;
     
-    // Check if user is admin or test user
-    if (adminUser?.role === 'founder' || regularUserId === "test001-user-id") {
+    // Debug removed for production
+    
+    // Check if user is admin
+    if (adminUser?.role === 'founder') {
       next();
     } else {
       res.status(403).json({ error: 'Access denied. App founder only.' });
@@ -1382,8 +1383,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const users = await db.execute(sql`
         SELECT 
-          u.id, u.username, u.display_name, u.email, u.user_type,
-          u.is_active, u.created_at, u.last_login_at,
+          u.id, u.username, u.email, u.user_type,
+          u.created_at, u.last_login_at,
           COALESCE(ua.total_zikir, 0) as total_zikir
         FROM users u
         LEFT JOIN user_analytics ua ON u.id = ua.user_id

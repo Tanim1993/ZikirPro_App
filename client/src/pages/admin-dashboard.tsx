@@ -81,26 +81,6 @@ export default function AdminDashboard() {
     category: 'general'
   });
 
-  // Check admin authentication
-  useEffect(() => {
-    const checkAdminAuth = async () => {
-      try {
-        const response = await fetch('/api/auth/admin-check');
-        if (response.ok) {
-          setIsAdminAuthenticated(true);
-        } else {
-          setLocation('/admin/login');
-        }
-      } catch (error) {
-        setLocation('/admin/login');
-      } finally {
-        setIsCheckingAuth(false);
-      }
-    };
-    
-    checkAdminAuth();
-  }, [setLocation]);
-
   // Fetch admin data
   const { data: competitions = [] } = useQuery({
     queryKey: ['/api/admin/seasonal-competitions'],
@@ -116,25 +96,6 @@ export default function AdminDashboard() {
     queryKey: ['/api/admin/stats'],
     queryFn: () => fetch('/api/admin/stats').then(res => res.json())
   });
-
-  // Show loading while checking authentication
-  if (isCheckingAuth) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 animate-spin">
-            <div className="w-full h-full border-4 border-blue-200 border-t-blue-600 rounded-full"></div>
-          </div>
-          <p className="text-gray-600">Verifying admin access...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Redirect handled by useEffect, this is backup
-  if (!isAdminAuthenticated) {
-    return null;
-  }
 
   // Create competition mutation
   const createMutation = useMutation({

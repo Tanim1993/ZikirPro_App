@@ -27,7 +27,7 @@ import Qiblah from "./pages/qiblah";
 import Donations from "./pages/donations";
 import OfflineDemo from "./pages/offline-demo";
 import SeasonalCompetitions from "./pages/seasonal-competitions";
-import AdminDashboard from "./pages/admin-dashboard";
+import AdminSimple from "./pages/admin-simple";
 import AdminLogin from "./pages/admin-login";
 
 function Router() {
@@ -76,7 +76,7 @@ function Router() {
             <Route path="/leaderboard" component={Leaderboard} />
             <Route path="/organizations" component={OrganizationSearch} />
             <Route path="/more" component={More} />
-            <Route path="/admin" component={AdminDashboard} />
+            <Route path="/admin" component={AdminSimple} />
             <Route path="/salah-tracker" component={SalahTracker} />
             <Route path="/quran" component={Quran} />
             <Route path="/quran/reader/:surahId?" component={QuranReader} />
@@ -90,7 +90,7 @@ function Router() {
         )}
         {/* Admin routes - accessible regardless of authentication status */}
         <Route path="/admin/login" component={AdminLogin} />
-        <Route path="/admin" component={AdminDashboard} />
+        <Route path="/admin" component={AdminSimple} />
         <Route component={NotFound} />
       </Switch>
       
