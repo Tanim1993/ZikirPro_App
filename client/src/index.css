@@ -3,6 +3,27 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom placeholder styling */
+::placeholder {
+  color: #999999 !important;
+  opacity: 1;
+}
+
+::-webkit-input-placeholder {
+  color: #999999 !important;
+  opacity: 1;
+}
+
+::-moz-placeholder {
+  color: #999999 !important;
+  opacity: 1;
+}
+
+:-ms-input-placeholder {
+  color: #999999 !important;
+  opacity: 1;
+}
+
 :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(210 25% 7.8431%);
