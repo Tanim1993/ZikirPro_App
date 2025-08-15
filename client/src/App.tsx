@@ -29,6 +29,7 @@ import OfflineDemo from "./pages/offline-demo";
 import SeasonalCompetitions from "./pages/seasonal-competitions";
 import AdminSimple from "./pages/admin-simple";
 import AdminLogin from "./pages/admin-login";
+import AdminDashboard from "./pages/admin-dashboard";
 import AdminGamification from "./pages/admin-gamification";
 
 function Router() {
@@ -91,7 +92,8 @@ function Router() {
         )}
         {/* Admin routes - accessible regardless of authentication status */}
         <Route path="/admin/login" component={AdminLogin} />
-        <Route path="/admin" component={AdminSimple} />
+        <Route path="/admin-dashboard" component={AdminDashboard} />
+        <Route path="/admin" component={AdminLogin} />
         <Route path="/admin-gamification" component={AdminGamification} />
         <Route component={NotFound} />
       </Switch>

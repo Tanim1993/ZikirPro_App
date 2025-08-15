@@ -21,11 +21,12 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/admin-login', {
+      const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(credentials),
       });
 
@@ -33,7 +34,7 @@ export default function AdminLogin() {
 
       if (response.ok) {
         toast({ title: 'Admin login successful!' });
-        setLocation('/admin');
+        setLocation('/admin-dashboard');
       } else {
         toast({ 
           title: 'Login failed', 
