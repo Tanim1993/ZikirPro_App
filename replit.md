@@ -7,7 +7,16 @@ This is an Islamic Zikir Competition App called "Zikir Amol" that combines digit
 - **Seasonal Competitions Integration:** End-to-end integration with live progress tracking
 - **Advanced Implementation Plans:** Comprehensive 8-phase development roadmap created
 - **Authentication System:** Separate admin session management from regular users
+- **Islamic Ludo-Style Gamification Plan:** Complete system design with 50-level progression, BO-configurable currency, badges, quests, and Islamic practices
+- **User Feedback Integration:** Revised monetization model focusing on room creation limits instead of cosmetic purchases
 - **Current Status:** Core platform operational with 55 users, 5 competitions, 448 total zikir counted
+
+## User Preferences
+- **Gamification Style:** Islamic Ludo-inspired progression system with 50 spiritual levels
+- **Monetization Preference:** Room creation limits with one-time purchases rather than cosmetic shop items
+- **BO Control Requirement:** Complete admin configuration for all game mechanics (levels, currency, badges, quests, Islamic practices)
+- **Islamic Integration:** Daily practice confirmation system (Surah Al-Kahf, Surah Al-Mulk, Sayyidul Istighfar, daily prayers)
+- **Learning Games:** Future zikir meaning match games and Islamic knowledge quizzes
 
 # User Preferences
 
