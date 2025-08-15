@@ -1241,13 +1241,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin routes - Only accessible by app founder
-  const isAppFounder = (req: any, res: any, next: any) => {
+  const isAppFounder = async (req: any, res: any, next: any) => {
     const adminUser = (req.session as any)?.adminUser;
+    let regularUser = req.user;
     
-    // Debug removed for production
+    console.log('isAppFounder debug:', {
+      hasAdminUser: !!adminUser,
+      adminUserRole: adminUser?.role,
+      hasRegularUser: !!regularUser,
+      hasSession: !!req.session?.user,
+      sessionUserId: req.session?.user?.id
+    });
     
-    // Check if user is admin
-    if (adminUser?.role === 'founder') {
+    // If no user attached to request, try to get from session
+    if (!regularUser && req.session?.user?.id) {
+      try {
+        regularUser = await storage.getUser(req.session.user.id);
+        console.log('Found user from session:', {
+          id: regularUser?.id,
+          username: regularUser?.username,
+          userType: regularUser?.userType
+        });
+      } catch (error) {
+        console.error('Error getting user in isAppFounder:', error);
+      }
+    }
+    
+    // Check if user is admin through either authentication method
+    const isAdmin = adminUser?.role === 'founder' || 
+        (regularUser && (regularUser.username === 'admin' || regularUser.id === 'founder-admin-id' || regularUser.userType === 'admin'));
+    
+    console.log('Admin check result:', { isAdmin, regularUserType: regularUser?.userType });
+    
+    if (isAdmin) {
       next();
     } else {
       res.status(403).json({ error: 'Access denied. App founder only.' });
