@@ -1204,6 +1204,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Check admin credentials
       if (username === 'admin' && password === 'Admin123!') {
+        // Clear any regular user session
+        delete (req.session as any).user;
+        
         // Set admin session
         (req.session as any).adminUser = { 
           id: 'founder-admin-id', 
@@ -1219,6 +1222,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Admin login error:', error);
       res.status(500).json({ error: 'Login failed' });
     }
+  });
+
+  // Admin authentication check
+  app.get('/api/auth/admin-check', (req, res) => {
+    const adminUser = req.session?.adminUser;
+    if (adminUser?.role === 'founder') {
+      res.json({ authenticated: true, user: adminUser });
+    } else {
+      res.status(401).json({ error: 'Not authenticated as admin' });
+    }
+  });
+
+  // Admin logout
+  app.post('/api/auth/admin-logout', (req, res) => {
+    delete (req.session as any).adminUser;
+    res.json({ message: 'Admin logout successful' });
   });
 
   // Admin routes - Only accessible by app founder
