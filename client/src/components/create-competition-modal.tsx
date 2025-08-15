@@ -182,56 +182,71 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-yellow-600" />
-            Create Zikir Competition
-          </DialogTitle>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white border border-gray-200 shadow-2xl">
+        <DialogHeader className="pb-6 border-b border-gray-100">
+          <div className="text-center">
+            <div className="mx-auto w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+              <Trophy className="w-6 h-6 text-gray-600" />
+            </div>
+            <DialogTitle className="text-2xl font-bold text-gray-800 mb-2">
+              Create Zikir Competition
+            </DialogTitle>
+            <p className="text-gray-500 text-sm">Design a meaningful Islamic competition for your community</p>
+          </div>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-8 pt-2">
           {/* Basic Information */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700">Competition Details</h3>
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <h3 className="font-semibold text-gray-700">Competition Details</h3>
+            </div>
             
-            <div>
-              <Label htmlFor="name">Competition Name *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="name" className="text-sm font-medium text-gray-700">Competition Name *</Label>
               <Input
                 id="name"
                 type="text"
                 value={formData.name}
                 onChange={(e) => handleInputChange("name", e.target.value)}
                 placeholder="Zikir Challenge 2025"
-                className={errors.name ? "border-red-300" : ""}
+                className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.name ? "border-red-300 bg-red-50" : ""}`}
                 data-testid="input-competition-name"
               />
               {errors.name && <p className="text-red-500 text-xs mt-1">{errors.name}</p>}
             </div>
             
-            <div>
-              <Label htmlFor="description">Description *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium text-gray-700">Description *</Label>
               <Textarea
                 id="description"
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
                 placeholder="Details about the competition, rules, and goal..."
-                rows={3}
-                className={errors.description ? "border-red-300" : ""}
+                rows={4}
+                className={`px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all resize-none ${errors.description ? "border-red-300 bg-red-50" : ""}`}
                 data-testid="input-competition-description"
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
             </div>
             
-            <div>
-              <Label htmlFor="zikirId">Zikir/Prayer *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="zikirId" className="text-sm font-medium text-gray-700">Zikir/Prayer *</Label>
               <Select value={formData.zikirId} onValueChange={(value) => handleInputChange("zikirId", value)}>
-                <SelectTrigger className={errors.zikirId ? "border-red-300" : ""} data-testid="select-competition-zikir">
+                <SelectTrigger 
+                  className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.zikirId ? "border-red-300 bg-red-50" : ""}`} 
+                  data-testid="select-competition-zikir"
+                >
                   <SelectValue placeholder="Select a zikir for the competition" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
                   {zikirs.map((zikir: any) => (
-                    <SelectItem key={zikir.id} value={zikir.id.toString()}>
+                    <SelectItem 
+                      key={zikir.id} 
+                      value={zikir.id.toString()}
+                      className="px-4 py-3 hover:bg-gray-50 cursor-pointer"
+                    >
                       {zikir.name}
                     </SelectItem>
                   ))}
@@ -242,18 +257,21 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
           </div>
           
           {/* Prize Information */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700">Prize Details</h3>
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <h3 className="font-semibold text-gray-700">Prize Details</h3>
+            </div>
             
-            <div>
-              <Label htmlFor="prizeDescription">Prize Description *</Label>
+            <div className="space-y-2">
+              <Label htmlFor="prizeDescription" className="text-sm font-medium text-gray-700">Prize Description *</Label>
               <Textarea
                 id="prizeDescription"
                 value={formData.prizeDescription}
                 onChange={(e) => handleInputChange("prizeDescription", e.target.value)}
                 placeholder="The winner will receive a gift card worth $50..."
                 rows={3}
-                className={errors.prizeDescription ? "border-red-300" : ""}
+                className={`px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all resize-none ${errors.prizeDescription ? "border-red-300 bg-red-50" : ""}`}
                 data-testid="input-competition-prize"
               />
               {errors.prizeDescription && <p className="text-red-500 text-xs mt-1">{errors.prizeDescription}</p>}
@@ -261,53 +279,61 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
           </div>
           
           {/* Competition Timeline */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-              <Calendar className="w-4 h-4" />
-              Competition Timeline
-            </h3>
-            
-            <div>
-              <Label htmlFor="competitionStartDate">Start Date & Time *</Label>
-              <Input
-                id="competitionStartDate"
-                type="datetime-local"
-                value={formData.competitionStartDate}
-                onChange={(e) => handleInputChange("competitionStartDate", e.target.value)}
-                min={formatDateTimeLocal(new Date())}
-                className={errors.competitionStartDate ? "border-red-300" : ""}
-                data-testid="input-competition-start-date"
-              />
-              {errors.competitionStartDate && <p className="text-red-500 text-xs mt-1">{errors.competitionStartDate}</p>}
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-gray-500" />
+                Competition Timeline
+              </h3>
             </div>
             
-            <div>
-              <Label htmlFor="competitionEndDate">End Date & Time *</Label>
-              <Input
-                id="competitionEndDate"
-                type="datetime-local"
-                value={formData.competitionEndDate}
-                onChange={(e) => handleInputChange("competitionEndDate", e.target.value)}
-                min={formData.competitionStartDate || formatDateTimeLocal(new Date())}
-                className={errors.competitionEndDate ? "border-red-300" : ""}
-                data-testid="input-competition-end-date"
-              />
-              {errors.competitionEndDate && <p className="text-red-500 text-xs mt-1">{errors.competitionEndDate}</p>}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="competitionStartDate" className="text-sm font-medium text-gray-700">Start Date & Time *</Label>
+                <Input
+                  id="competitionStartDate"
+                  type="datetime-local"
+                  value={formData.competitionStartDate}
+                  onChange={(e) => handleInputChange("competitionStartDate", e.target.value)}
+                  min={formatDateTimeLocal(new Date())}
+                  className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.competitionStartDate ? "border-red-300 bg-red-50" : ""}`}
+                  data-testid="input-competition-start-date"
+                />
+                {errors.competitionStartDate && <p className="text-red-500 text-xs mt-1">{errors.competitionStartDate}</p>}
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="competitionEndDate" className="text-sm font-medium text-gray-700">End Date & Time *</Label>
+                <Input
+                  id="competitionEndDate"
+                  type="datetime-local"
+                  value={formData.competitionEndDate}
+                  onChange={(e) => handleInputChange("competitionEndDate", e.target.value)}
+                  min={formData.competitionStartDate || formatDateTimeLocal(new Date())}
+                  className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.competitionEndDate ? "border-red-300 bg-red-50" : ""}`}
+                  data-testid="input-competition-end-date"
+                />
+                {errors.competitionEndDate && <p className="text-red-500 text-xs mt-1">{errors.competitionEndDate}</p>}
+              </div>
             </div>
           </div>
           
           {/* Competition Settings */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
-              <Users className="w-4 h-4" />
-              Competition Settings
-            </h3>
+          <div className="space-y-6">
+            <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+              <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+              <h3 className="font-semibold text-gray-700 flex items-center gap-2">
+                <Users className="w-4 h-4 text-gray-500" />
+                Competition Settings
+              </h3>
+            </div>
             
-            <div>
-              <Label htmlFor="levelRequired">Required Level</Label>
+            <div className="space-y-2">
+              <Label htmlFor="levelRequired" className="text-sm font-medium text-gray-700">Required Level</Label>
               <select
                 id="levelRequired"
-                className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all appearance-none cursor-pointer"
                 value={formData.levelRequired}
                 onChange={(e) => setFormData({ ...formData, levelRequired: e.target.value })}
                 data-testid="select-level-required"
@@ -318,11 +344,11 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
                 <option value="4">Darajah 4 (Expert)</option>
                 <option value="5">Darajah 5 (Master)</option>
               </select>
-              <p className="text-xs text-gray-500 mt-1">Only users at this level (and lower if allowed) can join</p>
+              <p className="text-xs text-gray-500 mt-1">Only users at this level can join this competition</p>
             </div>
 
-            <div>
-              <Label htmlFor="maxParticipants">Max Participants (Optional)</Label>
+            <div className="space-y-2">
+              <Label htmlFor="maxParticipants" className="text-sm font-medium text-gray-700">Max Participants (Optional)</Label>
               <Input
                 id="maxParticipants"
                 type="number"
@@ -330,25 +356,26 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
                 onChange={(e) => handleInputChange("maxParticipants", e.target.value)}
                 placeholder="Leave empty for unlimited"
                 min="1"
-                className={errors.maxParticipants ? "border-red-300" : ""}
+                className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.maxParticipants ? "border-red-300 bg-red-50" : ""}`}
                 data-testid="input-competition-max-participants"
               />
               {errors.maxParticipants && <p className="text-red-500 text-xs mt-1">{errors.maxParticipants}</p>}
             </div>
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
               <Checkbox
                 id="unlimited"
                 checked={formData.unlimited}
                 onCheckedChange={(checked) => handleInputChange("unlimited", checked as boolean)}
                 data-testid="checkbox-competition-unlimited"
+                className="data-[state=checked]:bg-gray-600 data-[state=checked]:border-gray-600"
               />
-              <Label htmlFor="unlimited">Unlimited counting (no target)</Label>
+              <Label htmlFor="unlimited" className="text-sm text-gray-700 cursor-pointer">Unlimited counting (no target)</Label>
             </div>
             
             {!formData.unlimited && (
-              <div>
-                <Label htmlFor="targetCount">Target Count *</Label>
+              <div className="space-y-2">
+                <Label htmlFor="targetCount" className="text-sm font-medium text-gray-700">Target Count *</Label>
                 <Input
                   id="targetCount"
                   type="number"
@@ -356,32 +383,33 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
                   onChange={(e) => handleInputChange("targetCount", e.target.value)}
                   placeholder="1000"
                   min="1"
-                  className={errors.targetCount ? "border-red-300" : ""}
+                  className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.targetCount ? "border-red-300 bg-red-50" : ""}`}
                   data-testid="input-competition-target-count"
                 />
                 {errors.targetCount && <p className="text-red-500 text-xs mt-1">{errors.targetCount}</p>}
               </div>
             )}
             
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
               <Checkbox
                 id="isPublic"
                 checked={formData.isPublic}
                 onCheckedChange={(checked) => handleInputChange("isPublic", checked as boolean)}
                 data-testid="checkbox-competition-public"
+                className="data-[state=checked]:bg-gray-600 data-[state=checked]:border-gray-600"
               />
-              <Label htmlFor="isPublic">Make competition public (anyone can join)</Label>
+              <Label htmlFor="isPublic" className="text-sm text-gray-700 cursor-pointer">Make competition public (anyone can join)</Label>
             </div>
           </div>
           
           {/* Submit Buttons */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-4 pt-6 border-t border-gray-100">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={createCompetitionMutation.isPending}
-              className="flex-1"
+              className="flex-1 h-12 border-gray-300 text-gray-700 hover:bg-gray-50"
               data-testid="button-cancel-competition"
             >
               Cancel
@@ -389,10 +417,17 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
             <Button
               type="submit"
               disabled={createCompetitionMutation.isPending}
-              className="flex-1 bg-yellow-600 hover:bg-yellow-700"
+              className="flex-1 h-12 bg-gray-800 hover:bg-gray-900 text-white font-medium"
               data-testid="button-create-competition"
             >
-              {createCompetitionMutation.isPending ? "Creating..." : "Create Competition"}
+              {createCompetitionMutation.isPending ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Creating...
+                </div>
+              ) : (
+                "Create Competition"
+              )}
             </Button>
           </div>
         </form>
