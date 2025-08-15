@@ -801,7 +801,20 @@ export default function AdminGamification() {
                   <div key={badge.id} className="border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <h4 className="font-semibold">{badge.name_en}</h4>
+                        <div className="flex items-center justify-between w-full">
+                          <h4 className="font-semibold">{badge.name_en}</h4>
+                          <Dialog>
+                            <DialogTrigger asChild>
+                              <Button variant="outline" size="sm">Edit</Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-2xl">
+                              <DialogHeader>
+                                <DialogTitle>Edit Badge: {badge.name_en}</DialogTitle>
+                              </DialogHeader>
+                              <EditBadgeForm badge={badge} />
+                            </DialogContent>
+                          </Dialog>
+                        </div>
                         <p className="text-sm text-gray-600">{badge.name_ar}</p>
                       </div>
                       <Badge variant="outline">{badge.category}</Badge>
@@ -843,10 +856,23 @@ function EditCurrencyForm({ currency }: { currency: any }) {
   });
 
   const updateMutation = useMutation({
-    mutationFn: (data: any) => apiRequest(`/api/admin/currency/${currency.id}`, 'PUT', data),
+    mutationFn: (data: any) => fetch(`/api/admin/currency/${currency.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({
+        basePoints: data.basePoints,
+        multiplier: data.multiplier,
+        seasonalBonus: data.seasonalBonus,
+        isActive: data.isActive
+      })
+    }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/currency'] });
       toast({ title: 'Currency updated successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
     }
   });
 
@@ -890,7 +916,12 @@ function CreateBadgeForm() {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: any) => apiRequest('/api/admin/badges', 'POST', data),
+    mutationFn: (data: any) => fetch('/api/admin/badges', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    }).then(res => res.json()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/badges'] });
       toast({ title: 'Badge created successfully!' });
@@ -898,8 +929,23 @@ function CreateBadgeForm() {
     }
   });
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    createMutation.mutate({
+      badgeId: formData.badgeId,
+      nameEn: formData.nameEn,
+      nameAr: formData.nameAr,
+      description: formData.description,
+      category: formData.category,
+      criteriaType: 'count',
+      targetValue: formData.targetValue,
+      pointsReward: formData.pointsReward,
+      coinsReward: formData.coinsReward
+    });
+  };
+
   return (
-    <form onSubmit={(e) => { e.preventDefault(); createMutation.mutate({...formData, criteriaType: 'count'}); }} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label>Badge ID</Label>
@@ -1103,6 +1149,105 @@ function CreatePracticeForm() {
       </div>
       <Button type="submit" disabled={createMutation.isPending}>
         {createMutation.isPending ? 'Creating...' : 'Create Practice'}
+      </Button>
+    </form>
+  );
+}
+
+// Edit Badge Form Component
+function EditBadgeForm({ badge }: { badge: any }) {
+  const { toast } = useToast();
+  const [formData, setFormData] = useState({
+    nameEn: badge.name_en,
+    nameAr: badge.name_ar,
+    description: badge.description,
+    category: badge.category,
+    targetValue: badge.target_value,
+    pointsReward: badge.points_reward,
+    coinsReward: badge.coins_reward,
+    isActive: badge.is_active
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: (data: any) => fetch(`/api/admin/badges/${badge.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(data)
+    }).then(res => res.json()),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/badges'] });
+      toast({ title: 'Badge updated successfully!' });
+    },
+    onError: (error: any) => {
+      toast({ title: 'Update failed', description: error.message, variant: 'destructive' });
+    }
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    updateMutation.mutate({
+      nameEn: formData.nameEn,
+      nameAr: formData.nameAr,
+      description: formData.description,
+      category: formData.category,
+      targetValue: formData.targetValue,
+      pointsReward: formData.pointsReward,
+      coinsReward: formData.coinsReward,
+      isActive: formData.isActive
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>Category</Label>
+          <Select value={formData.category} onValueChange={(value) => setFormData({...formData, category: value})}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="zikir">Zikir</SelectItem>
+              <SelectItem value="consistency">Consistency</SelectItem>
+              <SelectItem value="community">Community</SelectItem>
+              <SelectItem value="seasonal">Seasonal</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center space-x-2">
+          <Switch checked={formData.isActive} onCheckedChange={(checked) => setFormData({...formData, isActive: checked})} />
+          <Label>Active</Label>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label>English Name</Label>
+          <Input value={formData.nameEn} onChange={(e) => setFormData({...formData, nameEn: e.target.value})} required />
+        </div>
+        <div>
+          <Label>Arabic Name</Label>
+          <Input value={formData.nameAr} onChange={(e) => setFormData({...formData, nameAr: e.target.value})} required />
+        </div>
+      </div>
+      <div>
+        <Label>Description</Label>
+        <Textarea value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} />
+      </div>
+      <div className="grid grid-cols-3 gap-4">
+        <div>
+          <Label>Target Value</Label>
+          <Input type="number" value={formData.targetValue} onChange={(e) => setFormData({...formData, targetValue: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Points Reward</Label>
+          <Input type="number" value={formData.pointsReward} onChange={(e) => setFormData({...formData, pointsReward: parseInt(e.target.value)})} />
+        </div>
+        <div>
+          <Label>Coins Reward</Label>
+          <Input type="number" value={formData.coinsReward} onChange={(e) => setFormData({...formData, coinsReward: parseInt(e.target.value)})} />
+        </div>
+      </div>
+      <Button type="submit" disabled={updateMutation.isPending}>
+        {updateMutation.isPending ? 'Updating...' : 'Update Badge'}
       </Button>
     </form>
   );
