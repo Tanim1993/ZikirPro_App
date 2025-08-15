@@ -26,6 +26,7 @@ import ZakatCalculator from "./pages/zakat-calculator";
 import Qiblah from "./pages/qiblah";
 import Donations from "./pages/donations";
 import OfflineDemo from "./pages/offline-demo";
+import SeasonalCompetitions from "./pages/seasonal-competitions";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -81,6 +82,7 @@ function Router() {
             <Route path="/qiblah" component={Qiblah} />
             <Route path="/donations" component={Donations} />
             <Route path="/offline-demo" component={OfflineDemo} />
+            <Route path="/seasonal-competitions" component={SeasonalCompetitions} />
           </>
         )}
         <Route component={NotFound} />

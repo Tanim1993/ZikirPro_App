@@ -1,7 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff } from "lucide-react";
+import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff, Trophy } from "lucide-react";
 
 export default function More() {
   const features = [
@@ -53,6 +53,13 @@ export default function More() {
       icon: CloudOff,
       href: "/offline-demo",
       color: "from-orange-500 to-orange-700"
+    },
+    {
+      title: "Seasonal Competitions",
+      description: "Join special seasonal zikir competitions and earn exclusive rewards",
+      icon: Trophy,
+      href: "/seasonal-competitions",
+      color: "from-purple-500 to-pink-600"
     }
   ];
 

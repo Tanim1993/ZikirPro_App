@@ -4,7 +4,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertRoomSchema, insertRoomMemberSchema, updateUserProfileSchema } from "@shared/schema";
+import { insertRoomSchema, insertRoomMemberSchema, updateUserProfileSchema, insertSeasonalCompetitionSchema, insertAchievementBadgeSchema } from "@shared/schema";
 import { seedDatabase } from "./seedData";
 
 // Extend Express session to include user
@@ -1009,6 +1009,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error joining competition:', error);
       res.status(500).json({ message: 'Failed to join competition' });
+    }
+  });
+
+  // Seasonal competitions routes
+  app.get('/api/seasonal-competitions', async (req, res) => {
+    try {
+      const competitions = await storage.getActiveSeasonalCompetitions();
+      res.json(competitions);
+    } catch (error) {
+      console.error('Error fetching seasonal competitions:', error);
+      res.status(500).json({ error: 'Failed to fetch seasonal competitions' });
+    }
+  });
+
+  app.post('/api/seasonal-competitions', async (req, res) => {
+    try {
+      const competitionData = insertSeasonalCompetitionSchema.parse(req.body);
+      const competition = await storage.createSeasonalCompetition(competitionData);
+      res.json(competition);
+    } catch (error) {
+      console.error('Error creating seasonal competition:', error);
+      res.status(500).json({ error: 'Failed to create seasonal competition' });
+    }
+  });
+
+  app.post('/api/seasonal-competitions/:id/join', async (req, res) => {
+    try {
+      const competitionId = parseInt(req.params.id);
+      const userId = req.session?.user?.id || "test001-user-id";
+      
+      const participant = await storage.joinSeasonalCompetition(competitionId, userId);
+      res.json(participant);
+    } catch (error) {
+      console.error('Error joining seasonal competition:', error);
+      res.status(500).json({ error: 'Failed to join seasonal competition' });
+    }
+  });
+
+  // Achievement badges routes
+  app.get('/api/achievement-badges', async (req, res) => {
+    try {
+      const badges = await storage.getActiveAchievementBadges();
+      res.json(badges);
+    } catch (error) {
+      console.error('Error fetching achievement badges:', error);
+      res.status(500).json({ error: 'Failed to fetch achievement badges' });
+    }
+  });
+
+  app.get('/api/users/me/badges', async (req, res) => {
+    try {
+      const userId = req.session?.user?.id || "test001-user-id";
+      const badges = await storage.getUserAchievementBadges(userId);
+      res.json(badges);
+    } catch (error) {
+      console.error('Error fetching user badges:', error);
+      res.status(500).json({ error: 'Failed to fetch user badges' });
     }
   });
 

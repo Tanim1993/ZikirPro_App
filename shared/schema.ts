@@ -218,6 +218,76 @@ export const userPromotionCounters = pgTable("user_promotion_counters", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Seasonal competitions table
+export const seasonalCompetitions = pgTable("seasonal_competitions", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  season: varchar("season", { length: 50 }).notNull(), // ramadan, hajj, muharram, etc.
+  seasonYear: integer("season_year").notNull(), // 2025, 2026, etc.
+  zikirId: integer("zikir_id").notNull(),
+  targetCount: integer("target_count"),
+  unlimited: boolean("unlimited").default(false),
+  prizeDescription: text("prize_description"),
+  startDate: timestamp("start_date").notNull(),
+  endDate: timestamp("end_date").notNull(),
+  registrationStartDate: timestamp("registration_start_date").notNull(),
+  registrationEndDate: timestamp("registration_end_date").notNull(),
+  maxParticipants: integer("max_participants"),
+  isActive: boolean("is_active").default(true),
+  isGlobal: boolean("is_global").default(true), // Global vs country-specific
+  country: varchar("country"),
+  specialRewards: jsonb("special_rewards"), // JSON array of special rewards
+  backgroundImage: varchar("background_image"), // Seasonal themed background
+  themeColor: varchar("theme_color").default("#4a90e2"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Achievement badges table
+export const achievementBadges = pgTable("achievement_badges", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  category: varchar("category", { length: 50 }).notNull(), // zikir, seasonal, social, streak, milestone
+  badgeType: varchar("badge_type", { length: 50 }).notNull(), // bronze, silver, gold, platinum, special
+  iconName: varchar("icon_name", { length: 100 }).notNull(), // Icon identifier
+  iconColor: varchar("icon_color").default("#4a90e2"),
+  backgroundColor: varchar("background_color").default("#f0f7ff"),
+  conditions: jsonb("conditions").notNull(), // JSON object defining earning conditions
+  isActive: boolean("is_active").default(true),
+  rarity: varchar("rarity", { length: 20 }).default("common"), // common, uncommon, rare, epic, legendary
+  points: integer("points").default(10), // Points awarded for earning badge
+  seasonalOnly: boolean("seasonal_only").default(false), // Can only be earned during specific seasons
+  availableSeason: varchar("available_season"), // Which season this badge is available
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// User achievement badges (earned badges)
+export const userAchievementBadges = pgTable("user_achievement_badges", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  badgeId: integer("badge_id").notNull(),
+  earnedAt: timestamp("earned_at").defaultNow(),
+  seasonEarned: varchar("season_earned"), // Which season they earned it in
+  seasonYear: integer("season_year"), // Which year they earned it in
+  relatedCompetitionId: integer("related_competition_id"), // If earned through specific competition
+  metadata: jsonb("metadata"), // Additional context about how badge was earned
+});
+
+// Seasonal competition participants
+export const seasonalCompetitionParticipants = pgTable("seasonal_competition_participants", {
+  id: serial("id").primaryKey(),
+  competitionId: integer("competition_id").notNull(),
+  userId: varchar("user_id").notNull(),
+  registeredAt: timestamp("registered_at").defaultNow(),
+  totalCount: integer("total_count").default(0),
+  lastCountAt: timestamp("last_count_at"),
+  isActive: boolean("is_active").default(true),
+  rank: integer("rank"), // Current rank in competition
+  badgesEarned: integer("badges_earned").default(0), // Badges earned during this competition
+});
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   ownedRooms: many(rooms),
@@ -392,6 +462,19 @@ export type InsertCompetitionStat = typeof competitionStats.$inferInsert;
 export type UserPromotionCounter = typeof userPromotionCounters.$inferSelect;
 export type InsertUserPromotionCounter = typeof userPromotionCounters.$inferInsert;
 
+// Seasonal competitions and badges types
+export type SeasonalCompetition = typeof seasonalCompetitions.$inferSelect;
+export type InsertSeasonalCompetition = typeof seasonalCompetitions.$inferInsert;
+
+export type AchievementBadge = typeof achievementBadges.$inferSelect;
+export type InsertAchievementBadge = typeof achievementBadges.$inferInsert;
+
+export type UserAchievementBadge = typeof userAchievementBadges.$inferSelect;
+export type InsertUserAchievementBadge = typeof userAchievementBadges.$inferInsert;
+
+export type SeasonalCompetitionParticipant = typeof seasonalCompetitionParticipants.$inferSelect;
+export type InsertSeasonalCompetitionParticipant = typeof seasonalCompetitionParticipants.$inferInsert;
+
 // Zod schemas
 export const insertRoomSchema = createInsertSchema(rooms).omit({
   id: true,
@@ -443,6 +526,28 @@ export const insertCompetitionResultSchema = createInsertSchema(competitionResul
 export const insertPromotionCounterSchema = createInsertSchema(userPromotionCounters).omit({
   id: true,
   updatedAt: true,
+});
+
+// Seasonal competitions and badges schemas
+export const insertSeasonalCompetitionSchema = createInsertSchema(seasonalCompetitions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAchievementBadgeSchema = createInsertSchema(achievementBadges).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertUserAchievementBadgeSchema = createInsertSchema(userAchievementBadges).omit({
+  id: true,
+  earnedAt: true,
+});
+
+export const insertSeasonalCompetitionParticipantSchema = createInsertSchema(seasonalCompetitionParticipants).omit({
+  id: true,
+  registeredAt: true,
 });
 
 // Level and promotion rule types

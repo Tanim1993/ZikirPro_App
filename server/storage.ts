@@ -14,6 +14,10 @@ import {
   competitionStats,
   competitionResults,
   userPromotionCounters,
+  seasonalCompetitions,
+  achievementBadges,
+  userAchievementBadges,
+  seasonalCompetitionParticipants,
   type UpsertUser,
   type User,
   type Zikir,
@@ -34,6 +38,14 @@ import {
   type CompetitionStat,
   type CompetitionResult,
   type UserPromotionCounter,
+  type SeasonalCompetition,
+  type InsertSeasonalCompetition,
+  type AchievementBadge,
+  type InsertAchievementBadge,
+  type UserAchievementBadge,
+  type InsertUserAchievementBadge,
+  type SeasonalCompetitionParticipant,
+  type InsertSeasonalCompetitionParticipant,
   type LevelDefinition,
   type PromotionRule,
 } from "@shared/schema";
@@ -108,6 +120,34 @@ export interface IStorage {
   checkEligibility(userId: string, orgId: string, levelRequired: number): Promise<{ eligible: boolean; userLevel: number; reason?: string }>;
   getPromotionProgress(userId: string, orgId: string): Promise<any>;
   processPromotions(compId: number): Promise<void>;
+
+  // Seasonal competitions operations
+  createSeasonalCompetition(competition: InsertSeasonalCompetition): Promise<SeasonalCompetition>;
+  getAllSeasonalCompetitions(): Promise<SeasonalCompetition[]>;
+  getActiveSeasonalCompetitions(): Promise<SeasonalCompetition[]>;
+  getSeasonalCompetitionBySeason(season: string, year: number): Promise<SeasonalCompetition | undefined>;
+  updateSeasonalCompetition(id: number, updates: Partial<SeasonalCompetition>): Promise<SeasonalCompetition>;
+  deleteSeasonalCompetition(id: number): Promise<void>;
+  joinSeasonalCompetition(competitionId: number, userId: string): Promise<SeasonalCompetitionParticipant>;
+  leaveSeasonalCompetition(competitionId: number, userId: string): Promise<void>;
+  getSeasonalCompetitionParticipants(competitionId: number): Promise<SeasonalCompetitionParticipant[]>;
+  getSeasonalCompetitionLeaderboard(competitionId: number, limit?: number): Promise<any[]>;
+  updateSeasonalCompetitionCount(competitionId: number, userId: string, count: number): Promise<SeasonalCompetitionParticipant>;
+  
+  // Achievement badges operations
+  createAchievementBadge(badge: InsertAchievementBadge): Promise<AchievementBadge>;
+  getAllAchievementBadges(): Promise<AchievementBadge[]>;
+  getAchievementBadgesByCategory(category: string): Promise<AchievementBadge[]>;
+  getActiveAchievementBadges(): Promise<AchievementBadge[]>;
+  updateAchievementBadge(id: number, updates: Partial<AchievementBadge>): Promise<AchievementBadge>;
+  deleteAchievementBadge(id: number): Promise<void>;
+  
+  // User achievement operations
+  awardBadgeToUser(userId: string, badgeId: number, metadata?: any): Promise<UserAchievementBadge>;
+  getUserAchievementBadges(userId: string): Promise<UserAchievementBadge[]>;
+  getUserBadgesByCategory(userId: string, category: string): Promise<UserAchievementBadge[]>;
+  checkUserBadgeEligibility(userId: string, badgeId: number): Promise<boolean>;
+  processAchievementChecks(userId: string, eventType: string, eventData: any): Promise<UserAchievementBadge[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -1014,6 +1054,261 @@ export class DatabaseStorage implements IStorage {
     // This would be implemented to process promotions after competition ends
     // For now, we'll implement basic promotion logic
     console.log(`Processing promotions for competition ${compId}`);
+  }
+
+  // Seasonal competitions operations
+  async createSeasonalCompetition(competition: InsertSeasonalCompetition): Promise<SeasonalCompetition> {
+    const [newCompetition] = await db.insert(seasonalCompetitions).values(competition).returning();
+    return newCompetition;
+  }
+
+  async getAllSeasonalCompetitions(): Promise<SeasonalCompetition[]> {
+    return await db.select().from(seasonalCompetitions).orderBy(desc(seasonalCompetitions.createdAt));
+  }
+
+  async getActiveSeasonalCompetitions(): Promise<SeasonalCompetition[]> {
+    const now = new Date();
+    return await db.select().from(seasonalCompetitions)
+      .where(and(
+        eq(seasonalCompetitions.isActive, true),
+        lte(seasonalCompetitions.startDate, now),
+        gte(seasonalCompetitions.endDate, now)
+      ))
+      .orderBy(asc(seasonalCompetitions.endDate));
+  }
+
+  async getSeasonalCompetitionBySeason(season: string, year: number): Promise<SeasonalCompetition | undefined> {
+    const [competition] = await db.select().from(seasonalCompetitions)
+      .where(and(
+        eq(seasonalCompetitions.season, season),
+        eq(seasonalCompetitions.seasonYear, year)
+      ));
+    return competition;
+  }
+
+  async updateSeasonalCompetition(id: number, updates: Partial<SeasonalCompetition>): Promise<SeasonalCompetition> {
+    const [competition] = await db.update(seasonalCompetitions)
+      .set({ ...updates, updatedAt: new Date() })
+      .where(eq(seasonalCompetitions.id, id))
+      .returning();
+    return competition;
+  }
+
+  async deleteSeasonalCompetition(id: number): Promise<void> {
+    await db.delete(seasonalCompetitions).where(eq(seasonalCompetitions.id, id));
+  }
+
+  async joinSeasonalCompetition(competitionId: number, userId: string): Promise<SeasonalCompetitionParticipant> {
+    const [participant] = await db.insert(seasonalCompetitionParticipants)
+      .values({ competitionId, userId })
+      .returning();
+    return participant;
+  }
+
+  async leaveSeasonalCompetition(competitionId: number, userId: string): Promise<void> {
+    await db.update(seasonalCompetitionParticipants)
+      .set({ isActive: false })
+      .where(and(
+        eq(seasonalCompetitionParticipants.competitionId, competitionId),
+        eq(seasonalCompetitionParticipants.userId, userId)
+      ));
+  }
+
+  async getSeasonalCompetitionParticipants(competitionId: number): Promise<SeasonalCompetitionParticipant[]> {
+    return await db.select().from(seasonalCompetitionParticipants)
+      .where(and(
+        eq(seasonalCompetitionParticipants.competitionId, competitionId),
+        eq(seasonalCompetitionParticipants.isActive, true)
+      ));
+  }
+
+  async getSeasonalCompetitionLeaderboard(competitionId: number, limit: number = 100): Promise<any[]> {
+    return await db.select({
+      userId: seasonalCompetitionParticipants.userId,
+      totalCount: seasonalCompetitionParticipants.totalCount,
+      rank: seasonalCompetitionParticipants.rank,
+      lastCountAt: seasonalCompetitionParticipants.lastCountAt,
+      user: {
+        username: users.username,
+        firstName: users.firstName,
+        avatarType: users.avatarType,
+        bgColor: users.bgColor,
+      }
+    })
+    .from(seasonalCompetitionParticipants)
+    .leftJoin(users, eq(seasonalCompetitionParticipants.userId, users.id))
+    .where(and(
+      eq(seasonalCompetitionParticipants.competitionId, competitionId),
+      eq(seasonalCompetitionParticipants.isActive, true)
+    ))
+    .orderBy(desc(seasonalCompetitionParticipants.totalCount))
+    .limit(limit);
+  }
+
+  async updateSeasonalCompetitionCount(competitionId: number, userId: string, count: number): Promise<SeasonalCompetitionParticipant> {
+    const [participant] = await db.update(seasonalCompetitionParticipants)
+      .set({ 
+        totalCount: sql`${seasonalCompetitionParticipants.totalCount} + ${count}`,
+        lastCountAt: new Date() 
+      })
+      .where(and(
+        eq(seasonalCompetitionParticipants.competitionId, competitionId),
+        eq(seasonalCompetitionParticipants.userId, userId)
+      ))
+      .returning();
+    return participant;
+  }
+
+  // Achievement badges operations
+  async createAchievementBadge(badge: InsertAchievementBadge): Promise<AchievementBadge> {
+    const [newBadge] = await db.insert(achievementBadges).values(badge).returning();
+    return newBadge;
+  }
+
+  async getAllAchievementBadges(): Promise<AchievementBadge[]> {
+    return await db.select().from(achievementBadges).orderBy(asc(achievementBadges.category));
+  }
+
+  async getAchievementBadgesByCategory(category: string): Promise<AchievementBadge[]> {
+    return await db.select().from(achievementBadges)
+      .where(and(
+        eq(achievementBadges.category, category),
+        eq(achievementBadges.isActive, true)
+      ));
+  }
+
+  async getActiveAchievementBadges(): Promise<AchievementBadge[]> {
+    return await db.select().from(achievementBadges)
+      .where(eq(achievementBadges.isActive, true))
+      .orderBy(asc(achievementBadges.category));
+  }
+
+  async updateAchievementBadge(id: number, updates: Partial<AchievementBadge>): Promise<AchievementBadge> {
+    const [badge] = await db.update(achievementBadges)
+      .set(updates)
+      .where(eq(achievementBadges.id, id))
+      .returning();
+    return badge;
+  }
+
+  async deleteAchievementBadge(id: number): Promise<void> {
+    await db.delete(achievementBadges).where(eq(achievementBadges.id, id));
+  }
+
+  // User achievement operations
+  async awardBadgeToUser(userId: string, badgeId: number, metadata?: any): Promise<UserAchievementBadge> {
+    // Check if user already has this badge
+    const existing = await db.select().from(userAchievementBadges)
+      .where(and(
+        eq(userAchievementBadges.userId, userId),
+        eq(userAchievementBadges.badgeId, badgeId)
+      ));
+
+    if (existing.length > 0) {
+      return existing[0];
+    }
+
+    const [userBadge] = await db.insert(userAchievementBadges)
+      .values({
+        userId,
+        badgeId,
+        metadata,
+        seasonEarned: this.getCurrentSeason(),
+        seasonYear: new Date().getFullYear()
+      })
+      .returning();
+    return userBadge;
+  }
+
+  async getUserAchievementBadges(userId: string): Promise<UserAchievementBadge[]> {
+    return await db.select().from(userAchievementBadges)
+      .where(eq(userAchievementBadges.userId, userId))
+      .orderBy(desc(userAchievementBadges.earnedAt));
+  }
+
+  async getUserBadgesByCategory(userId: string, category: string): Promise<UserAchievementBadge[]> {
+    return await db.select().from(userAchievementBadges)
+      .leftJoin(achievementBadges, eq(userAchievementBadges.badgeId, achievementBadges.id))
+      .where(and(
+        eq(userAchievementBadges.userId, userId),
+        eq(achievementBadges.category, category)
+      ));
+  }
+
+  async checkUserBadgeEligibility(userId: string, badgeId: number): Promise<boolean> {
+    const badge = await db.select().from(achievementBadges)
+      .where(eq(achievementBadges.id, badgeId));
+
+    if (!badge.length || !badge[0].isActive) {
+      return false;
+    }
+
+    // Check if user already has this badge
+    const existing = await db.select().from(userAchievementBadges)
+      .where(and(
+        eq(userAchievementBadges.userId, userId),
+        eq(userAchievementBadges.badgeId, badgeId)
+      ));
+
+    return existing.length === 0;
+  }
+
+  async processAchievementChecks(userId: string, eventType: string, eventData: any): Promise<UserAchievementBadge[]> {
+    // Get all active badges that could be earned
+    const badges = await this.getActiveAchievementBadges();
+    const earnedBadges: UserAchievementBadge[] = [];
+
+    for (const badge of badges) {
+      const isEligible = await this.checkUserBadgeEligibility(userId, badge.id);
+      if (isEligible && this.checkBadgeConditions(badge, eventType, eventData, userId)) {
+        const earnedBadge = await this.awardBadgeToUser(userId, badge.id, eventData);
+        earnedBadges.push(earnedBadge);
+      }
+    }
+
+    return earnedBadges;
+  }
+
+  private getCurrentSeason(): string {
+    const now = new Date();
+    const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+    
+    // Approximate Islamic calendar seasons
+    if (month >= 3 && month <= 5) return 'ramadan';
+    if (month >= 7 && month <= 9) return 'hajj';
+    if (month >= 9 && month <= 11) return 'muharram';
+    return 'regular';
+  }
+
+  private checkBadgeConditions(badge: AchievementBadge, eventType: string, eventData: any, userId: string): boolean {
+    const conditions = badge.conditions as any;
+    
+    // Example condition checking logic
+    if (badge.category === 'zikir' && eventType === 'count_completed') {
+      if (conditions.totalCount && eventData.userTotalCount >= conditions.totalCount) {
+        return true;
+      }
+      if (conditions.singleSessionCount && eventData.sessionCount >= conditions.singleSessionCount) {
+        return true;
+      }
+    }
+
+    if (badge.category === 'streak' && eventType === 'daily_streak') {
+      if (conditions.streakDays && eventData.streakCount >= conditions.streakDays) {
+        return true;
+      }
+    }
+
+    if (badge.category === 'seasonal' && eventType === 'seasonal_competition') {
+      const currentSeason = this.getCurrentSeason();
+      if (badge.availableSeason === currentSeason) {
+        if (conditions.rank && eventData.finalRank <= conditions.rank) {
+          return true;
+        }
+      }
+    }
+
+    return false;
   }
 }
 

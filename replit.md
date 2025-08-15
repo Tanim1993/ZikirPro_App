@@ -45,6 +45,8 @@ Design approach: Minimal, modern, professional look with blue gradients and whit
 - **Islamic Features Suite**: Comprehensive external features accessible via "More" button including Salah Tracker, Quran Reader, Hadith Collection, Zakat Calculator, Qiblah Direction, and Donations platform - all maintaining consistent blue gradient theme
 - **Data Separation System**: Complete separation between user types - organizations see only their created competitions, regular users see only their joined rooms, with type-specific UI layouts and navigation
 - **Organization Tools**: Focused competition management interface with Analytics tab, 2-tab layout (My Competitions + Leaders), and dedicated "Create Competition" workflow
+- **Seasonal Competitions System**: Special competition framework for Islamic seasons (Ramadan, Hajj, Muharram) with themed competitions, exclusive rewards, and seasonal-specific leaderboards
+- **Achievement Badges System**: Comprehensive gamification with bronze, silver, gold, and platinum badges across multiple categories (zikir, seasonal, social, streak, milestone) including automatic eligibility checking and reward awarding
 
 ## Component Structure
 - **Modular Components**: Reusable UI components for tasbih counter, room cards, leaderboards
