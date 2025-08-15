@@ -101,23 +101,20 @@ export default function AdminDashboard() {
     checkAdminAuth();
   }, [setLocation]);
 
-  // Fetch admin data - only when authenticated
+  // Fetch admin data
   const { data: competitions = [] } = useQuery({
     queryKey: ['/api/admin/seasonal-competitions'],
-    queryFn: () => fetch('/api/admin/seasonal-competitions').then(res => res.json()),
-    enabled: isAdminAuthenticated
+    queryFn: () => fetch('/api/admin/seasonal-competitions').then(res => res.json())
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ['/api/admin/users'],
-    queryFn: () => fetch('/api/admin/users').then(res => res.json()),
-    enabled: isAdminAuthenticated
+    queryFn: () => fetch('/api/admin/users').then(res => res.json())
   });
 
   const { data: stats } = useQuery({
     queryKey: ['/api/admin/stats'],
-    queryFn: () => fetch('/api/admin/stats').then(res => res.json()),
-    enabled: isAdminAuthenticated
+    queryFn: () => fetch('/api/admin/stats').then(res => res.json())
   });
 
   // Show loading while checking authentication
