@@ -83,7 +83,36 @@ function QuestConfiguration() {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>🎯 Daily Quest System</span>
-          <Button data-testid="button-create-quest">Create New Quest</Button>
+          <Button data-testid="button-create-quest" onClick={() => {
+            const questId = prompt('Enter quest ID (unique):');
+            const nameEn = prompt('Enter English name:');
+            const nameAr = prompt('Enter Arabic name:');
+            const description = prompt('Enter description:');
+            const questType = prompt('Enter quest type (zikir, community, etc.):');
+            const targetValue = prompt('Enter target value:');
+            const pointsReward = prompt('Enter points reward:');
+            const minLevel = prompt('Enter minimum level (1-50):', '1');
+            const maxLevel = prompt('Enter maximum level (1-50):', '50');
+            
+            if (questId && nameEn && nameAr && description && questType && targetValue && pointsReward) {
+              fetch('/api/admin/quests', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  questId,
+                  nameEn,
+                  nameAr,
+                  description,
+                  questType,
+                  targetValue: parseInt(targetValue),
+                  timeLimit: 'all_day',
+                  pointsReward: parseInt(pointsReward),
+                  minLevel: parseInt(minLevel || '1'),
+                  maxLevel: parseInt(maxLevel || '50')
+                })
+              }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/quests'] }));
+            }
+          }}>Create New Quest</Button>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -227,7 +256,19 @@ function QuestConfiguration() {
                   {editingQuest && (
                     <Button
                       className="w-full"
-                      onClick={() => updateQuestMutation.mutate({ id: selectedQuest.id, config: selectedQuest })}
+                      onClick={() => updateQuestMutation.mutate({ 
+                        id: selectedQuest.id, 
+                        config: {
+                          nameEn: selectedQuest.name_en,
+                          nameAr: selectedQuest.name_ar,
+                          description: selectedQuest.description,
+                          targetValue: selectedQuest.target_value,
+                          pointsReward: selectedQuest.points_reward,
+                          minLevel: selectedQuest.min_level,
+                          maxLevel: selectedQuest.max_level,
+                          isActive: selectedQuest.is_active
+                        }
+                      })}
                       disabled={updateQuestMutation.isPending}
                     >
                       {updateQuestMutation.isPending ? 'Saving...' : 'Save Changes'}
@@ -285,7 +326,35 @@ function IslamicPracticeConfiguration() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>🕌 Islamic Practice Configuration</CardTitle>
+        <CardTitle className="flex items-center justify-between">
+          <span>🕌 Islamic Practice Configuration</span>
+          <Button data-testid="button-create-practice" onClick={() => {
+            const practiceId = prompt('Enter practice ID (unique):');
+            const nameEn = prompt('Enter English name:');
+            const nameAr = prompt('Enter Arabic name:');
+            const description = prompt('Enter description:');
+            const recommendedTime = prompt('Enter recommended time (any_time, night_time, friday_only, all_day):');
+            const pointsReward = prompt('Enter points reward:');
+            const streakBonus = prompt('Enter streak bonus:');
+            
+            if (practiceId && nameEn && nameAr && description && recommendedTime && pointsReward && streakBonus) {
+              fetch('/api/admin/practices', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  practiceId,
+                  nameEn,
+                  nameAr,
+                  description,
+                  recommendedTime,
+                  pointsReward: parseInt(pointsReward),
+                  streakBonus: parseInt(streakBonus),
+                  verificationType: 'self_confirmation'
+                })
+              }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/practices'] }));
+            }
+          }}>Create New Practice</Button>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -391,7 +460,14 @@ function IslamicPracticeConfiguration() {
                   {editingPractice && (
                     <Button
                       className="w-full"
-                      onClick={() => updatePracticeMutation.mutate({ id: selectedPractice.id, config: selectedPractice })}
+                      onClick={() => updatePracticeMutation.mutate({ 
+                        id: selectedPractice.id, 
+                        config: {
+                          pointsReward: selectedPractice.points_reward,
+                          streakBonus: selectedPractice.streak_bonus,
+                          isActive: selectedPractice.is_active
+                        }
+                      })}
                       disabled={updatePracticeMutation.isPending}
                     >
                       {updatePracticeMutation.isPending ? 'Saving...' : 'Save Changes'}
@@ -709,7 +785,24 @@ export default function AdminGamification() {
                       <Badge variant={currency.is_active ? "default" : "secondary"}>
                         {currency.is_active ? 'Active' : 'Inactive'}
                       </Badge>
-                      <Button variant="outline" size="sm" data-testid={`button-edit-currency-${currency.id}`}>
+                      <Button variant="outline" size="sm" data-testid={`button-edit-currency-${currency.id}`} onClick={() => {
+                        // Create a currency edit modal or expand inline editing
+                        const newPoints = prompt(`Enter new base points for ${currency.activity_type}:`, currency.base_points.toString());
+                        const newMultiplier = prompt(`Enter new multiplier (current: ${currency.multiplier}):`, currency.multiplier.toString());
+                        if (newPoints && newMultiplier) {
+                          // Call API to update currency
+                          fetch(`/api/admin/currency/${currency.id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                              basePoints: parseInt(newPoints),
+                              multiplier: parseInt(newMultiplier),
+                              seasonalBonus: currency.seasonal_bonus,
+                              isActive: currency.is_active
+                            })
+                          }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/currency'] }));
+                        }
+                      }}>
                         Edit
                       </Button>
                     </div>
@@ -726,7 +819,33 @@ export default function AdminGamification() {
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <span>🏆 Badge System</span>
-                <Button data-testid="button-create-badge">Create New Badge</Button>
+                <Button data-testid="button-create-badge" onClick={() => {
+                  const badgeId = prompt('Enter badge ID (unique):');
+                  const nameEn = prompt('Enter English name:');
+                  const nameAr = prompt('Enter Arabic name:');
+                  const description = prompt('Enter description:');
+                  const category = prompt('Enter category (zikir, consistency, community, etc.):');
+                  const targetValue = prompt('Enter target value:');
+                  const pointsReward = prompt('Enter points reward:');
+                  
+                  if (badgeId && nameEn && nameAr && description && category && targetValue && pointsReward) {
+                    fetch('/api/admin/badges', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        badgeId,
+                        nameEn,
+                        nameAr,
+                        description,
+                        category,
+                        criteriaType: 'count',
+                        targetValue: parseInt(targetValue),
+                        pointsReward: parseInt(pointsReward),
+                        coinsReward: parseInt(pointsReward)
+                      })
+                    }).then(() => queryClient.invalidateQueries({ queryKey: ['/api/admin/badges'] }));
+                  }
+                }}>Create New Badge</Button>
               </CardTitle>
             </CardHeader>
             <CardContent>

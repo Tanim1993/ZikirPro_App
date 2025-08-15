@@ -189,14 +189,26 @@ export default function Dashboard() {
                 <p className="text-white/80 text-xs">Islamic Prayer Counter & Competition</p>
               </div>
             </div>
-            <Button 
-              onClick={() => setShowCreateModal(true)}
-              className="bg-white text-islamic-primary hover:bg-white/90 shadow-sm px-4 py-2 text-sm font-medium rounded-lg"
-              data-testid="button-create-room"
-            >
-              <Plus className="w-4 h-4 mr-1" />
-              Create Room
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                onClick={() => setShowCreateModal(true)}
+                className="bg-white text-islamic-primary hover:bg-white/90 shadow-sm px-4 py-2 text-sm font-medium rounded-lg"
+                data-testid="button-create-room"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Create Room
+              </Button>
+              
+              {/* Admin Gamification Button */}
+              {user && ((user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
+                <Link href="/admin-gamification">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm px-4 py-2 text-sm font-medium rounded-lg" data-testid="button-admin-gamification">
+                    <div className="text-sm mr-1">🎮</div>
+                    Admin
+                  </Button>
+                </Link>
+              )}
+            </div>
           </div>
           
           {/* Clean Stats Cards */}
@@ -376,16 +388,7 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Admin Gamification Button - Only for admin users */}
-      {user && ((user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
-        <div className="fixed bottom-24 right-6 z-50">
-          <Link href="/admin-gamification">
-            <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white shadow-xl rounded-full p-4 w-16 h-16 transition-all duration-300 hover:scale-110" data-testid="button-admin-gamification">
-              <div className="text-2xl animate-pulse">🎮</div>
-            </Button>
-          </Link>
-        </div>
-      )}
+
     </div>
   );
 }

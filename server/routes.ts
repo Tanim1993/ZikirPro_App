@@ -1245,23 +1245,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     const adminUser = (req.session as any)?.adminUser;
     let regularUser = req.user;
     
-    console.log('isAppFounder debug:', {
-      hasAdminUser: !!adminUser,
-      adminUserRole: adminUser?.role,
-      hasRegularUser: !!regularUser,
-      hasSession: !!req.session?.user,
-      sessionUserId: req.session?.user?.id
-    });
-    
     // If no user attached to request, try to get from session
     if (!regularUser && req.session?.user?.id) {
       try {
         regularUser = await storage.getUser(req.session.user.id);
-        console.log('Found user from session:', {
-          id: regularUser?.id,
-          username: regularUser?.username,
-          userType: regularUser?.userType
-        });
       } catch (error) {
         console.error('Error getting user in isAppFounder:', error);
       }
@@ -1270,8 +1257,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     // Check if user is admin through either authentication method
     const isAdmin = adminUser?.role === 'founder' || 
         (regularUser && (regularUser.username === 'admin' || regularUser.id === 'founder-admin-id' || regularUser.userType === 'admin'));
-    
-    console.log('Admin check result:', { isAdmin, regularUserType: regularUser?.userType });
     
     if (isAdmin) {
       next();
@@ -1989,6 +1974,25 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error fetching practices:', error);
       res.status(500).json({ error: 'Failed to fetch practices' });
+    }
+  });
+
+  // Create Islamic practice
+  app.post('/api/admin/practices', isAppFounder, async (req, res) => {
+    try {
+      const { practiceId, nameEn, nameAr, description, recommendedTime, pointsReward, streakBonus, verificationType } = req.body;
+      
+      const result = await db.execute(sql`
+        INSERT INTO islamic_practice_configuration 
+        (practice_id, name_en, name_ar, description, recommended_time, points_reward, streak_bonus, verification_type)
+        VALUES (${practiceId}, ${nameEn}, ${nameAr}, ${description}, ${recommendedTime}, ${pointsReward}, ${streakBonus}, ${verificationType})
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error creating practice:', error);
+      res.status(500).json({ error: 'Failed to create practice' });
     }
   });
 
