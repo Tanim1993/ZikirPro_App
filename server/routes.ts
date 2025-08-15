@@ -5,6 +5,8 @@ import session from "express-session";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertRoomSchema, insertRoomMemberSchema, updateUserProfileSchema, insertSeasonalCompetitionSchema, insertAchievementBadgeSchema } from "@shared/schema";
+import { db } from "./db";
+import { sql } from "drizzle-orm";
 import { seedDatabase } from "./seedData";
 
 // Extend Express session to include user
@@ -482,7 +484,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post('/api/rooms/:id/count', async (req: any, res) => {
     try {
       const roomId = parseInt(req.params.id);
-      const userId = "test-user-123"; // Mock user ID
+      const userId = req.session?.user?.id || "test-user-123";
 
       // Auto-join user to room if not already a member for public rooms
       const room = await storage.getRoomById(roomId);
@@ -508,10 +510,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update user analytics
       const analytics = await storage.getUserAnalytics(userId);
+      const newTotalCount = (analytics?.totalZikir || 0) + 1;
       await storage.updateUserAnalytics(userId, {
-        totalZikir: (analytics?.totalZikir || 0) + 1,
+        totalZikir: newTotalCount,
         lastActiveDate: new Date(),
       });
+
+      // Update seasonal competition progress
+      try {
+        await updateSeasonalCompetitionProgress(userId, 1, newTotalCount);
+      } catch (seasonalError) {
+        console.error("Error updating seasonal competition progress:", seasonalError);
+        // Don't fail the count submission if seasonal update fails
+      }
 
       // Broadcast count update to room
       const leaderboard = await storage.getRoomLeaderboard(roomId);
@@ -526,6 +537,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to increment count" });
     }
   });
+
+  // Helper function to update seasonal competition progress
+  async function updateSeasonalCompetitionProgress(userId: string, incrementCount: number, totalCount: number) {
+    try {
+      // Get user's active seasonal competition participations
+      const participations = await db.execute(sql`
+        SELECT scp.*, sc.target_count, sc.unlimited 
+        FROM seasonal_competition_participants scp
+        JOIN seasonal_competitions sc ON scp.competition_id = sc.id
+        WHERE scp.user_id = ${userId} AND sc.is_active = true
+        AND sc.start_date <= NOW() AND sc.end_date >= NOW()
+      `);
+
+      for (const participation of participations.rows || []) {
+        // Update the participant's count
+        await db.execute(sql`
+          UPDATE seasonal_competition_participants 
+          SET total_count = total_count + ${incrementCount},
+              last_activity = NOW()
+          WHERE id = ${participation.id}
+        `);
+
+        // Check if user completed the competition (if not unlimited)
+        if (!participation.unlimited && participation.target_count) {
+          const newTotal = (participation.total_count || 0) + incrementCount;
+          if (newTotal >= participation.target_count) {
+            console.log(`User ${userId} completed seasonal competition ${participation.competition_id}!`);
+            // Here you could trigger completion notifications or badges
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error updating seasonal competition progress:", error);
+      throw error;
+    }
+  }
 
   // Bulk count endpoint for offline sync
   app.post('/api/rooms/:id/count/bulk', async (req: any, res) => {
@@ -566,10 +613,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Update user analytics
       const analytics = await storage.getUserAnalytics(userId);
+      const newTotalCount = (analytics?.totalZikir || 0) + count;
       await storage.updateUserAnalytics(userId, {
-        totalZikir: (analytics?.totalZikir || 0) + count,
+        totalZikir: newTotalCount,
         lastActiveDate: new Date(),
       });
+
+      // Update seasonal competition progress for bulk counts
+      try {
+        await updateSeasonalCompetitionProgress(userId, count, newTotalCount);
+      } catch (seasonalError) {
+        console.error("Error updating seasonal competition progress (bulk):", seasonalError);
+        // Don't fail the bulk count submission if seasonal update fails
+      }
 
       // Broadcast final count update to room
       const leaderboard = await storage.getRoomLeaderboard(roomId);
@@ -1047,6 +1103,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get seasonal competition leaderboard
+  app.get('/api/seasonal-competitions/:id/leaderboard', async (req, res) => {
+    try {
+      const competitionId = parseInt(req.params.id);
+      
+      const leaderboard = await db.execute(sql`
+        SELECT 
+          scp.user_id,
+          scp.total_count,
+          scp.current_rank,
+          scp.last_activity,
+          u.username,
+          u.display_name
+        FROM seasonal_competition_participants scp
+        LEFT JOIN users u ON scp.user_id = u.id
+        WHERE scp.competition_id = ${competitionId}
+        ORDER BY scp.total_count DESC, scp.last_activity ASC
+        LIMIT 50
+      `);
+      
+      res.json(leaderboard.rows || []);
+    } catch (error) {
+      console.error('Error fetching seasonal competition leaderboard:', error);
+      res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    }
+  });
+
+  // Get user's seasonal competition progress
+  app.get('/api/seasonal-competitions/my-progress', async (req, res) => {
+    try {
+      const userId = req.session?.user?.id || "test001-user-id";
+      
+      const progress = await db.execute(sql`
+        SELECT 
+          sc.id,
+          sc.name,
+          sc.target_count,
+          sc.unlimited,
+          scp.total_count,
+          scp.current_rank,
+          scp.joined_at,
+          scp.last_activity
+        FROM seasonal_competition_participants scp
+        JOIN seasonal_competitions sc ON scp.competition_id = sc.id
+        WHERE scp.user_id = ${userId} AND sc.is_active = true
+        ORDER BY scp.joined_at DESC
+      `);
+      
+      res.json(progress.rows || []);
+    } catch (error) {
+      console.error('Error fetching user seasonal competition progress:', error);
+      res.status(500).json({ error: 'Failed to fetch progress' });
+    }
+  });
+
   // Achievement badges routes
   app.get('/api/achievement-badges', async (req, res) => {
     try {
@@ -1079,6 +1190,204 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Error accepting rules:', error);
       res.status(500).json({ message: 'Failed to accept rules' });
+    }
+  });
+
+  // Admin routes - Only accessible by app founder
+  const isAppFounder = (req: any, res: any, next: any) => {
+    const userId = req.session?.user?.id || "test001-user-id";
+    // Check if user is app founder (you can implement your own logic)
+    if (userId === "founder-admin-id" || userId === "test001-user-id") {
+      next();
+    } else {
+      res.status(403).json({ error: 'Access denied. App founder only.' });
+    }
+  };
+
+  // Admin - Get all seasonal competitions
+  app.get('/api/admin/seasonal-competitions', isAppFounder, async (req, res) => {
+    try {
+      const competitions = await db.execute(sql`
+        SELECT sc.*, COUNT(scp.id) as participant_count
+        FROM seasonal_competitions sc
+        LEFT JOIN seasonal_competition_participants scp ON sc.id = scp.competition_id
+        GROUP BY sc.id
+        ORDER BY sc.created_at DESC
+      `);
+      
+      res.json(competitions.rows || []);
+    } catch (error) {
+      console.error('Error fetching admin competitions:', error);
+      res.status(500).json({ error: 'Failed to fetch competitions' });
+    }
+  });
+
+  // Admin - Create seasonal competition
+  app.post('/api/admin/seasonal-competitions', isAppFounder, async (req, res) => {
+    try {
+      const competitionData = req.body;
+      
+      const result = await db.execute(sql`
+        INSERT INTO seasonal_competitions (
+          name, description, start_date, end_date, target_count, 
+          unlimited, is_active, max_participants, prize_description, 
+          category, created_at
+        ) VALUES (
+          ${competitionData.name},
+          ${competitionData.description},
+          ${competitionData.startDate || new Date()},
+          ${competitionData.endDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)},
+          ${competitionData.targetCount || null},
+          ${competitionData.unlimited || false},
+          ${competitionData.isActive || true},
+          ${competitionData.maxParticipants || null},
+          ${competitionData.prizeDescription || null},
+          ${competitionData.category || 'general'},
+          NOW()
+        )
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error creating competition:', error);
+      res.status(500).json({ error: 'Failed to create competition' });
+    }
+  });
+
+  // Admin - Update seasonal competition
+  app.put('/api/admin/seasonal-competitions/:id', isAppFounder, async (req, res) => {
+    try {
+      const competitionId = parseInt(req.params.id);
+      const data = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE seasonal_competitions 
+        SET name = ${data.name},
+            description = ${data.description},
+            start_date = ${data.startDate},
+            end_date = ${data.endDate},
+            target_count = ${data.targetCount},
+            unlimited = ${data.unlimited},
+            is_active = ${data.isActive},
+            max_participants = ${data.maxParticipants},
+            prize_description = ${data.prizeDescription},
+            category = ${data.category}
+        WHERE id = ${competitionId}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating competition:', error);
+      res.status(500).json({ error: 'Failed to update competition' });
+    }
+  });
+
+  // Admin - Delete seasonal competition
+  app.delete('/api/admin/seasonal-competitions/:id', isAppFounder, async (req, res) => {
+    try {
+      const competitionId = parseInt(req.params.id);
+      
+      // Delete participants first
+      await db.execute(sql`
+        DELETE FROM seasonal_competition_participants 
+        WHERE competition_id = ${competitionId}
+      `);
+      
+      // Delete competition
+      await db.execute(sql`
+        DELETE FROM seasonal_competitions 
+        WHERE id = ${competitionId}
+      `);
+      
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Error deleting competition:', error);
+      res.status(500).json({ error: 'Failed to delete competition' });
+    }
+  });
+
+  // Admin - Toggle competition status
+  app.put('/api/admin/seasonal-competitions/:id/toggle', isAppFounder, async (req, res) => {
+    try {
+      const competitionId = parseInt(req.params.id);
+      const { isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE seasonal_competitions 
+        SET is_active = ${isActive}
+        WHERE id = ${competitionId}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error toggling competition status:', error);
+      res.status(500).json({ error: 'Failed to toggle status' });
+    }
+  });
+
+  // Admin - Get all users
+  app.get('/api/admin/users', isAppFounder, async (req, res) => {
+    try {
+      const users = await db.execute(sql`
+        SELECT 
+          u.id, u.username, u.display_name, u.email, u.user_type,
+          u.is_active, u.created_at, u.last_login_at,
+          COALESCE(ua.total_zikir, 0) as total_zikir
+        FROM users u
+        LEFT JOIN user_analytics ua ON u.id = ua.user_id
+        ORDER BY u.created_at DESC
+        LIMIT 100
+      `);
+      
+      res.json(users.rows || []);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      res.status(500).json({ error: 'Failed to fetch users' });
+    }
+  });
+
+  // Admin - Toggle user status
+  app.put('/api/admin/users/:userId/toggle', isAppFounder, async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const { isActive } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE users 
+        SET is_active = ${isActive}
+        WHERE id = ${userId}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error toggling user status:', error);
+      res.status(500).json({ error: 'Failed to toggle user status' });
+    }
+  });
+
+  // Admin - Get system stats
+  app.get('/api/admin/stats', isAppFounder, async (req, res) => {
+    try {
+      const [competitions, users, participants, totalZikir] = await Promise.all([
+        db.execute(sql`SELECT COUNT(*) as count FROM seasonal_competitions`),
+        db.execute(sql`SELECT COUNT(*) as count FROM users WHERE is_active = true`),
+        db.execute(sql`SELECT COUNT(*) as count FROM seasonal_competition_participants`),
+        db.execute(sql`SELECT SUM(total_zikir) as total FROM user_analytics`)
+      ]);
+      
+      res.json({
+        totalCompetitions: competitions.rows?.[0]?.count || 0,
+        activeUsers: users.rows?.[0]?.count || 0,
+        totalParticipants: participants.rows?.[0]?.count || 0,
+        totalZikir: totalZikir.rows?.[0]?.total || 0
+      });
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+      res.status(500).json({ error: 'Failed to fetch stats' });
     }
   });
 

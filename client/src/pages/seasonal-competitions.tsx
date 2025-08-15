@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, Trophy, Users, Clock, Star } from 'lucide-react';
+import { Calendar, Trophy, Users, Clock, Star, Target, TrendingUp } from 'lucide-react';
 
 interface SeasonalCompetition {
   id: number;
@@ -30,6 +30,12 @@ export default function SeasonalCompetitions() {
   const { data: competitions, isLoading } = useQuery({
     queryKey: ['/api/seasonal-competitions'],
     queryFn: () => fetch('/api/seasonal-competitions').then(res => res.json())
+  });
+
+  const { data: userProgress = [] } = useQuery({
+    queryKey: ['/api/seasonal-competitions/my-progress'],
+    queryFn: () => fetch('/api/seasonal-competitions/my-progress').then(res => res.json()),
+    refetchInterval: 10000 // Refresh every 10 seconds
   });
 
   if (isLoading) {
@@ -74,6 +80,8 @@ export default function SeasonalCompetitions() {
       
       if (response.ok) {
         alert('Successfully joined the competition!');
+        // Refresh user progress data
+        window.location.reload();
       } else {
         const error = await response.json();
         alert(error.error || 'Failed to join competition');
@@ -82,6 +90,15 @@ export default function SeasonalCompetitions() {
       console.error('Error joining competition:', error);
       alert('Failed to join competition');
     }
+  };
+
+  const getUserProgress = (competitionId: number) => {
+    return userProgress.find((p: any) => p.id === competitionId);
+  };
+
+  const getProgressPercentage = (progress: any, competition: SeasonalCompetition) => {
+    if (competition.unlimited || !competition.targetCount) return 0;
+    return Math.min((progress?.total_count || 0) / competition.targetCount * 100, 100);
   };
 
   return (
@@ -146,14 +163,61 @@ export default function SeasonalCompetitions() {
                     </div>
                   )}
 
+                  {/* User Progress Display */}
+                  {(() => {
+                    const progress = getUserProgress(competition.id);
+                    if (progress) {
+                      return (
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center text-sm font-medium text-blue-800">
+                              <TrendingUp className="w-4 h-4 mr-1" />
+                              Your Progress
+                            </div>
+                            <span className="text-sm font-bold text-blue-900">
+                              {progress.total_count || 0} {competition.unlimited ? '' : `/ ${competition.targetCount}`}
+                            </span>
+                          </div>
+                          
+                          {!competition.unlimited && competition.targetCount && (
+                            <div className="w-full bg-blue-200 rounded-full h-2">
+                              <div 
+                                className="bg-gradient-to-r from-blue-500 to-blue-600 h-2 rounded-full transition-all duration-300"
+                                style={{ width: `${getProgressPercentage(progress, competition)}%` }}
+                              ></div>
+                            </div>
+                          )}
+                          
+                          {progress.last_activity && (
+                            <p className="text-xs text-blue-600 mt-1">
+                              Last activity: {new Date(progress.last_activity).toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    }
+                    return null;
+                  })()}
+
                   <div className="flex space-x-2 pt-2">
-                    <Button 
-                      onClick={() => handleJoinCompetition(competition.id)}
-                      className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
-                      data-testid={`button-join-competition-${competition.id}`}
-                    >
-                      Join Competition
-                    </Button>
+                    {getUserProgress(competition.id) ? (
+                      <Button 
+                        variant="outline"
+                        className="flex-1"
+                        data-testid={`button-already-joined-${competition.id}`}
+                        disabled
+                      >
+                        Already Joined
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={() => handleJoinCompetition(competition.id)}
+                        className="flex-1 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                        data-testid={`button-join-competition-${competition.id}`}
+                      >
+                        Join Competition
+                      </Button>
+                    )}
                     <Button 
                       variant="outline" 
                       size="sm" 
