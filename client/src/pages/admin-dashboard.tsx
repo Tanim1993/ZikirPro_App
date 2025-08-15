@@ -26,7 +26,8 @@ import {
   Activity,
   BarChart3,
   Shield,
-  Database
+  Database,
+  Building2
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -84,17 +85,32 @@ export default function AdminDashboard() {
   // Fetch admin data
   const { data: competitions = [] } = useQuery({
     queryKey: ['/api/admin/seasonal-competitions'],
-    queryFn: () => fetch('/api/admin/seasonal-competitions').then(res => res.json())
+    queryFn: () => fetch('/api/admin/seasonal-competitions', {
+      credentials: 'include'
+    }).then(res => {
+      if (!res.ok) throw new Error('Failed to fetch competitions');
+      return res.json();
+    })
   });
 
   const { data: users = [] } = useQuery({
     queryKey: ['/api/admin/users'],
-    queryFn: () => fetch('/api/admin/users').then(res => res.json())
+    queryFn: () => fetch('/api/admin/users', {
+      credentials: 'include'
+    }).then(res => {
+      if (!res.ok) throw new Error('Failed to fetch users');
+      return res.json();
+    })
   });
 
   const { data: stats } = useQuery({
     queryKey: ['/api/admin/stats'],
-    queryFn: () => fetch('/api/admin/stats').then(res => res.json())
+    queryFn: () => fetch('/api/admin/stats', {
+      credentials: 'include'
+    }).then(res => {
+      if (!res.ok) throw new Error('Failed to fetch stats');
+      return res.json();
+    })
   });
 
   // Create competition mutation
@@ -207,9 +223,19 @@ export default function AdminDashboard() {
               </h1>
               <p className="text-gray-600 mt-1">Seasonal Competitions Management Portal</p>
             </div>
-            <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2">
-              App Founder Portal
-            </Badge>
+            <div className="flex items-center space-x-3">
+              <Button 
+                onClick={() => setLocation('/admin-gamification')}
+                className="bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+                data-testid="button-admin-gamification"
+              >
+                <div className="text-sm mr-2">🎮</div>
+                Gamification Admin
+              </Button>
+              <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2">
+                App Founder Portal
+              </Badge>
+            </div>
           </div>
         </div>
 
@@ -268,10 +294,14 @@ export default function AdminDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="competitions" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="competitions" className="flex items-center">
               <Trophy className="w-4 h-4 mr-2" />
               Competitions
+            </TabsTrigger>
+            <TabsTrigger value="organizations" className="flex items-center">
+              <Building2 className="w-4 h-4 mr-2" />
+              Organizations
             </TabsTrigger>
             <TabsTrigger value="users" className="flex items-center">
               <Users className="w-4 h-4 mr-2" />
@@ -489,6 +519,65 @@ export default function AdminDashboard() {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Organizations Tab */}
+          <TabsContent value="organizations" className="space-y-6">
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-semibold">Organization Management</h2>
+              <Button className="bg-gradient-to-r from-green-500 to-green-600">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Organization Account
+              </Button>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>All Organizations</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {users.filter((user: AdminUser) => user.userType === 'organization').map((org: AdminUser) => (
+                    <div key={org.id} className="flex items-center justify-between p-4 border rounded-lg">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                          <Building2 className="w-6 h-6 text-green-600" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold">{org.displayName || org.username}</h3>
+                          <p className="text-sm text-gray-500">ID: {org.id}</p>
+                          <p className="text-sm text-gray-500">Total Competitions: {org.totalZikir || 0}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge variant={org.isActive ? "default" : "secondary"}>
+                          {org.isActive ? 'Active' : 'Inactive'}
+                        </Badge>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => toggleUserMutation.mutate({
+                            userId: org.id,
+                            isActive: !org.isActive
+                          })}
+                        >
+                          {org.isActive ? 'Deactivate' : 'Activate'}
+                        </Button>
+                        <Button variant="outline" size="sm" onClick={() => setSelectedUser(org)}>
+                          <Eye className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  {users.filter((user: AdminUser) => user.userType === 'organization').length === 0 && (
+                    <div className="text-center py-8 text-gray-500">
+                      No organizations found. Create one to get started.
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           {/* Users Tab */}
