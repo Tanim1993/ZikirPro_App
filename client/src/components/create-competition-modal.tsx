@@ -24,11 +24,11 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
     name: "",
     description: "",
     zikirId: "",
+    targetCount: "",
+    unlimited: false,
     prizeDescription: "",
     competitionStartDate: "",
     competitionEndDate: "",
-    targetCount: "",
-    unlimited: false,
     duration: "30",
     isPublic: true,
     country: "Bangladesh",
@@ -46,17 +46,21 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
 
   const createCompetitionMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const payload = {
+        ...data,
+        competitionType: 'competition',
+        zikirId: parseInt(data.zikirId),
+        targetCount: data.unlimited ? null : parseInt(data.targetCount || "0"),
+        duration: parseInt(data.duration),
+        maxParticipants: data.maxParticipants ? parseInt(data.maxParticipants) : null,
+        levelRequired: parseInt(data.levelRequired),
+      };
+      
+      console.log('Creating competition with payload:', payload);
+      
       return await apiRequest('/api/rooms/competition', {
         method: 'POST',
-        body: JSON.stringify({
-          ...data,
-          competitionType: 'competition',
-          zikirId: parseInt(data.zikirId),
-          targetCount: data.unlimited ? null : parseInt(data.targetCount),
-          duration: parseInt(data.duration),
-          maxParticipants: data.maxParticipants ? parseInt(data.maxParticipants) : null,
-          levelRequired: parseInt(data.levelRequired),
-        }),
+        body: JSON.stringify(payload),
       });
     },
     onSuccess: (data) => {
@@ -74,11 +78,11 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
         name: "",
         description: "",
         zikirId: "",
+        targetCount: "",
+        unlimited: false,
         prizeDescription: "",
         competitionStartDate: "",
         competitionEndDate: "",
-        targetCount: "",
-        unlimited: false,
         duration: "30",
         isPublic: true,
         country: "Bangladesh",
@@ -254,6 +258,47 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
               </Select>
               {errors.zikirId && <p className="text-red-500 text-xs mt-1">{errors.zikirId}</p>}
             </div>
+
+            {/* Count Section */}
+            <div className="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200">
+              <div className="flex items-center justify-between">
+                <Label className="text-sm font-medium text-gray-700">Competition Target</Label>
+                <div className="flex items-center space-x-3">
+                  <Checkbox
+                    id="unlimited-target"
+                    checked={formData.unlimited}
+                    onCheckedChange={(checked) => handleInputChange("unlimited", checked as boolean)}
+                    data-testid="checkbox-unlimited-target"
+                    className="data-[state=checked]:bg-gray-600 data-[state=checked]:border-gray-600"
+                  />
+                  <Label htmlFor="unlimited-target" className="text-sm text-gray-600 cursor-pointer">Unlimited</Label>
+                </div>
+              </div>
+              
+              {!formData.unlimited && (
+                <div className="space-y-2">
+                  <Label htmlFor="targetCount" className="text-sm font-medium text-gray-700">Target Count *</Label>
+                  <Input
+                    id="targetCount"
+                    type="number"
+                    value={formData.targetCount}
+                    onChange={(e) => handleInputChange("targetCount", e.target.value)}
+                    placeholder="1000"
+                    min="1"
+                    className={`h-12 px-4 bg-white border border-gray-200 rounded-lg focus:border-gray-400 focus:ring-0 transition-all ${errors.targetCount ? "border-red-300 bg-red-50" : ""}`}
+                    data-testid="input-target-count"
+                  />
+                  {errors.targetCount && <p className="text-red-500 text-xs mt-1">{errors.targetCount}</p>}
+                  <p className="text-xs text-gray-500">Set the zikir count goal for this competition</p>
+                </div>
+              )}
+              
+              {formData.unlimited && (
+                <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded border">
+                  <p>🕊️ This will be an unlimited competition - participants can count without a specific target goal.</p>
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Prize Information */}
@@ -362,33 +407,7 @@ export function CreateCompetitionModal({ isOpen, onClose }: CreateCompetitionMod
               {errors.maxParticipants && <p className="text-red-500 text-xs mt-1">{errors.maxParticipants}</p>}
             </div>
             
-            <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-              <Checkbox
-                id="unlimited"
-                checked={formData.unlimited}
-                onCheckedChange={(checked) => handleInputChange("unlimited", checked as boolean)}
-                data-testid="checkbox-competition-unlimited"
-                className="data-[state=checked]:bg-gray-600 data-[state=checked]:border-gray-600"
-              />
-              <Label htmlFor="unlimited" className="text-sm text-gray-700 cursor-pointer">Unlimited counting (no target)</Label>
-            </div>
-            
-            {!formData.unlimited && (
-              <div className="space-y-2">
-                <Label htmlFor="targetCount" className="text-sm font-medium text-gray-700">Target Count *</Label>
-                <Input
-                  id="targetCount"
-                  type="number"
-                  value={formData.targetCount}
-                  onChange={(e) => handleInputChange("targetCount", e.target.value)}
-                  placeholder="1000"
-                  min="1"
-                  className={`h-12 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:bg-white focus:border-gray-400 focus:ring-0 transition-all ${errors.targetCount ? "border-red-300 bg-red-50" : ""}`}
-                  data-testid="input-competition-target-count"
-                />
-                {errors.targetCount && <p className="text-red-500 text-xs mt-1">{errors.targetCount}</p>}
-              </div>
-            )}
+
             
             <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
               <Checkbox
