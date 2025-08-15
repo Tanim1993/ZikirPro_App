@@ -2,6 +2,13 @@
 
 This is an Islamic Zikir Competition App called "Zikir Amol" that combines digital tasbih functionality with competitive elements. The application allows users to join or create Zikir rooms where they can perform remembrance (dhikr) while competing with others through real-time leaderboards. The app features a full-stack architecture with React frontend, Express.js backend, PostgreSQL database, and WebSocket support for live updates.
 
+## Recent Changes (August 15, 2025)
+- **Admin Portal (BO) Implementation:** Complete Back Office portal with founder-only access
+- **Seasonal Competitions Integration:** End-to-end integration with live progress tracking
+- **Advanced Implementation Plans:** Comprehensive 8-phase development roadmap created
+- **Authentication System:** Separate admin session management from regular users
+- **Current Status:** Core platform operational with 55 users, 5 competitions, 448 total zikir counted
+
 # User Preferences
 
 Preferred communication style: Simple, everyday language.
