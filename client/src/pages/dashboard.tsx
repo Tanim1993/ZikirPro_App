@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import CreateRoomModal from "@/components/create-room-modal";
 import { GlobalLeaderboard } from "@/components/global-leaderboard";
+import SeasonalCompetitions from "@/pages/seasonal-competitions";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -222,8 +223,8 @@ export default function Dashboard() {
           <TabsList className={cn(
             "bg-gray-100 p-1 rounded-lg w-full",
 (user as any)?.userType === 'organization' 
-              ? "grid grid-cols-2" 
-              : "grid grid-cols-3"
+              ? "grid grid-cols-3" 
+              : "grid grid-cols-4"
           )}>
             <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
               <Home className="w-4 h-4 mr-2" />
@@ -235,8 +236,12 @@ export default function Dashboard() {
                 Org
               </TabsTrigger>
             )}
-            <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
+            <TabsTrigger value="seasonal" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-seasonal">
               <Trophy className="w-4 h-4 mr-2" />
+              Seasonal
+            </TabsTrigger>
+            <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
+              <Star className="w-4 h-4 mr-2" />
               Leaders
             </TabsTrigger>
           </TabsList>
@@ -302,6 +307,10 @@ export default function Dashboard() {
               )}
             </TabsContent>
           )}
+
+          <TabsContent value="seasonal" className="space-y-4">
+            <SeasonalCompetitions />
+          </TabsContent>
 
           <TabsContent value="leaderboard" className="space-y-4">
             <GlobalLeaderboard />

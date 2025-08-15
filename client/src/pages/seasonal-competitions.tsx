@@ -85,22 +85,10 @@ export default function SeasonalCompetitions() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full mb-4">
-            <Trophy className="w-8 h-8 text-white" />
-          </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Seasonal Competitions</h1>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            Join special competitions during Islamic seasons and earn exclusive rewards and achievements
-          </p>
-        </div>
-
-        {/* Competitions Grid */}
-        {competitions?.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="space-y-4">
+      {/* Competitions Grid */}
+      {competitions?.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4">
             {competitions.map((competition: SeasonalCompetition) => (
               <Card key={competition.id} className="group hover:shadow-lg transition-shadow duration-200">
                 <CardHeader className="pb-4">
@@ -179,17 +167,17 @@ export default function SeasonalCompetitions() {
               </Card>
             ))}
           </div>
-        ) : (
-          <div className="text-center py-16">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
-              <Clock className="w-8 h-8 text-gray-400" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No Active Competitions</h3>
-            <p className="text-gray-600">
-              Stay tuned for upcoming seasonal competitions during special Islamic occasions.
-            </p>
+      ) : (
+        <div className="text-center py-12">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-gray-100 rounded-full mb-4">
+            <Clock className="w-6 h-6 text-gray-400" />
           </div>
-        )}
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Active Competitions</h3>
+          <p className="text-gray-600 text-sm">
+            Stay tuned for upcoming seasonal competitions during special Islamic occasions.
+          </p>
+        </div>
+      )}
 
         {/* Competition Detail Modal */}
         {selectedCompetition && (
@@ -280,7 +268,6 @@ export default function SeasonalCompetitions() {
             </Card>
           </div>
         )}
-      </div>
     </div>
   );
 }
