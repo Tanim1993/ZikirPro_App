@@ -47,6 +47,14 @@ export const users = pgTable("users", {
   // Organization level settings
   allowJoinLowerLevels: boolean("allow_join_lower_levels").default(true),
   verified: boolean("verified").default(false), // verified organization status
+  // Gamification fields
+  spiritualPoints: integer("spiritual_points").default(0),
+  zikirCoins: integer("zikir_coins").default(0),
+  dailyBlessingPoints: integer("daily_blessing_points").default(0),
+  userLevel: integer("user_level").default(1),
+  roomCreationLimit: integer("room_creation_limit").default(1),
+  lastDailyReward: timestamp("last_daily_reward"),
+  totalRoomsCreated: integer("total_rooms_created").default(0),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -567,3 +575,164 @@ export interface PromotionRule {
   toLevel: number;
   anyOf: PromotionCondition[];
 }
+
+// ===== GAMIFICATION SYSTEM TABLES =====
+
+// Level Configuration (1-50 levels)
+export const levelConfiguration = pgTable("level_configuration", {
+  level: integer("level").primaryKey(),
+  titleEn: varchar("title_en", { length: 100 }),
+  titleAr: varchar("title_ar", { length: 100 }),
+  pointsRequired: integer("points_required").notNull(),
+  roomCreationLimit: integer("room_creation_limit").default(1),
+  coinMultiplier: integer("coin_multiplier").default(100), // stored as integer (100 = 1.0x)
+  specialFeatures: text("special_features").array(),
+  unlockMessage: text("unlock_message"),
+  levelImageUrl: varchar("level_image_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Currency Configuration
+export const currencyConfiguration = pgTable("currency_configuration", {
+  id: serial("id").primaryKey(),
+  activityType: varchar("activity_type", { length: 100 }).notNull(),
+  basePoints: integer("base_points").default(0),
+  multiplier: integer("multiplier").default(100), // stored as integer (100 = 1.0x)
+  levelRequirement: integer("level_requirement").default(1),
+  seasonalBonus: integer("seasonal_bonus").default(100), // stored as integer (100 = 1.0x)
+  isActive: boolean("is_active").default(true),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Badge Configuration
+export const badgeConfiguration = pgTable("badge_configuration", {
+  id: serial("id").primaryKey(),
+  badgeId: varchar("badge_id", { length: 100 }).unique().notNull(),
+  nameEn: varchar("name_en", { length: 200 }).notNull(),
+  nameAr: varchar("name_ar", { length: 200 }),
+  description: text("description"),
+  category: varchar("category", { length: 100 }).notNull(), // zikir, practice, community, seasonal
+  criteriaType: varchar("criteria_type", { length: 100 }).notNull(),
+  targetValue: integer("target_value").notNull(),
+  pointsReward: integer("points_reward").default(0),
+  coinsReward: integer("coins_reward").default(0),
+  badgeImageUrl: varchar("badge_image_url"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Badges (earned badges)
+export const userBadges = pgTable("user_badges", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  badgeId: varchar("badge_id").notNull(),
+  earnedAt: timestamp("earned_at").defaultNow(),
+});
+
+// Daily Quest Configuration
+export const questConfiguration = pgTable("quest_configuration", {
+  id: serial("id").primaryKey(),
+  questId: varchar("quest_id", { length: 100 }).unique().notNull(),
+  nameEn: varchar("name_en", { length: 200 }).notNull(),
+  nameAr: varchar("name_ar", { length: 200 }),
+  description: text("description"),
+  questType: varchar("quest_type", { length: 100 }).notNull(), // zikir, practice, community, time
+  targetValue: integer("target_value").notNull(),
+  timeLimit: varchar("time_limit", { length: 50 }), // all_day, before_10am, after_maghrib, custom
+  pointsReward: integer("points_reward").default(0),
+  bonusMultiplier: integer("bonus_multiplier").default(100),
+  minLevel: integer("min_level").default(1),
+  maxLevel: integer("max_level").default(50),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Daily Quest Progress
+export const userQuestProgress = pgTable("user_quest_progress", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  questId: varchar("quest_id").notNull(),
+  currentProgress: integer("current_progress").default(0),
+  targetValue: integer("target_value").notNull(),
+  isCompleted: boolean("is_completed").default(false),
+  completedAt: timestamp("completed_at"),
+  questDate: timestamp("quest_date").defaultNow(),
+});
+
+// Islamic Practice Configuration
+export const islamicPracticeConfiguration = pgTable("islamic_practice_configuration", {
+  id: serial("id").primaryKey(),
+  practiceId: varchar("practice_id", { length: 100 }).unique().notNull(),
+  nameEn: varchar("name_en", { length: 200 }).notNull(),
+  nameAr: varchar("name_ar", { length: 200 }),
+  description: text("description"),
+  recommendedTime: varchar("recommended_time", { length: 100 }), // any_time, after_fajr, friday_only, night_time
+  pointsReward: integer("points_reward").default(0),
+  streakBonus: integer("streak_bonus").default(0), // bonus points per consecutive day
+  verificationType: varchar("verification_type", { length: 100 }).default("self_confirmation"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User Islamic Practice Tracking
+export const userIslamicPractices = pgTable("user_islamic_practices", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  practiceId: varchar("practice_id").notNull(),
+  completedAt: timestamp("completed_at").defaultNow(),
+  practiceDate: timestamp("practice_date").defaultNow(),
+  currentStreak: integer("current_streak").default(1),
+  longestStreak: integer("longest_streak").default(1),
+  totalCompletions: integer("total_completions").default(1),
+});
+
+// User Room Purchases (room expansions, etc.)
+export const userRoomPurchases = pgTable("user_room_purchases", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(),
+  itemType: varchar("item_type", { length: 100 }).notNull(), // room_slot, room_package
+  itemId: varchar("item_id", { length: 100 }).notNull(),
+  costUsd: integer("cost_usd").notNull(), // stored in cents
+  purchasedAt: timestamp("purchased_at").defaultNow(),
+  isActive: boolean("is_active").default(true),
+});
+
+// Room Economy Configuration
+export const roomEconomyConfig = pgTable("room_economy_config", {
+  id: serial("id").primaryKey(),
+  levelMin: integer("level_min").notNull(),
+  levelMax: integer("level_max").notNull(),
+  freeRooms: integer("free_rooms").default(1),
+  additionalSlotPrice: integer("additional_slot_price").default(299), // in cents
+  maxPurchasable: integer("max_purchasable").default(5),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Gamification Types
+export type LevelConfiguration = typeof levelConfiguration.$inferSelect;
+export type InsertLevelConfiguration = typeof levelConfiguration.$inferInsert;
+
+export type CurrencyConfiguration = typeof currencyConfiguration.$inferSelect;
+export type InsertCurrencyConfiguration = typeof currencyConfiguration.$inferInsert;
+
+export type BadgeConfiguration = typeof badgeConfiguration.$inferSelect;
+export type InsertBadgeConfiguration = typeof badgeConfiguration.$inferInsert;
+
+export type UserBadge = typeof userBadges.$inferSelect;
+export type InsertUserBadge = typeof userBadges.$inferInsert;
+
+export type QuestConfiguration = typeof questConfiguration.$inferSelect;
+export type InsertQuestConfiguration = typeof questConfiguration.$inferInsert;
+
+export type UserQuestProgress = typeof userQuestProgress.$inferSelect;
+export type InsertUserQuestProgress = typeof userQuestProgress.$inferInsert;
+
+export type IslamicPracticeConfiguration = typeof islamicPracticeConfiguration.$inferSelect;
+export type InsertIslamicPracticeConfiguration = typeof islamicPracticeConfiguration.$inferInsert;
+
+export type UserIslamicPractice = typeof userIslamicPractices.$inferSelect;
+export type InsertUserIslamicPractice = typeof userIslamicPractices.$inferInsert;

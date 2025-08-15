@@ -1384,7 +1384,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const users = await db.execute(sql`
         SELECT 
           u.id, u.username, u.email, u.user_type,
-          u.created_at, u.last_login_at,
+          u.created_at, u.spiritual_points, u.zikir_coins, u.user_level,
           COALESCE(ua.total_zikir, 0) as total_zikir
         FROM users u
         LEFT JOIN user_analytics ua ON u.id = ua.user_id
@@ -1751,6 +1751,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
   } catch (error) {
     console.log("Note: Seasonal data seeding skipped - tables may not exist yet. Run 'npm run db:push' first.");
   }
+
+  // ===== GAMIFICATION BO ENDPOINTS =====
+
+  // Get all level configurations
+  app.get('/api/admin/levels', isAppFounder, async (req, res) => {
+    try {
+      const levels = await db.execute(sql`
+        SELECT * FROM level_configuration ORDER BY level ASC
+      `);
+      res.json(levels.rows || []);
+    } catch (error) {
+      console.error('Error fetching levels:', error);
+      res.status(500).json({ error: 'Failed to fetch levels' });
+    }
+  });
+
+  // Update level configuration
+  app.put('/api/admin/levels/:level', isAppFounder, async (req, res) => {
+    try {
+      const level = parseInt(req.params.level);
+      const { titleEn, titleAr, pointsRequired, roomCreationLimit, coinMultiplier, unlockMessage } = req.body;
+      
+      const result = await db.execute(sql`
+        UPDATE level_configuration 
+        SET 
+          title_en = ${titleEn},
+          title_ar = ${titleAr},
+          points_required = ${pointsRequired},
+          room_creation_limit = ${roomCreationLimit},
+          coin_multiplier = ${coinMultiplier},
+          unlock_message = ${unlockMessage},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE level = ${level}
+        RETURNING *
+      `);
+      
+      res.json(result.rows?.[0] || {});
+    } catch (error) {
+      console.error('Error updating level:', error);
+      res.status(500).json({ error: 'Failed to update level' });
+    }
+  });
+
+  // Get currency configurations
+  app.get('/api/admin/currency', isAppFounder, async (req, res) => {
+    try {
+      const configs = await db.execute(sql`
+        SELECT * FROM currency_configuration ORDER BY activity_type ASC
+      `);
+      res.json(configs.rows || []);
+    } catch (error) {
+      console.error('Error fetching currency configs:', error);
+      res.status(500).json({ error: 'Failed to fetch currency configurations' });
+    }
+  });
 
   return httpServer;
 }

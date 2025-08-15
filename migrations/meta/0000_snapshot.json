@@ -1,0 +1,2599 @@
+{
+  "id": "6077acc4-5d5d-4907-a53f-57a9216576fb",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.achievement_badges": {
+      "name": "achievement_badges",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "badge_type": {
+          "name": "badge_type",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "icon_name": {
+          "name": "icon_name",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "icon_color": {
+          "name": "icon_color",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'#4a90e2'"
+        },
+        "background_color": {
+          "name": "background_color",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'#f0f7ff'"
+        },
+        "conditions": {
+          "name": "conditions",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "rarity": {
+          "name": "rarity",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'common'"
+        },
+        "points": {
+          "name": "points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 10
+        },
+        "seasonal_only": {
+          "name": "seasonal_only",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "available_season": {
+          "name": "available_season",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.badge_configuration": {
+      "name": "badge_configuration",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "badge_id": {
+          "name": "badge_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_ar": {
+          "name": "name_ar",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "criteria_type": {
+          "name": "criteria_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_value": {
+          "name": "target_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "points_reward": {
+          "name": "points_reward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "coins_reward": {
+          "name": "coins_reward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "badge_image_url": {
+          "name": "badge_image_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "badge_configuration_badge_id_unique": {
+          "name": "badge_configuration_badge_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "badge_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competition_results": {
+      "name": "competition_results",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "comp_id": {
+          "name": "comp_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level_at_entry": {
+          "name": "level_at_entry",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "final_count": {
+          "name": "final_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "placed_at": {
+          "name": "placed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.competition_stats": {
+      "name": "competition_stats",
+      "schema": "",
+      "columns": {
+        "comp_id": {
+          "name": "comp_id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "total_participants": {
+          "name": "total_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "joined_today": {
+          "name": "joined_today",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "active_participants": {
+          "name": "active_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.count_entries": {
+      "name": "count_entries",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "day": {
+          "name": "day",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "count": {
+          "name": "count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.currency_configuration": {
+      "name": "currency_configuration",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "activity_type": {
+          "name": "activity_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "base_points": {
+          "name": "base_points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "multiplier": {
+          "name": "multiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "level_requirement": {
+          "name": "level_requirement",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "seasonal_bonus": {
+          "name": "seasonal_bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.islamic_practice_configuration": {
+      "name": "islamic_practice_configuration",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "practice_id": {
+          "name": "practice_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_ar": {
+          "name": "name_ar",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recommended_time": {
+          "name": "recommended_time",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_reward": {
+          "name": "points_reward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "streak_bonus": {
+          "name": "streak_bonus",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "verification_type": {
+          "name": "verification_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'self_confirmation'"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "islamic_practice_configuration_practice_id_unique": {
+          "name": "islamic_practice_configuration_practice_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "practice_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.level_configuration": {
+      "name": "level_configuration",
+      "schema": "",
+      "columns": {
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "title_en": {
+          "name": "title_en",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title_ar": {
+          "name": "title_ar",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_required": {
+          "name": "points_required",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "room_creation_limit": {
+          "name": "room_creation_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "coin_multiplier": {
+          "name": "coin_multiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "special_features": {
+          "name": "special_features",
+          "type": "text[]",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unlock_message": {
+          "name": "unlock_message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level_image_url": {
+          "name": "level_image_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.live_counters": {
+      "name": "live_counters",
+      "schema": "",
+      "columns": {
+        "room_id": {
+          "name": "room_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_count": {
+          "name": "current_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "today_count": {
+          "name": "today_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_count": {
+          "name": "total_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "last_count_at": {
+          "name": "last_count_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "live_counters_room_id_user_id_pk": {
+          "name": "live_counters_room_id_user_id_pk",
+          "columns": [
+            "room_id",
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.org_level_schemas": {
+      "name": "org_level_schemas",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "levels": {
+          "name": "levels",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "promotion_rules": {
+          "name": "promotion_rules",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.participations": {
+      "name": "participations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "comp_id": {
+          "name": "comp_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'view_only'"
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "accepted_rules_at": {
+          "name": "accepted_rules_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level_at_entry": {
+          "name": "level_at_entry",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.quest_configuration": {
+      "name": "quest_configuration",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "quest_id": {
+          "name": "quest_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_ar": {
+          "name": "name_ar",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quest_type": {
+          "name": "quest_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_value": {
+          "name": "target_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "time_limit": {
+          "name": "time_limit",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "points_reward": {
+          "name": "points_reward",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "bonus_multiplier": {
+          "name": "bonus_multiplier",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 100
+        },
+        "min_level": {
+          "name": "min_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "max_level": {
+          "name": "max_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 50
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "quest_configuration_quest_id_unique": {
+          "name": "quest_configuration_quest_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "quest_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.reports": {
+      "name": "reports",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "kind": {
+          "name": "kind",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_id": {
+          "name": "target_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "by_user_id": {
+          "name": "by_user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "details": {
+          "name": "details",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "admin_notes": {
+          "name": "admin_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.room_economy_config": {
+      "name": "room_economy_config",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "level_min": {
+          "name": "level_min",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level_max": {
+          "name": "level_max",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "free_rooms": {
+          "name": "free_rooms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "additional_slot_price": {
+          "name": "additional_slot_price",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 299
+        },
+        "max_purchasable": {
+          "name": "max_purchasable",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 5
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.room_members": {
+      "name": "room_members",
+      "schema": "",
+      "columns": {
+        "room_id": {
+          "name": "room_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'member'"
+        },
+        "joined_at": {
+          "name": "joined_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "room_members_room_id_user_id_pk": {
+          "name": "room_members_room_id_user_id_pk",
+          "columns": [
+            "room_id",
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.rooms": {
+      "name": "rooms",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "zikir_id": {
+          "name": "zikir_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "target_count": {
+          "name": "target_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unlimited": {
+          "name": "unlimited",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "duration": {
+          "name": "duration",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_public": {
+          "name": "is_public",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "picture_url": {
+          "name": "picture_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "prize_description": {
+          "name": "prize_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "competition_type": {
+          "name": "competition_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'regular'"
+        },
+        "competition_start_date": {
+          "name": "competition_start_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "competition_end_date": {
+          "name": "competition_end_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "max_participants": {
+          "name": "max_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "level_required": {
+          "name": "level_required",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.seasonal_competition_participants": {
+      "name": "seasonal_competition_participants",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "competition_id": {
+          "name": "competition_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registered_at": {
+          "name": "registered_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "total_count": {
+          "name": "total_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "last_count_at": {
+          "name": "last_count_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "rank": {
+          "name": "rank",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "badges_earned": {
+          "name": "badges_earned",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.seasonal_competitions": {
+      "name": "seasonal_competitions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "season": {
+          "name": "season",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "season_year": {
+          "name": "season_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "zikir_id": {
+          "name": "zikir_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "target_count": {
+          "name": "target_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unlimited": {
+          "name": "unlimited",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "prize_description": {
+          "name": "prize_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registration_start_date": {
+          "name": "registration_start_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "registration_end_date": {
+          "name": "registration_end_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "max_participants": {
+          "name": "max_participants",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "is_global": {
+          "name": "is_global",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "special_rewards": {
+          "name": "special_rewards",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "background_image": {
+          "name": "background_image",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "theme_color": {
+          "name": "theme_color",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'#4a90e2'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sessions": {
+      "name": "sessions",
+      "schema": "",
+      "columns": {
+        "sid": {
+          "name": "sid",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "sess": {
+          "name": "sess",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expire": {
+          "name": "expire",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "IDX_session_expire": {
+          "name": "IDX_session_expire",
+          "columns": [
+            {
+              "expression": "expire",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.tasbih_skins": {
+      "name": "tasbih_skins",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "rarity": {
+          "name": "rarity",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "price_coins": {
+          "name": "price_coins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "preview_url": {
+          "name": "preview_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "thumb_url": {
+          "name": "thumb_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "animation_type": {
+          "name": "animation_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_achievement_badges": {
+      "name": "user_achievement_badges",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "badge_id": {
+          "name": "badge_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "earned_at": {
+          "name": "earned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "season_earned": {
+          "name": "season_earned",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "season_year": {
+          "name": "season_year",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "related_competition_id": {
+          "name": "related_competition_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_analytics": {
+      "name": "user_analytics",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "current_streak": {
+          "name": "current_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "longest_streak": {
+          "name": "longest_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_zikir": {
+          "name": "total_zikir",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "completed_rooms": {
+          "name": "completed_rooms",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "last_active_date": {
+          "name": "last_active_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_badges": {
+      "name": "user_badges",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "badge_id": {
+          "name": "badge_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "earned_at": {
+          "name": "earned_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_inventory": {
+      "name": "user_inventory",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tasbih_skin_id": {
+          "name": "tasbih_skin_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "purchased_at": {
+          "name": "purchased_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_islamic_practices": {
+      "name": "user_islamic_practices",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "practice_id": {
+          "name": "practice_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "practice_date": {
+          "name": "practice_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "current_streak": {
+          "name": "current_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "longest_streak": {
+          "name": "longest_streak",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "total_completions": {
+          "name": "total_completions",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_org_profiles": {
+      "name": "user_org_profiles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "stats": {
+          "name": "stats",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'{\"wins\":0,\"podiums\":0,\"top10\":0,\"comps\":0}'"
+        },
+        "history": {
+          "name": "history",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_promotion_counters": {
+      "name": "user_promotion_counters",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "org_id": {
+          "name": "org_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "level": {
+          "name": "level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "top3": {
+          "name": "top3",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "top5": {
+          "name": "top5",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "top10": {
+          "name": "top10",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "total_comps": {
+          "name": "total_comps",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_purchases": {
+      "name": "user_purchases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sku": {
+          "name": "sku",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "coins_delta": {
+          "name": "coins_delta",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount_currency": {
+          "name": "amount_currency",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount_cents": {
+          "name": "amount_cents",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_quest_progress": {
+      "name": "user_quest_progress",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quest_id": {
+          "name": "quest_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "current_progress": {
+          "name": "current_progress",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "target_value": {
+          "name": "target_value",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_completed": {
+          "name": "is_completed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "quest_date": {
+          "name": "quest_date",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_room_configs": {
+      "name": "user_room_configs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "room_id": {
+          "name": "room_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "equipped_tasbih_skin_id": {
+          "name": "equipped_tasbih_skin_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_room_purchases": {
+      "name": "user_room_purchases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_type": {
+          "name": "item_type",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "item_id": {
+          "name": "item_id",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cost_usd": {
+          "name": "cost_usd",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "purchased_at": {
+          "name": "purchased_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.user_wallets": {
+      "name": "user_wallets",
+      "schema": "",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "coins": {
+          "name": "coins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "username": {
+          "name": "username",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "password": {
+          "name": "password",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profile_image_url": {
+          "name": "profile_image_url",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "country": {
+          "name": "country",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'Bangladesh'"
+        },
+        "avatar_type": {
+          "name": "avatar_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'male-1'"
+        },
+        "bg_color": {
+          "name": "bg_color",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'green'"
+        },
+        "signup_method": {
+          "name": "signup_method",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'username'"
+        },
+        "is_verified": {
+          "name": "is_verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "user_type": {
+          "name": "user_type",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'regular'"
+        },
+        "organization_name": {
+          "name": "organization_name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organization_logo": {
+          "name": "organization_logo",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "organization_description": {
+          "name": "organization_description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "allow_join_lower_levels": {
+          "name": "allow_join_lower_levels",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": true
+        },
+        "verified": {
+          "name": "verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "spiritual_points": {
+          "name": "spiritual_points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "zikir_coins": {
+          "name": "zikir_coins",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "daily_blessing_points": {
+          "name": "daily_blessing_points",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "user_level": {
+          "name": "user_level",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "room_creation_limit": {
+          "name": "room_creation_limit",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 1
+        },
+        "last_daily_reward": {
+          "name": "last_daily_reward",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "total_rooms_created": {
+          "name": "total_rooms_created",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "users_username_unique": {
+          "name": "users_username_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "username"
+          ]
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "email"
+          ]
+        },
+        "users_phone_unique": {
+          "name": "users_phone_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "phone"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.zikirs": {
+      "name": "zikirs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "arabic_text": {
+          "name": "arabic_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "transliteration": {
+          "name": "transliteration",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "translation": {
+          "name": "translation",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fazilat": {
+          "name": "fazilat",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "references": {
+          "name": "references",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}
