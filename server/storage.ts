@@ -1078,24 +1078,24 @@ export class DatabaseStorage implements IStorage {
     return result.rows || [];
   }
 
-  async getActiveSeasonalCompetitions(): Promise<SeasonalCompetition[]> {
-    const now = new Date();
-    return await db.select().from(seasonalCompetitions)
-      .where(and(
-        eq(seasonalCompetitions.isActive, true),
-        lte(seasonalCompetitions.startDate, now),
-        gte(seasonalCompetitions.endDate, now)
-      ))
-      .orderBy(asc(seasonalCompetitions.endDate));
+  async getActiveSeasonalCompetitions(): Promise<any[]> {
+    const result = await db.execute(sql`
+      SELECT * FROM seasonal_competitions 
+      WHERE is_active = true 
+      AND start_date <= NOW() 
+      AND end_date >= NOW()
+      ORDER BY end_date ASC
+    `);
+    return result.rows || [];
   }
 
-  async getSeasonalCompetitionBySeason(season: string, year: number): Promise<SeasonalCompetition | undefined> {
-    const [competition] = await db.select().from(seasonalCompetitions)
-      .where(and(
-        eq(seasonalCompetitions.season, season),
-        eq(seasonalCompetitions.seasonYear, year)
-      ));
-    return competition;
+  async getSeasonalCompetitionBySeason(season: string, year: number): Promise<any> {
+    const result = await db.execute(sql`
+      SELECT * FROM seasonal_competitions 
+      WHERE season = ${season} AND season_year = ${year}
+      LIMIT 1
+    `);
+    return result.rows?.[0];
   }
 
   async updateSeasonalCompetition(id: number, updates: Partial<SeasonalCompetition>): Promise<SeasonalCompetition> {
