@@ -11,11 +11,12 @@ import SeasonalCompetitions from "@/pages/seasonal-competitions";
 import { GamificationTopBar } from "@/components/gamification-top-bar";
 import { AchievementNotification } from "@/components/achievement-notification";
 import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
+import { FloatingTasbihButton } from "@/components/FloatingTasbihButton";
 import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar, Settings2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -23,6 +24,7 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
+  const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
   
   // All custom hooks immediately after useState
   const { user } = useAuth();
@@ -47,7 +49,8 @@ export default function Dashboard() {
     refetchInterval: 10000, // Refresh every 10 seconds
   });
 
-  const { gamificationData } = useGamification();
+  // Get gamification data from separate query since it's not in the hook
+  const { data: gamificationData } = useQuery({ queryKey: ["/api/user/gamification"] });
 
   // Calculate total rooms count
   const totalRoomsCount = (userRooms as any[])?.length || 0;
@@ -188,6 +191,24 @@ export default function Dashboard() {
     <div className="min-h-screen bg-white">
       {/* Ludo Star Style Gamification Top Bar */}
       <GamificationTopBar />
+      
+      {/* Floating Tasbih Toggle Button */}
+      <div className="fixed top-4 right-4 z-40">
+        <Button
+          onClick={() => setShowFloatingTasbih(!showFloatingTasbih)}
+          size="sm"
+          variant={showFloatingTasbih ? "default" : "outline"}
+          className={cn(
+            "h-10 w-10 p-0 rounded-full shadow-lg transition-all duration-200",
+            showFloatingTasbih 
+              ? "bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white" 
+              : "bg-white hover:bg-gray-50 text-gray-600 border-gray-200"
+          )}
+          data-testid="button-toggle-floating-tasbih"
+        >
+          <Settings2 className="w-4 h-4" />
+        </Button>
+      </div>
 
       {/* Achievement Notifications */}
       <AchievementNotification 
@@ -205,7 +226,7 @@ export default function Dashboard() {
                 <Star className="w-4 h-4" />
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold">{userAnalytics?.totalZikir?.toLocaleString() || 0}</div>
+                <div className="text-lg font-bold">{parseInt((userAnalytics as any)?.totalZikir) || 0}</div>
                 <div className="text-xs opacity-90">Total Zikir</div>
               </div>
             </div>
@@ -216,7 +237,7 @@ export default function Dashboard() {
                 <Calculator className="w-4 h-4" />
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold">{gamificationData?.barakahCoins || 0}</div>
+                <div className="text-lg font-bold">{(gamificationData as any)?.barakahCoins || 0}</div>
                 <div className="text-xs opacity-90">Coins</div>
               </div>
             </div>
@@ -238,7 +259,7 @@ export default function Dashboard() {
                 <Zap className="w-4 h-4" />
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold">{userAnalytics?.currentStreak || 0}</div>
+                <div className="text-lg font-bold">{(userAnalytics as any)?.currentStreak || 0}</div>
                 <div className="text-xs opacity-90">Day Streak</div>
               </div>
             </div>
@@ -454,7 +475,11 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-
+      {/* Floating Tasbih Button */}
+      <FloatingTasbihButton 
+        isVisible={showFloatingTasbih}
+        onClose={() => setShowFloatingTasbih(false)}
+      />
     </div>
   );
 }

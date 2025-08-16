@@ -55,6 +55,8 @@ export const users = pgTable("users", {
   roomCreationLimit: integer("room_creation_limit").default(1),
   lastDailyReward: timestamp("last_daily_reward"),
   totalRoomsCreated: integer("total_rooms_created").default(0),
+  // Floating Tasbih Settings
+  floatingTasbihEnabled: boolean("floating_tasbih_enabled").default(false),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
