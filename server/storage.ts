@@ -1249,12 +1249,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserBadgesByCategory(userId: string, category: string): Promise<UserAchievementBadge[]> {
-    return await db.select().from(userAchievementBadges)
+    const result = await db.select().from(userAchievementBadges)
       .leftJoin(achievementBadges, eq(userAchievementBadges.badgeId, achievementBadges.id))
       .where(and(
         eq(userAchievementBadges.userId, userId),
         eq(achievementBadges.category, category)
       ));
+    
+    // Transform joined result to match expected type
+    return result.map((row: any) => row.user_achievement_badges);
   }
 
   async checkUserBadgeEligibility(userId: string, badgeId: number): Promise<boolean> {

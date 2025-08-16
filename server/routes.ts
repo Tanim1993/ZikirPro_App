@@ -13,6 +13,7 @@ import { seedDatabase } from "./seedData";
 declare module 'express-session' {
   interface SessionData {
     user?: { id: string };
+    adminUser?: { id: string; role: string; username: string };
   }
 }
 
@@ -561,8 +562,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Check if user completed the competition (if not unlimited)
         if (!participation.unlimited && participation.target_count) {
-          const newTotal = (participation.total_count || 0) + incrementCount;
-          if (newTotal >= participation.target_count) {
+          const currentTotal = typeof participation.total_count === 'number' ? participation.total_count : 0;
+          const newTotal = currentTotal + incrementCount;
+          const targetCount = typeof participation.target_count === 'number' ? participation.target_count : 0;
+          if (newTotal >= targetCount) {
             console.log(`User ${userId} completed seasonal competition ${participation.competition_id}!`);
             // Here you could trigger completion notifications or badges
           }
@@ -1009,14 +1012,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const compId = parseInt(req.params.compId);
       const userId = "test001-user-id"; // Mock user ID
       
-      // Get competition details
-      const competition = await storage.getRoomById(compId);
+      // Get competition details from seasonal competitions
+      const competitions = await storage.getAllSeasonalCompetitions();
+      const competition = competitions.find((c: any) => c.id === compId);
       if (!competition) {
         return res.status(404).json({ message: 'Competition not found' });
       }
       
-      // Check eligibility
-      const eligibility = await storage.checkEligibility(userId, competition.createdBy, competition.levelRequired || 1);
+      // Check level eligibility (seasonal competitions don't have creators)
+      const user = await storage.getUser(userId);
+      const userLevel = user?.userLevel || 1;
+      const requiredLevel = 1; // Seasonal competitions are open to all levels
+      const eligibility = {
+        eligible: userLevel >= requiredLevel,
+        userLevel,
+        requiredLevel,
+        reason: userLevel < requiredLevel ? `Level ${requiredLevel} required` : undefined
+      };
       res.json(eligibility);
     } catch (error) {
       console.error('Error checking eligibility:', error);
@@ -1044,14 +1056,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const compId = parseInt(req.params.compId);
       const userId = "test001-user-id"; // Mock user ID
       
-      // Get competition details
-      const competition = await storage.getRoomById(compId);
+      // Get competition details from seasonal competitions
+      const competitions = await storage.getAllSeasonalCompetitions();
+      const competition = competitions.find((c: any) => c.id === compId);
       if (!competition) {
         return res.status(404).json({ message: 'Competition not found' });
       }
       
-      // Check eligibility
-      const eligibility = await storage.checkEligibility(userId, competition.createdBy, competition.levelRequired || 1);
+      // Check level eligibility (seasonal competitions don't have creators)
+      const user = await storage.getUser(userId);
+      const userLevel = user?.userLevel || 1;
+      const requiredLevel = 1; // Seasonal competitions are open to all levels
+      const eligibility = {
+        eligible: userLevel >= requiredLevel,
+        userLevel,
+        requiredLevel,
+        reason: userLevel < requiredLevel ? `Level ${requiredLevel} required` : undefined
+      };
       if (!eligibility.eligible) {
         return res.status(403).json({ 
           message: eligibility.reason || 'Not eligible to join this competition',
@@ -1389,7 +1410,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const newLevel = levelResult.rows[0];
       let leveledUp = false;
       
-      if (newLevel && newLevel.level > (user?.userLevel || 1)) {
+      if (newLevel && (newLevel as any).level > (user?.userLevel || 1)) {
         await db.execute(sql`
           UPDATE users 
           SET user_level = ${newLevel.level}

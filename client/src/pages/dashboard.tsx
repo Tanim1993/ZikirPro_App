@@ -118,7 +118,7 @@ export default function Dashboard() {
     );
   }
 
-  const RoomCard = ({ room, isOwner = false, isPublic = false }: { room: any, isOwner?: boolean, isPublic?: boolean }) => (
+  const RoomCard = ({ room, isOwner = false, isPublic = false, isOrganization = false }: { room: any, isOwner?: boolean, isPublic?: boolean, isOrganization?: boolean }) => (
     <Card className="mb-3 islamic-card-subtle shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]">
       <CardContent className="p-4">
         <div className="flex justify-between items-start mb-3">
@@ -214,14 +214,14 @@ export default function Dashboard() {
               </Button>
               
               {/* Admin Gamification Button - Only for admin users */}
-              {user && ((user as any)?.userType === 'admin' || (user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
+              {user && ((user as any)?.userType === 'admin' || (user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') ? (
                 <Link href="/admin-gamification">
                   <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm px-3 py-2 text-sm font-medium rounded-lg" data-testid="button-admin-gamification">
                     <div className="text-sm mr-1">🎮</div>
                     Admin
                   </Button>
                 </Link>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
