@@ -20,6 +20,7 @@ import TasbihGallery from "@/components/tasbih-gallery";
 import { ReportRoomModal } from "@/components/report-room-modal";
 import { DeleteRoomModal } from "@/components/delete-room-modal";
 import { VoiceRecognitionButton } from "@/components/VoiceRecognitionButton";
+import { FloatingTasbih } from "@/components/floating-tasbih";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function Room() {
@@ -44,6 +45,7 @@ export default function Room() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
 
   const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: [`/api/rooms/${roomId}`],
@@ -370,48 +372,26 @@ export default function Room() {
           </CardContent>
         </Card>
 
-        {/* Tasbih Type Selector with Premium Gallery */}
-        <Card className="mb-6">
+        {/* Tasbih Type Selection */}
+        <Card className="mb-4">
           <CardContent className="p-4">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3">
               <div>
-                <h3 className="font-semibold">Tasbih Type: Classic Wood</h3>
+                <h3 className="font-semibold">Tasbih Type: <span className="text-blue-600">Classic Wood</span></h3>
                 <p className="text-sm text-gray-600">Cosmetic only - no pay-to-win</p>
               </div>
-              <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" size="sm" className="flex items-center gap-2">
-                    <Settings className="w-4 h-4" />
-                    Change Tasbih
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md max-h-[80vh] overflow-hidden flex flex-col">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <span>Premium Tasbih Gallery</span>
-                      <Badge variant="secondary" className="bg-green-100 text-green-800">
-                        Halal
-                      </Badge>
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="flex-1 overflow-y-auto">
-                    <TasbihGallery 
-                      roomId={roomId}
-                      currentTasbihId="classic_wood"
-                      onTasbihChange={(tasbihId: string) => {
-                        toast({
-                          title: "Tasbih Updated",
-                          description: "Your tasbih has been equipped for this room",
-                        });
-                      }}
-                    />
-                  </div>
-                </DialogContent>
-              </Dialog>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFloatingTasbih(true)}
+                className="flex items-center gap-2 bg-green-50 hover:bg-green-100 border-green-200"
+              >
+                📿 Floating Tasbih
+              </Button>
             </div>
             <Select value={tasbihType} onValueChange={(value: any) => setTasbihType(value)}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select tasbih type" />
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Change Tasbih" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="digital">📱 Digital Tasbih</SelectItem>
@@ -662,6 +642,12 @@ export default function Room() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Floating Tasbih */}
+      <FloatingTasbih 
+        isOpen={showFloatingTasbih}
+        onClose={() => setShowFloatingTasbih(false)}
+      />
     </div>
   );
 }
