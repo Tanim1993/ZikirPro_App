@@ -142,17 +142,17 @@ export default function Dashboard() {
           </div>
         </div>
         
-        <div className="grid grid-cols-3 gap-3 mb-4 text-center">
-          <div className="bg-islamic-gradient-sky rounded-xl p-3 text-white shadow-lg">
-            <div className="text-lg font-bold drop-shadow">{room.memberCount || 0}</div>
+        <div className="grid grid-cols-3 gap-2 mb-3 text-center">
+          <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-2.5 text-white shadow-md">
+            <div className="text-lg font-bold">{room.memberCount || 0}</div>
             <div className="text-xs opacity-90">Members</div>
           </div>
-          <div className="bg-islamic-gradient-deep rounded-xl p-3 text-white shadow-lg">
-            <div className="text-lg font-bold drop-shadow">{room.totalCount || 0}</div>
+          <div className="bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg p-2.5 text-white shadow-md">
+            <div className="text-lg font-bold">{room.totalCount || 0}</div>
             <div className="text-xs opacity-90">Total Count</div>
           </div>
-          <div className="bg-islamic-gradient-gold rounded-xl p-3 text-white shadow-lg">
-            <div className="text-lg font-bold drop-shadow">{formatDuration(room.duration)}</div>
+          <div className="bg-green-500 rounded-lg p-2.5 text-white shadow-md">
+            <div className="text-sm font-bold">{formatDuration(room.duration)}</div>
             <div className="text-xs opacity-90">Duration</div>
           </div>
         </div>
@@ -163,14 +163,14 @@ export default function Dashboard() {
               setSelectedRoom(room);
               setShowJoinConfirm(true);
             }}
-            className="w-full bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
+            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white py-2 text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all"
             data-testid="button-tap-to-join"
           >
-            Tap to Join Room
+            Join Room
           </Button>
         ) : (
           <Link href={`/room/${room.id}`}>
-            <Button className="w-full bg-islamic-gradient text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105" data-testid="button-enter-room">
+            <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-2 text-sm font-medium rounded-lg shadow-md hover:shadow-lg transition-all" data-testid="button-enter-room">
               {isOwner ? 'Manage Room' : 'Enter Room'}
             </Button>
           </Link>
