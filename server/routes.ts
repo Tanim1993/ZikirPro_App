@@ -1265,7 +1265,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/gamification", async (req, res) => {
     try {
       // Get authenticated user from session
-      const userId = (req.session as any)?.user?.id || "user-3"; // Fallback to user-3 for testing
+      const userId = (req.session as any)?.user?.id || "7af312ca-90e5-428b-acac-a36a954fa081"; // Fallback to test001 user
       
       // Get user from database
       const user = await storage.getUser(userId);
