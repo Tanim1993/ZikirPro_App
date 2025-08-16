@@ -104,9 +104,16 @@ export default function Room() {
       return { previousCount };
     },
     onError: (error, variables, context) => {
-      // Rollback on error
+      // Smart rollback - prevent negative visual changes that caused embarrassing bug
       if (context?.previousCount !== undefined) {
-        queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], context.previousCount);
+        const currentCount = queryClient.getQueryData([`/api/rooms/${roomId}/user-count`]) as number || 0;
+        // Only rollback if it doesn't create a "minus" visual effect
+        if (context.previousCount <= currentCount) {
+          queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], context.previousCount);
+        } else {
+          // If rollback would increase count (weird scenario), just subtract 1 instead
+          queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], Math.max(0, currentCount - 1));
+        }
       }
       
       if (isUnauthorizedError(error)) {
@@ -119,8 +126,8 @@ export default function Room() {
         return;
       }
       toast({
-        title: "Count Failed",
-        description: "Please try again",
+        title: "Voice Count Failed ❌",
+        description: "Network issue - count not saved. Please try manual count or try again.",
         variant: "destructive",
       });
     },
@@ -421,7 +428,8 @@ export default function Room() {
             <div className="flex flex-col items-center space-y-3">
               <div className="text-sm text-gray-600 text-center">
                 <span className="font-medium">Voice Recognition</span>
-                <p className="text-xs mt-1">Say "{room?.zikirName}" to count automatically</p>
+                <p className="text-xs mt-1">🎤 Say "{room?.zikirName}" clearly to count automatically</p>
+                <p className="text-xs text-gray-500 mt-1">Requires stable internet connection</p>
               </div>
               <VoiceRecognitionButton
                 targetPhrase={room?.zikirName || "Allahu Akbar"}

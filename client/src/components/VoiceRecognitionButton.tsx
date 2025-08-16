@@ -30,13 +30,13 @@ export function VoiceRecognitionButton({
     targetPhrase,
     onPhraseDetected: () => {
       onPhraseDetected();
-      showFeedback('correct', 'Phrase detected!');
+      showFeedback('correct', '✅ Voice Count Success!');
     },
     onFeedback: (type, detectedText) => {
       if (type === 'wrong') {
-        showFeedback('wrong', `Wrong phrase: "${detectedText}"`);
+        showFeedback('wrong', `❌ Wrong phrase: "${detectedText}"`);
       } else if (type === 'unclear') {
-        showFeedback('unclear', `Unclear: "${detectedText}"`);
+        showFeedback('unclear', `❓ Unclear speech: "${detectedText}"`);
       }
     }
   });
