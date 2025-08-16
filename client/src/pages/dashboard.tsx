@@ -36,22 +36,29 @@ export default function Dashboard() {
   // All useQuery hooks together
   const { data: userRooms = [], isLoading: roomsLoading } = useQuery({
     queryKey: ["/api/rooms/my"],
-    refetchInterval: 15000, // Refresh every 15 seconds
+    staleTime: 30000, // Data stays fresh for 30 seconds
+    refetchInterval: 30000, // Reduced from 15s to 30s
   });
 
 
 
   const { data: orgRooms = [], isLoading: orgRoomsLoading } = useQuery({
     queryKey: ["/api/rooms/organizations"],
+    staleTime: 60000, // Data stays fresh for 60 seconds
+    enabled: (user as any)?.userType !== 'organization', // Only load for regular users
   });
 
   const { data: userAnalytics = {}, isLoading: analyticsLoading } = useQuery({
     queryKey: ["/api/user/analytics"],
-    refetchInterval: 10000, // Refresh every 10 seconds
+    staleTime: 20000, // Data stays fresh for 20 seconds
+    refetchInterval: 60000, // Reduced from 10s to 60s for analytics
   });
 
   // Get gamification data from separate query since it's not in the hook
-  const { data: gamificationData } = useQuery({ queryKey: ["/api/user/gamification"] });
+  const { data: gamificationData } = useQuery({ 
+    queryKey: ["/api/user/gamification"],
+    staleTime: 30000, // Data stays fresh for 30 seconds
+  });
 
   // Calculate total rooms count
   const totalRoomsCount = (userRooms as any[])?.length || 0;

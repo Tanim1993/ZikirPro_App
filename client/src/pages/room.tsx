@@ -74,8 +74,8 @@ export default function Room() {
     mutationFn: async () => {
       // If offline, add to offline queue
       if (!isOnline) {
-        if (user?.id) {
-          addOfflineCount(roomId, user.id);
+        if ((user as any)?.id) {
+          addOfflineCount(roomId, (user as any).id);
         }
         return { success: true, offline: true };
       }
@@ -160,7 +160,7 @@ export default function Room() {
     },
     onSuccess: () => {
       // Immediate navigation without delays
-      setLocation('/dashboard');
+      window.location.href = '/dashboard';
       
       // Invalidate queries in background (non-blocking)
       setTimeout(() => {
@@ -444,18 +444,19 @@ export default function Room() {
         <div className="mb-6">
           <DigitalTasbih
             onCount={handleCount}
-            count={(userCount as number) + (user?.id ? getPendingCountForRoom(roomId, user.id) : 0)}
+            count={(userCount as number) + ((user as any)?.id ? getPendingCountForRoom(roomId, (user as any).id) : 0)}
             targetCount={room?.targetCount}
             unlimited={room?.unlimited}
             tasbihType={tasbihType}
+            roomName={room?.name}
           />
           
           {/* Pending Counts Indicator */}
-          {user?.id && getPendingCountForRoom(roomId, user.id) > 0 && (
+          {(user as any)?.id && getPendingCountForRoom(roomId, (user as any).id) > 0 && (
             <div className="mt-2 p-2 bg-orange-100 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg">
               <p className="text-sm text-orange-700 dark:text-orange-300 text-center">
                 <CloudOff className="w-4 h-4 inline mr-1" />
-                {getPendingCountForRoom(roomId, user.id)} counts pending sync
+                {getPendingCountForRoom(roomId, (user as any).id)} counts pending sync
               </p>
             </div>
           )}
