@@ -1264,53 +1264,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // User gamification endpoints
   app.get("/api/user/gamification", async (req, res) => {
     try {
-      const userId = "test001-user-id"; // Use existing test user
+      // Get authenticated user from session
+      const userId = (req.session as any)?.user?.id || "user-3"; // Fallback to user-3 for testing
       
       // Get user from database
       const user = await storage.getUser(userId);
       if (!user) {
-        // Create default mock gamification data if user not found
-        const mockData = {
-          amalScore: 45,
-          barakahCoins: 125,
-          noorTokens: 8,
-          userLevel: 3,
-          roomCreationLimit: 2,
-          totalRoomsCreated: 1,
-          currentLevel: {
-            level: 3,
-            title: 'Devoted Seeker',
-            titleAr: 'الطالب المخلص',
-            requiredPoints: 200,
-            multiplier: 1.2
-          },
-          nextLevel: {
-            level: 4,
-            title: 'Spiritual Guardian',
-            requiredPoints: 400,
-            progressPercentage: 22.5,
-            pointsNeeded: 355
-          },
-          badges: [
-            {
-              id: 1,
-              badgeId: 'first_steps',
-              name: 'First Steps',
-              nameAr: 'الخطوات الأولى',
-              description: 'Completed your first 50 zikir',
-              earnedAt: new Date().toISOString()
-            }
-          ],
-          totalBadges: 1,
-          canCreateRoom: true,
-          hasSpecialStatus: false
-        };
-        return res.json(mockData);
+        return res.status(404).json({ error: "User not found" });
       }
 
-      // Use user data to build gamification response
-      const currentPoints = user.spiritualPoints || 45;
-      const currentLevel = user.userLevel || 3;
+      // Use ACTUAL user data (no fallbacks to maintain fresh start)
+      const currentPoints = user.spiritualPoints || 0;
+      const currentLevel = user.userLevel || 1;
 
       // Create complete gamification response with mock data for now
       const levelTitles = [
@@ -1329,11 +1294,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json({
         amalScore: currentPoints,
-        barakahCoins: user.zikirCoins || 125,
-        noorTokens: user.dailyBlessingPoints || 8,
+        barakahCoins: user.zikirCoins || 0,
+        noorTokens: user.dailyBlessingPoints || 0,
         userLevel: currentLevel,
-        roomCreationLimit: user.roomCreationLimit || 2,
-        totalRoomsCreated: user.totalRoomsCreated || 1,
+        roomCreationLimit: user.roomCreationLimit || 1,
+        totalRoomsCreated: user.totalRoomsCreated || 0,
         currentLevel: {
           level: currentLevelData.level,
           title: currentLevelData.title,
