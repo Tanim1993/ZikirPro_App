@@ -15,7 +15,7 @@ import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2 } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -46,6 +46,11 @@ export default function Dashboard() {
     queryKey: ["/api/user/analytics"],
     refetchInterval: 10000, // Refresh every 10 seconds
   });
+
+  const { gamificationData } = useGamification();
+
+  // Calculate total rooms count
+  const totalRoomsCount = (userRooms as any[])?.length || 0;
 
   // useMutation hooks
   const joinRoomMutation = useMutation({
@@ -190,7 +195,58 @@ export default function Dashboard() {
         onComplete={dismissAchievement}
       />
 
-      {/* App Header with Create Room Button */}
+      {/* User Stats Section - Beautiful Cards positioned above Level display */}
+      <div className="bg-gradient-to-b from-blue-50 to-white px-4 py-4">
+        <div className="max-w-md mx-auto">
+          <div className="grid grid-cols-4 gap-3 mb-4">
+            {/* Total Zikir */}
+            <div className="bg-gradient-to-br from-emerald-500 to-green-600 rounded-lg p-3 text-white shadow-lg">
+              <div className="flex items-center justify-center mb-1">
+                <Star className="w-4 h-4" />
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold">{userAnalytics?.totalZikir?.toLocaleString() || 0}</div>
+                <div className="text-xs opacity-90">Total Zikir</div>
+              </div>
+            </div>
+
+            {/* Barakah Coins */}
+            <div className="bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg p-3 text-white shadow-lg">
+              <div className="flex items-center justify-center mb-1">
+                <Calculator className="w-4 h-4" />
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold">{gamificationData?.barakahCoins || 0}</div>
+                <div className="text-xs opacity-90">Coins</div>
+              </div>
+            </div>
+
+            {/* Total Rooms */}
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg p-3 text-white shadow-lg">
+              <div className="flex items-center justify-center mb-1">
+                <Home className="w-4 h-4" />
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold">{totalRoomsCount}</div>
+                <div className="text-xs opacity-90">My Rooms</div>
+              </div>
+            </div>
+
+            {/* Current Streak */}
+            <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg p-3 text-white shadow-lg">
+              <div className="flex items-center justify-center mb-1">
+                <Zap className="w-4 h-4" />
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold">{userAnalytics?.currentStreak || 0}</div>
+                <div className="text-xs opacity-90">Day Streak</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* App Header with Create Room Button - Moved below stats */}
       <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-md mx-auto">
           <div className="flex items-center justify-between">
