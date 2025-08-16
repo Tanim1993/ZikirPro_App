@@ -1,0 +1,66 @@
+Perfect point 👌
+You want the **app UI** itself to feel like a game (similar to **Ludo Star**) where users instantly see their **progress, coins, and levels** on the top bar. Let’s extend the BRD with this requirement:
+
+---
+
+# 📌 Business Requirement Document (BRD)
+
+### Islamic Gamification System (BO ↔ App Integration)
+
+---
+
+## 6. App UI Design Requirements
+
+### 6.1 Top Bar (Ludo-Star Style)
+
+* **Purpose:** Show user’s real-time game status (motivates progression).
+* **Position:** Fixed at the top of the app home/dashboard screen.
+* **Elements to Display (all values come from BO):**
+
+  * ⭐ **XP Bar:** (e.g., 344/1200 XP) with a progress bar.
+  * 🪙 **Coins/Points Balance** – pulled from BO.
+  * 💎 **Special Currency/Rewards (if configured)** – e.g., gems, streak multipliers.
+  * 🏅 **User Level** – current level number + title (e.g., Level 19 – “Devoted”).
+  * 📸 **Profile Picture + Country Flag** (optional, configurable from BO).
+  * 🎯 **Special Buttons/Badges:** e.g., “Mega Win”, “Top Streak”, “New Quest” (if enabled in BO).
+
+---
+
+### 6.2 Integration with BO
+
+* **All numbers, limits, and labels must be fetched from BO.**
+* BO controls:
+
+  * Max XP for each level.
+  * Currency icons, names, and conversion rules.
+  * Whether special labels (“Mega Win”, “Ramadan Bonus”) are displayed.
+* App displays exactly what BO defines, no local overrides.
+
+---
+
+### 6.3 Example Scenario (User View)
+
+* Top bar shows:
+
+  * ⭐ 344/1200 XP → progress bar (Level 19 – Devoted).
+  * 🪙 318.2M Coins.
+  * 💎 8226 Gems.
+  * 🎖️ Badge: “Top 10 in 5 Competitions”.
+* If BO admin updates reward → next refresh, numbers and badges change instantly.
+
+---
+
+### 6.4 User Motivation
+
+* Always visible → encourages users to play more and level up.
+* Works like a **spiritual scoreboard** for their Islamic practices.
+* Tied to progression → if user tries to enter higher-level rooms, top bar itself reminds them of required XP/coins.
+
+---
+
+✅ **Summary Addition:**
+The app must display a **Ludo-Star-style top bar** that reflects **all BO-defined game metrics (XP, Coins, Levels, Badges, Gems)** in real-time, motivating users to progress.
+
+---
+
+Do you want me to also **rename these items with Islamic-themed names** (e.g., Coins → Barakah Points, Gems → Noor Tokens, XP → Amal Score) so the UI matches the Islamic identity?

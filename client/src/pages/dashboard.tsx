@@ -8,6 +8,10 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import CreateRoomModal from "@/components/create-room-modal";
 import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import SeasonalCompetitions from "@/pages/seasonal-competitions";
+import { GamificationTopBar } from "@/components/gamification-top-bar";
+import { AchievementNotification } from "@/components/achievement-notification";
+import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
+import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
@@ -24,6 +28,7 @@ export default function Dashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { currentAchievement, dismissAchievement } = useGamification();
   
   // All useQuery hooks together
   const { data: userRooms = [], isLoading: roomsLoading } = useQuery({
@@ -176,23 +181,32 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Clean Blue Header */}
-      <div className="bg-islamic-gradient px-4 py-6">
+      {/* Ludo Star Style Gamification Top Bar */}
+      <GamificationTopBar />
+
+      {/* Achievement Notifications */}
+      <AchievementNotification 
+        achievement={currentAchievement}
+        onComplete={dismissAchievement}
+      />
+
+      {/* App Header with Create Room Button */}
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="max-w-md mx-auto">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white/90 rounded-lg flex items-center justify-center">
-                <div className="text-lg font-bold text-islamic-primary font-amiri">ج</div>
+              <div className="w-8 h-8 bg-islamic-gradient rounded-lg flex items-center justify-center">
+                <div className="text-sm font-bold text-white font-amiri">ج</div>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-white">Zikir Amol</h1>
-                <p className="text-white/80 text-xs">Islamic Prayer Counter & Competition</p>
+                <h1 className="text-lg font-bold text-gray-800">Zikir Amol</h1>
+                <p className="text-gray-500 text-xs">Islamic Prayer Counter & Competition</p>
               </div>
             </div>
             <div className="flex gap-2">
               <Button 
                 onClick={() => setShowCreateModal(true)}
-                className="bg-white text-islamic-primary hover:bg-white/90 shadow-sm px-4 py-2 text-sm font-medium rounded-lg"
+                className="bg-islamic-primary text-white hover:bg-islamic-primary/90 shadow-sm px-3 py-2 text-sm font-medium rounded-lg"
                 data-testid="button-create-room"
               >
                 <Plus className="w-4 h-4 mr-1" />
@@ -202,28 +216,12 @@ export default function Dashboard() {
               {/* Admin Gamification Button - Only for admin users */}
               {user && ((user as any)?.userType === 'admin' || (user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
                 <Link href="/admin-gamification">
-                  <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm px-4 py-2 text-sm font-medium rounded-lg" data-testid="button-admin-gamification">
+                  <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm px-3 py-2 text-sm font-medium rounded-lg" data-testid="button-admin-gamification">
                     <div className="text-sm mr-1">🎮</div>
                     Admin
                   </Button>
                 </Link>
               )}
-            </div>
-          </div>
-          
-          {/* Clean Stats Cards */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-              <div className="text-xl font-bold text-white">{parseInt((userAnalytics as any)?.totalCount) || 102}</div>
-              <div className="text-xs text-white/80">Total Zikir</div>
-            </div>
-            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-              <div className="text-xl font-bold text-white">{(userAnalytics as any)?.currentStreak || 1}</div>
-              <div className="text-xs text-white/80">Day Streak</div>
-            </div>
-            <div className="text-center bg-white/10 rounded-lg p-3 backdrop-blur-sm">
-              <div className="text-xl font-bold text-white">{Array.isArray(userRooms) ? userRooms.length : 6}</div>
-              <div className="text-xs text-white/80">My Rooms</div>
             </div>
           </div>
         </div>
@@ -234,26 +232,32 @@ export default function Dashboard() {
         <Tabs defaultValue="my-rooms" className="w-full">
           <TabsList className={cn(
             "bg-gray-100 p-1 rounded-lg w-full",
-(user as any)?.userType === 'organization' 
+            (user as any)?.userType === 'organization' 
               ? "grid grid-cols-3" 
-              : "grid grid-cols-4"
+              : "grid grid-cols-5"
           )}>
-            <TabsTrigger value="my-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
-              <Home className="w-4 h-4 mr-2" />
-{(user as any)?.userType === 'organization' ? 'My Competitions' : 'My Rooms'}
+            <TabsTrigger value="my-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
+              <Home className="w-3 h-3 mr-1" />
+              {(user as any)?.userType === 'organization' ? 'Competitions' : 'Rooms'}
             </TabsTrigger>
-{(user as any)?.userType !== 'organization' && (
-              <TabsTrigger value="org-rooms" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
-                <Building2 className="w-4 h-4 mr-2" />
+            {(user as any)?.userType !== 'organization' && (
+              <TabsTrigger value="org-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
+                <Building2 className="w-3 h-3 mr-1" />
                 Org
               </TabsTrigger>
             )}
-            <TabsTrigger value="seasonal" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-seasonal">
-              <Trophy className="w-4 h-4 mr-2" />
+            <TabsTrigger value="seasonal" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-seasonal">
+              <Star className="w-3 h-3 mr-1" />
               Seasonal
             </TabsTrigger>
-            <TabsTrigger value="leaderboard" className="text-sm data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
-              <Star className="w-4 h-4 mr-2" />
+            {(user as any)?.userType !== 'organization' && (
+              <TabsTrigger value="badges" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-badges">
+                <Trophy className="w-3 h-3 mr-1" />
+                Badges
+              </TabsTrigger>
+            )}
+            <TabsTrigger value="leaderboard" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-leaderboard">
+              <Trophy className="w-3 h-3 mr-1" />
               Leaders
             </TabsTrigger>
           </TabsList>
@@ -323,6 +327,12 @@ export default function Dashboard() {
           <TabsContent value="seasonal" className="space-y-4">
             <SeasonalCompetitions />
           </TabsContent>
+
+          {(user as any)?.userType !== 'organization' && (
+            <TabsContent value="badges" className="space-y-4">
+              <IslamicBadgeGallery />
+            </TabsContent>
+          )}
 
           <TabsContent value="leaderboard" className="space-y-4">
             <GlobalLeaderboard />

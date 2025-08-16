@@ -1240,6 +1240,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json({ message: 'Admin logout successful' });
   });
 
+  // User gamification endpoints
+  app.get("/api/user/gamification", async (req, res) => {
+    try {
+      const userId = "test-user-123"; // Mock user ID for development
+      
+      // Get user from database
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Get user's current level info from level_configuration
+      const levelResult = await db.execute(sql`
+        SELECT level, title_en as title, title_ar, required_points, points_multiplier 
+        FROM level_configuration 
+        WHERE level = ${user.userLevel || 1}
+        LIMIT 1
+      `);
+      
+      const currentLevel = levelResult.rows[0] || {
+        level: 1,
+        title: 'Seeker',
+        title_ar: 'طالب',
+        required_points: 100,
+        points_multiplier: 1.0
+      };
+
+      // Get next level info
+      const nextLevelResult = await db.execute(sql`
+        SELECT level, title_en as title, required_points 
+        FROM level_configuration 
+        WHERE level = ${(user.userLevel || 1) + 1}
+        LIMIT 1
+      `);
+      
+      const nextLevel = nextLevelResult.rows[0];
+
+      // Get user badges
+      const badgesResult = await db.execute(sql`
+        SELECT ub.*, bc.name_en as badge_name, bc.name_ar, bc.description_en, bc.icon_url
+        FROM user_badges ub
+        LEFT JOIN badge_configuration bc ON ub.badge_id = bc.badge_id
+        WHERE ub.user_id = ${userId}
+        ORDER BY ub.earned_at DESC
+        LIMIT 10
+      `);
+
+      // Calculate progress percentage
+      const currentPoints = user.spiritualPoints || 0;
+      const progressPercentage = nextLevel ? 
+        Math.min(100, (currentPoints / nextLevel.required_points) * 100) : 100;
+
+      const gamificationData = {
+        // Islamic-themed currency (Ludo Star style)
+        amalScore: currentPoints, // Spiritual Points → Amal Score (Good Deeds)
+        barakahCoins: user.zikirCoins || 0, // Zikir Coins → Barakah Coins (Blessings)
+        noorTokens: user.dailyBlessingPoints || 0, // Daily Blessing Points → Noor Tokens (Divine Light)
+        userLevel: user.userLevel || 1,
+        roomCreationLimit: user.roomCreationLimit || 1,
+        totalRoomsCreated: user.totalRoomsCreated || 0,
+        
+        // Level information with Islamic titles
+        currentLevel: {
+          level: currentLevel.level,
+          title: currentLevel.title,
+          titleAr: currentLevel.title_ar,
+          requiredPoints: currentLevel.required_points,
+          multiplier: currentLevel.points_multiplier
+        },
+        
+        // Progress to next level (XP Bar style)
+        nextLevel: nextLevel ? {
+          level: nextLevel.level,
+          title: nextLevel.title,
+          requiredPoints: nextLevel.required_points,
+          progressPercentage,
+          pointsNeeded: Math.max(0, nextLevel.required_points - currentPoints)
+        } : null,
+        
+        // Achievement badges (Islamic themed)
+        badges: badgesResult.rows.map(badge => ({
+          id: badge.id,
+          badgeId: badge.badge_id,
+          name: badge.badge_name,
+          nameAr: badge.name_ar,
+          description: badge.description_en,
+          iconUrl: badge.icon_url,
+          earnedAt: badge.earned_at
+        })),
+        
+        // Quick stats for top bar
+        totalBadges: badgesResult.rows.length,
+        canCreateRoom: (user.totalRoomsCreated || 0) < (user.roomCreationLimit || 1),
+        hasSpecialStatus: badgesResult.rows.length >= 5 // "Top Player" status
+      };
+
+      res.json(gamificationData);
+    } catch (error) {
+      console.error("Gamification data error:", error);
+      res.status(500).json({ error: "Failed to fetch gamification data" });
+    }
+  });
+
+  // Award points for zikir counting (Islamic themed)
+  app.post("/api/user/award-points", async (req, res) => {
+    try {
+      const userId = "test-user-123"; // Mock user ID for development
+      const { zikirCount, roomId } = req.body;
+      
+      if (!zikirCount || zikirCount <= 0) {
+        return res.status(400).json({ error: "Invalid zikir count" });
+      }
+
+      // Islamic-themed point calculation
+      const amalScoreEarned = Math.floor(zikirCount / 10); // Amal Score (Good Deeds)
+      const barakahCoinsEarned = Math.floor(zikirCount / 5); // Barakah Coins (Blessings)
+      const noorTokensEarned = Math.floor(zikirCount / 20); // Noor Tokens (Divine Light)
+
+      // Update user's Islamic currency
+      await db.execute(sql`
+        UPDATE users 
+        SET 
+          spiritual_points = COALESCE(spiritual_points, 0) + ${amalScoreEarned},
+          zikir_coins = COALESCE(zikir_coins, 0) + ${barakahCoinsEarned},
+          daily_blessing_points = COALESCE(daily_blessing_points, 0) + ${noorTokensEarned}
+        WHERE id = ${userId}
+      `);
+
+      // Check for level up
+      const user = await storage.getUserById(userId);
+      const newAmalScore = (user?.spiritualPoints || 0) + amalScoreEarned;
+      
+      const levelResult = await db.execute(sql`
+        SELECT level, title_en as title, required_points 
+        FROM level_configuration 
+        WHERE required_points <= ${newAmalScore}
+        ORDER BY level DESC
+        LIMIT 1
+      `);
+      
+      const newLevel = levelResult.rows[0];
+      let leveledUp = false;
+      
+      if (newLevel && newLevel.level > (user?.userLevel || 1)) {
+        await db.execute(sql`
+          UPDATE users 
+          SET user_level = ${newLevel.level}
+          WHERE id = ${userId}
+        `);
+        leveledUp = true;
+      }
+
+      // Check for new badges (simplified for now)
+      const newBadges: any[] = [];
+      
+      // Check for "First Century" badge (100 total zikir)
+      if (newAmalScore >= 10 && (user?.spiritualPoints || 0) < 10) {
+        const badge = await db.execute(sql`
+          INSERT INTO user_badges (user_id, badge_id, earned_at)
+          VALUES (${userId}, 'first_century', NOW())
+          ON CONFLICT (user_id, badge_id) DO NOTHING
+          RETURNING *
+        `);
+        if (badge.rows[0]) {
+          newBadges.push({ name: 'First Century', description: 'Completed first 100 zikir' });
+        }
+      }
+
+      res.json({
+        pointsAwarded: {
+          amalScore: amalScoreEarned,
+          barakahCoins: barakahCoinsEarned,
+          noorTokens: noorTokensEarned
+        },
+        leveledUp,
+        newLevel: leveledUp ? newLevel : null,
+        newBadges
+      });
+
+    } catch (error) {
+      console.error("Award points error:", error);
+      res.status(500).json({ error: "Failed to award points" });
+    }
+  });
+
   // Admin routes - Only accessible by app founder
   const isAppFounder = async (req: any, res: any, next: any) => {
     const adminUser = (req.session as any)?.adminUser;
