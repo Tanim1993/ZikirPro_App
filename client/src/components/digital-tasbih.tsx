@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { RotateCcw, Settings, Share2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { RotateCcw, Settings, Share2, Trophy, Sparkles } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface DigitalTasbihProps {
   onCount: () => void;
@@ -9,16 +11,35 @@ interface DigitalTasbihProps {
   targetCount?: number;
   unlimited?: boolean;
   tasbihType?: 'digital' | 'physical' | 'hand';
+  roomName?: string;
 }
 
-export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihType = 'digital' }: DigitalTasbihProps) {
+export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihType = 'digital', roomName }: DigitalTasbihProps) {
   const [isPressed, setIsPressed] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(false);
+  const [lastCompletedTarget, setLastCompletedTarget] = useState(0);
+  const { toast } = useToast();
 
   const handleCount = () => {
     setIsPressed(true);
     onCount();
     setTimeout(() => setIsPressed(false), 150);
   };
+
+  // Check for target completion
+  useEffect(() => {
+    if (!unlimited && targetCount && count >= targetCount && count > lastCompletedTarget) {
+      setLastCompletedTarget(count);
+      setShowCongratulations(true);
+      
+      // Also show toast notification
+      toast({
+        title: "🎉 Mashallah! Target Completed!",
+        description: `You've completed ${targetCount.toLocaleString()} dhikr in ${roomName || 'this room'}`,
+        duration: 5000,
+      });
+    }
+  }, [count, targetCount, unlimited, lastCompletedTarget, roomName, toast]);
 
   const progress = unlimited ? 0 : targetCount ? Math.min(100, (count / targetCount) * 100) : 0;
 
@@ -163,6 +184,45 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
           Share
         </Button>
       </div>
+
+      {/* Congratulations Dialog */}
+      <Dialog open={showCongratulations} onOpenChange={setShowCongratulations}>
+        <DialogContent className="max-w-md text-center">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-center gap-2 text-2xl text-green-600">
+              <Trophy className="w-8 h-8" />
+              Mashallah! 🎉
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-6">
+            <div className="text-6xl animate-bounce">🎊</div>
+            <div className="space-y-2">
+              <h3 className="text-xl font-bold text-green-800">Target Completed!</h3>
+              <p className="text-gray-700">
+                You have successfully completed <strong>{targetCount?.toLocaleString()}</strong> dhikr
+                {roomName && ` in ${roomName}`}
+              </p>
+              <div className="bg-green-50 p-3 rounded-lg">
+                <p className="text-sm text-green-800 font-medium">
+                  "And whoever relies upon Allah - then He is sufficient for him. 
+                  Indeed, Allah will accomplish His purpose." - Quran 65:3
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-center gap-2">
+              <Sparkles className="w-5 h-5 text-yellow-500 animate-pulse" />
+              <Sparkles className="w-4 h-4 text-yellow-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
+              <Sparkles className="w-6 h-6 text-yellow-600 animate-pulse" style={{ animationDelay: '1s' }} />
+            </div>
+            <Button 
+              onClick={() => setShowCongratulations(false)}
+              className="bg-green-600 hover:bg-green-700 text-white px-8"
+            >
+              Continue Dhikr
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

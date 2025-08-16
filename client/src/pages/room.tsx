@@ -326,7 +326,7 @@ export default function Room() {
             <div className="flex items-center justify-center mb-1">
               <Users className="w-4 h-4" />
             </div>
-            <div className="text-sm font-bold">{leaderboard.length}</div>
+            <div className="text-sm font-bold">{memberCount}</div>
             <div className="text-xs text-islamic-secondary/80">Members</div>
           </div>
           <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
