@@ -12,6 +12,7 @@ import { GamificationTopBar } from "@/components/gamification-top-bar";
 import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import { AchievementNotification } from "@/components/achievement-notification";
 import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
+import { FloatingTasbih } from "@/components/floating-tasbih";
 import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
@@ -26,6 +27,7 @@ export default function Dashboard() {
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
   
   // All custom hooks immediately after useState
   const { user } = useAuth();
@@ -59,6 +61,13 @@ export default function Dashboard() {
     queryKey: ["/api/user/gamification"],
     staleTime: 30000, // Data stays fresh for 30 seconds
   });
+
+  // Check floating tasbih setting
+  React.useEffect(() => {
+    if ((user as any)?.floatingTasbihEnabled) {
+      setShowFloatingTasbih(true);
+    }
+  }, [(user as any)?.floatingTasbihEnabled]);
 
   // Calculate total rooms count
   const totalRoomsCount = (userRooms as any[])?.length || 0;
@@ -217,6 +226,12 @@ export default function Dashboard() {
       <AchievementNotification 
         achievement={currentAchievement}
         onComplete={dismissAchievement}
+      />
+
+      {/* Floating Tasbih */}
+      <FloatingTasbih 
+        isOpen={showFloatingTasbih}
+        onClose={() => setShowFloatingTasbih(false)}
       />
 
       {/* User Stats Section - Beautiful Cards positioned above Level display */}

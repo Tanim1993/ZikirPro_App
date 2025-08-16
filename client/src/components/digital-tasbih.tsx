@@ -21,6 +21,16 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
   const { toast } = useToast();
 
   const handleCount = () => {
+    // Prevent counting if target is reached and not unlimited
+    if (!unlimited && targetCount && count >= targetCount) {
+      toast({
+        title: "Target Completed!",
+        description: "You've reached your target. Create a new room or enable unlimited mode to continue counting.",
+        duration: 3000,
+      });
+      return;
+    }
+    
     setIsPressed(true);
     onCount();
     setTimeout(() => setIsPressed(false), 150);
@@ -132,21 +142,42 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
       {tasbihType === 'physical' && (
         <div className="relative">
           <div className="w-64 h-64 relative">
-            {/* Hand with Tasbih */}
-            <div className="absolute inset-0 bg-gradient-to-br from-orange-100 to-orange-200 rounded-full">
-              <img 
-                src="/api/placeholder/256/256"
-                alt="Hand with Tasbih"
-                className="w-full h-full object-cover rounded-full"
-              />
+            {/* Physical Tasbih Design - Prayer Beads */}
+            <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-100 rounded-full border-4 border-amber-200 shadow-xl">
+              {/* Prayer Beads around the circle */}
+              {Array.from({ length: 33 }).map((_, i) => {
+                const angle = (i * 360) / 33;
+                const radius = 110;
+                const x = Math.cos(angle * Math.PI / 180) * radius + 128;
+                const y = Math.sin(angle * Math.PI / 180) * radius + 128;
+                return (
+                  <div
+                    key={i}
+                    className="absolute w-3 h-3 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full shadow-sm"
+                    style={{
+                      left: `${x - 6}px`,
+                      top: `${y - 6}px`,
+                      transform: 'translate(-50%, -50%)'
+                    }}
+                  />
+                );
+              })}
+              
+              {/* Center Islamic Design */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-800 rounded-full flex items-center justify-center text-white text-2xl font-amiri shadow-lg">
+                  ﷲ
+                </div>
+              </div>
             </div>
             
             {/* Count Button Overlay */}
             <button
               onClick={handleCount}
-              className={`absolute inset-0 w-full h-full rounded-full bg-black/10 hover:bg-black/20 transition-all duration-100 ${
+              disabled={!unlimited && targetCount ? count >= targetCount : false}
+              className={`absolute inset-0 w-full h-full rounded-full bg-transparent hover:bg-amber-200/30 transition-all duration-100 ${
                 isPressed ? 'scale-95' : 'scale-100'
-              }`}
+              } ${!unlimited && targetCount ? (count >= targetCount ? 'opacity-50 cursor-not-allowed' : '') : ''}`}
             >
               <span className="sr-only">Count Tasbih</span>
             </button>
@@ -214,12 +245,30 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
               <Sparkles className="w-4 h-4 text-yellow-400 animate-pulse" style={{ animationDelay: '0.5s' }} />
               <Sparkles className="w-6 h-6 text-yellow-600 animate-pulse" style={{ animationDelay: '1s' }} />
             </div>
-            <Button 
-              onClick={() => setShowCongratulations(false)}
-              className="bg-green-600 hover:bg-green-700 text-white px-8"
-            >
-              Continue Dhikr
-            </Button>
+            <div className="flex gap-3 justify-center">
+              <Button 
+                onClick={() => setShowCongratulations(false)}
+                className="bg-green-600 hover:bg-green-700 text-white px-6"
+              >
+                Continue Dhikr
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowCongratulations(false);
+                  // Navigate to create new room
+                  window.location.href = '/dashboard';
+                }}
+                className="px-6"
+              >
+                New Room
+              </Button>
+            </div>
+            <div className="mt-3 p-2 bg-amber-50 rounded-lg">
+              <p className="text-xs text-amber-700">
+                📿 Floating tasbih counts separately and won't be recorded in leaderboards
+              </p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
