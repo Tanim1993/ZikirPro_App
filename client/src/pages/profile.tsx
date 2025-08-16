@@ -4,15 +4,18 @@ import { Button } from "../components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
 import { Badge } from "../components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2, Settings } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, LogOut, Edit2, Settings, Smartphone } from "lucide-react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { FloatingTasbihButton } from "@/components/FloatingTasbihButton";
+import { Switch } from "@/components/ui/switch";
 import type { User as UserType } from "@shared/schema";
 
 export default function Profile() {
   const { user, isLoading } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
+  const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
   const { toast } = useToast();
   
   // Type assertion for user data
@@ -21,6 +24,37 @@ export default function Profile() {
   const { data: analytics } = useQuery({
     queryKey: ["/api/user/analytics"],
     enabled: !!user,
+  });
+
+  // Update Floating Tasbih Setting
+  const updateFloatingTasbihMutation = useMutation({
+    mutationFn: async (enabled: boolean) => {
+      const response = await fetch('/api/user/floating-tasbih', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ enabled }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update floating tasbih setting');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/auth/user'] });
+      toast({
+        title: "Setting Updated",
+        description: "Floating Tasbih setting has been saved",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: "Failed to update floating tasbih setting",
+        variant: "destructive",
+      });
+    },
   });
 
   // Update Mazhab mutation
@@ -99,7 +133,7 @@ export default function Profile() {
     }
   };
 
-  const getAvatarDisplay = () => {
+  const getAvatarDisplay = (): string => {
     const avatarMap: { [key: string]: string } = {
       'male-1': '🧔',
       'male-2': '👨',
@@ -111,7 +145,7 @@ export default function Profile() {
     return avatarMap[typedUser?.avatarType || 'male-1'] || '👤';
   };
 
-  const getBgColorClass = () => {
+  const getBgColorClass = (): string => {
     const colorMap: { [key: string]: string } = {
       'green': 'bg-green-100',
       'blue': 'bg-blue-100',
@@ -136,7 +170,7 @@ export default function Profile() {
         <Card>
           <CardHeader className="text-center">
             <div className={`w-20 h-20 ${getBgColorClass()} rounded-full flex items-center justify-center text-3xl mx-auto mb-4`}>
-              {getAvatarDisplay()}
+              <span>{getAvatarDisplay()}</span>
             </div>
             <CardTitle className="text-xl">{typedUser?.firstName} {typedUser?.lastName}</CardTitle>
             <CardDescription>@{typedUser?.username}</CardDescription>
@@ -161,13 +195,13 @@ export default function Profile() {
             </div>
             <div className="flex items-center gap-3 text-gray-600">
               <Calendar className="h-4 w-4" />
-              <span>Joined {typedUser?.createdAt ? new Date(typedUser.createdAt as string).toLocaleDateString() : 'Unknown'}</span>
+              <span>Joined {typedUser?.createdAt ? new Date(typedUser.createdAt as unknown as string).toLocaleDateString() : 'Unknown'}</span>
             </div>
           </CardContent>
         </Card>
 
         {/* Analytics Card */}
-        {analytics && (
+        {analytics && typeof analytics === 'object' && (
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Your Statistics</CardTitle>
@@ -223,6 +257,34 @@ export default function Profile() {
                 This affects prayer time calculations in Salah Tracker
               </p>
             </div>
+
+            <div className="space-y-3 pt-4 border-t">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Smartphone className="h-4 w-4 text-blue-600" />
+                    <label className="text-sm font-medium text-gray-700">Floating Tasbih</label>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    Enable floating tasbih button for quick access anywhere
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Switch
+                    checked={(user as any)?.floatingTasbihEnabled || false}
+                    onCheckedChange={(checked) => {
+                      updateFloatingTasbihMutation.mutate(checked);
+                      if (checked) {
+                        setShowFloatingTasbih(true);
+                      } else {
+                        setShowFloatingTasbih(false);
+                      }
+                    }}
+                    disabled={updateFloatingTasbihMutation.isPending}
+                  />
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 
@@ -269,6 +331,12 @@ export default function Profile() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Floating Tasbih Button */}
+      <FloatingTasbihButton 
+        isVisible={showFloatingTasbih || (user as any)?.floatingTasbihEnabled}
+        onClose={() => setShowFloatingTasbih(false)}
+      />
     </div>
   );
 }

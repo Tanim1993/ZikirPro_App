@@ -243,6 +243,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update user floating tasbih setting
+  app.put("/api/user/floating-tasbih", async (req, res) => {
+    try {
+      const userId = req.session?.user?.id || "test-user-123";
+      const { enabled } = req.body;
+      
+      if (typeof enabled !== 'boolean') {
+        return res.status(400).json({ message: "Invalid enabled value" });
+      }
+      
+      // Update the user's floating tasbih setting in the database
+      await storage.updateUserFloatingTasbihSetting(userId, enabled);
+      
+      res.json({ message: "Floating tasbih setting updated successfully", enabled });
+    } catch (error) {
+      console.error("Error updating floating tasbih setting:", error);
+      res.status(500).json({ message: "Failed to update floating tasbih setting" });
+    }
+  });
+
   app.get('/api/user/analytics', async (req: any, res) => {
     try {
       const userId = "test-user-123"; // Mock user ID for testing

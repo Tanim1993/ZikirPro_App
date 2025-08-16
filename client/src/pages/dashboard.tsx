@@ -9,14 +9,15 @@ import CreateRoomModal from "@/components/create-room-modal";
 import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import SeasonalCompetitions from "@/pages/seasonal-competitions";
 import { GamificationTopBar } from "@/components/gamification-top-bar";
+import { NewUserOnboarding } from "@/components/NewUserOnboarding";
 import { AchievementNotification } from "@/components/achievement-notification";
 import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
-import { FloatingTasbihButton } from "@/components/FloatingTasbihButton";
 import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar, Settings2 } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar } from "lucide-react";
+import React from "react";
 import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
@@ -24,7 +25,7 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
-  const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // All custom hooks immediately after useState
   const { user } = useAuth();
@@ -54,6 +55,18 @@ export default function Dashboard() {
 
   // Calculate total rooms count
   const totalRoomsCount = (userRooms as any[])?.length || 0;
+
+  // Check if user is new (no rooms and low activity)
+  const isNewUser = totalRoomsCount === 0 && 
+    ((userAnalytics as any)?.totalZikir || 0) === 0 && 
+    ((gamificationData as any)?.barakahCoins || 0) === 0;
+
+  // Show onboarding for new users
+  React.useEffect(() => {
+    if (isNewUser && !roomsLoading && !analyticsLoading) {
+      setShowOnboarding(true);
+    }
+  }, [isNewUser, roomsLoading, analyticsLoading]);
 
   // useMutation hooks
   const joinRoomMutation = useMutation({
@@ -192,23 +205,6 @@ export default function Dashboard() {
       {/* Ludo Star Style Gamification Top Bar */}
       <GamificationTopBar />
       
-      {/* Floating Tasbih Toggle Button */}
-      <div className="fixed top-4 right-4 z-40">
-        <Button
-          onClick={() => setShowFloatingTasbih(!showFloatingTasbih)}
-          size="sm"
-          variant={showFloatingTasbih ? "default" : "outline"}
-          className={cn(
-            "h-10 w-10 p-0 rounded-full shadow-lg transition-all duration-200",
-            showFloatingTasbih 
-              ? "bg-gradient-to-br from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white" 
-              : "bg-white hover:bg-gray-50 text-gray-600 border-gray-200"
-          )}
-          data-testid="button-toggle-floating-tasbih"
-        >
-          <Settings2 className="w-4 h-4" />
-        </Button>
-      </div>
 
       {/* Achievement Notifications */}
       <AchievementNotification 
@@ -425,8 +421,14 @@ export default function Dashboard() {
         onOpenChange={setShowCreateModal} 
       />
 
+      {/* New User Onboarding */}
+      <NewUserOnboarding 
+        onComplete={() => setShowOnboarding(false)}
+        onCreateRoom={() => setShowCreateModal(true)}
+      />
+
       {/* Join Room Confirmation Dialog */}
-      <Dialog open={showJoinConfirm} onOpenChange={setShowJoinConfirm}>
+      <Dialog open={showJoinConfirm && !showOnboarding} onOpenChange={setShowJoinConfirm}>
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-green-600">Join Room?</DialogTitle>
@@ -475,11 +477,6 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Floating Tasbih Button */}
-      <FloatingTasbihButton 
-        isVisible={showFloatingTasbih}
-        onClose={() => setShowFloatingTasbih(false)}
-      />
     </div>
   );
 }

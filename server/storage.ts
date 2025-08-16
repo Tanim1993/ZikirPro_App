@@ -62,6 +62,7 @@ export interface IStorage {
   createUser(userData: Partial<User>): Promise<User>;
   authenticateUser(username: string, password: string): Promise<User | null>;
   updateUserProfile(id: string, updates: Partial<User>): Promise<User>;
+  updateUserFloatingTasbihSetting(userId: string, enabled: boolean): Promise<User>;
   
   // Zikir operations
   getAllZikirs(): Promise<Zikir[]>;
@@ -212,6 +213,15 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ ...updates, updatedAt: new Date() })
       .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async updateUserFloatingTasbihSetting(userId: string, enabled: boolean): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({ floatingTasbihEnabled: enabled, updatedAt: new Date() })
+      .where(eq(users.id, userId))
       .returning();
     return user;
   }
