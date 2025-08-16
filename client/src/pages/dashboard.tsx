@@ -199,8 +199,8 @@ export default function Dashboard() {
                 Create Room
               </Button>
               
-              {/* Admin Gamification Button */}
-              {user && ((user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
+              {/* Admin Gamification Button - Only for admin users */}
+              {user && ((user as any)?.userType === 'admin' || (user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') && (
                 <Link href="/admin-gamification">
                   <Button className="bg-purple-600 hover:bg-purple-700 text-white shadow-sm px-4 py-2 text-sm font-medium rounded-lg" data-testid="button-admin-gamification">
                     <div className="text-sm mr-1">🎮</div>
