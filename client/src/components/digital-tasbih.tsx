@@ -141,46 +141,93 @@ export function DigitalTasbih({ onCount, count, targetCount, unlimited, tasbihTy
       {/* Physical Tasbih Interface */}
       {tasbihType === 'physical' && (
         <div className="relative">
-          <div className="w-64 h-64 relative">
-            {/* Physical Tasbih Design - Prayer Beads */}
-            <div className="absolute inset-0 bg-gradient-to-br from-amber-50 to-orange-100 rounded-full border-4 border-amber-200 shadow-xl">
-              {/* Prayer Beads around the circle */}
+          <div className="w-80 h-96 relative bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-4 shadow-2xl">
+            {/* Islamic Pattern Background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-teal-900/20 to-emerald-900/20 rounded-2xl opacity-60">
+              <div className="absolute inset-4 bg-gradient-to-br from-teal-800/10 to-emerald-800/10 rounded-xl" 
+                style={{
+                  backgroundImage: `radial-gradient(circle at 20% 20%, rgba(20, 184, 166, 0.1) 0%, transparent 50%), 
+                                   radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%)`
+                }}
+              />
+            </div>
+            
+            {/* Tasbih String Path */}
+            <div className="absolute inset-8">
+              <svg width="100%" height="100%" viewBox="0 0 288 320" className="absolute inset-0">
+                {/* String path */}
+                <path
+                  d="M 144 40 Q 240 120 144 200 Q 48 280 144 320"
+                  stroke="rgba(139, 69, 19, 0.8)"
+                  strokeWidth="2"
+                  fill="none"
+                />
+              </svg>
+              
+              {/* Moving Beads - 33 beads following the string path */}
               {Array.from({ length: 33 }).map((_, i) => {
-                const angle = (i * 360) / 33;
-                const radius = 110;
-                const x = Math.cos(angle * Math.PI / 180) * radius + 128;
-                const y = Math.sin(angle * Math.PI / 180) * radius + 128;
+                // Calculate position along the curved path
+                const progress = (i + (count * 0.1) % 33) / 33;
+                let x, y;
+                
+                if (progress <= 0.5) {
+                  // Upper curve: right to center
+                  const t = progress * 2;
+                  x = 144 + (96 * Math.cos(Math.PI * t)) - 96 * t;
+                  y = 40 + 80 * t + 40 * Math.sin(Math.PI * t);
+                } else {
+                  // Lower curve: center to left and back
+                  const t = (progress - 0.5) * 2;
+                  x = 144 - (96 * Math.cos(Math.PI * t)) + 96 * t;
+                  y = 200 + 60 * t + 40 * Math.sin(Math.PI * t);
+                }
+                
+                // Animate movement on count
+                const animationDelay = `${i * 50}ms`;
+                const isActiveBeads = i < (count % 33);
+                
                 return (
                   <div
                     key={i}
-                    className="absolute w-3 h-3 bg-gradient-to-br from-amber-600 to-amber-800 rounded-full shadow-sm"
+                    className={`absolute w-4 h-4 rounded-full shadow-lg transition-all duration-500 ${
+                      isActiveBeads 
+                        ? 'bg-gradient-to-br from-yellow-400 to-amber-500 scale-110' 
+                        : 'bg-gradient-to-br from-amber-600 to-amber-800'
+                    }`}
                     style={{
-                      left: `${x - 6}px`,
-                      top: `${y - 6}px`,
-                      transform: 'translate(-50%, -50%)'
+                      left: `${x - 8}px`,
+                      top: `${y - 8}px`,
+                      transform: `translate(-50%, -50%) ${isPressed ? 'scale(1.2)' : 'scale(1)'}`,
+                      transitionDelay: animationDelay,
+                      zIndex: isActiveBeads ? 10 : 5
                     }}
                   />
                 );
               })}
               
-              {/* Center Islamic Design */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-800 rounded-full flex items-center justify-center text-white text-2xl font-amiri shadow-lg">
-                  ﷲ
+              {/* Central Counter Display */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-600 to-teal-700 rounded-full flex items-center justify-center text-white text-xl font-bold shadow-xl border-4 border-emerald-400/50">
+                  {count}
                 </div>
               </div>
             </div>
             
-            {/* Count Button Overlay */}
+            {/* Tap Area */}
             <button
               onClick={handleCount}
               disabled={!unlimited && targetCount ? count >= targetCount : false}
-              className={`absolute inset-0 w-full h-full rounded-full bg-transparent hover:bg-amber-200/30 transition-all duration-100 ${
-                isPressed ? 'scale-95' : 'scale-100'
+              className={`absolute inset-0 w-full h-full rounded-2xl bg-transparent hover:bg-white/5 transition-all duration-100 ${
+                isPressed ? 'scale-98' : 'scale-100'
               } ${!unlimited && targetCount ? (count >= targetCount ? 'opacity-50 cursor-not-allowed' : '') : ''}`}
             >
               <span className="sr-only">Count Tasbih</span>
             </button>
+            
+            {/* Islamic Decoration */}
+            <div className="absolute top-2 left-1/2 transform -translate-x-1/2 text-emerald-400 text-lg font-amiri">
+              بِسْمِ ٱللَّٰهِ
+            </div>
           </div>
         </div>
       )}
