@@ -109,7 +109,7 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
     enabled: !!user,
   });
 
-  const { data: progressData } = useQuery({
+  const { data: progressData = {} } = useQuery({
     queryKey: ["/api/user/spiritual-progress"],
     enabled: !!user,
   });
@@ -121,29 +121,29 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
       title: `Level ${dhikr.id}: ${dhikr.transliteration}`,
       category: dhikr.category,
       dhikr: dhikr,
-      isUnlocked: index === 0 || (progressData?.completedLevels || []).includes(dhikr.id - 1),
-      isCompleted: (progressData?.completedLevels || []).includes(dhikr.id),
-      progress: progressData?.[`level_${dhikr.id}_progress`] || 0,
+      isUnlocked: index === 0 || ((progressData as any)?.completedLevels || []).includes(dhikr.id - 1),
+      isCompleted: ((progressData as any)?.completedLevels || []).includes(dhikr.id),
+      progress: (progressData as any)?.[`level_${dhikr.id}_progress`] || 0,
       tasks: [
         {
           type: "learn",
           title: "Learn Meaning",
           description: `Understand the meaning: "${dhikr.meaning}"`,
-          completed: progressData?.[`level_${dhikr.id}_meaning_learned`] || false,
+          completed: (progressData as any)?.[`level_${dhikr.id}_meaning_learned`] || false,
           coins: Math.floor(dhikr.coins * 0.3)
         },
         {
           type: "practice", 
           title: "Practice with Reflection",
           description: `Recite ${dhikr.count} times with contemplation (minimum 5 minutes)`,
-          completed: progressData?.[`level_${dhikr.id}_practiced`] || false,
+          completed: (progressData as any)?.[`level_${dhikr.id}_practiced`] || false,
           coins: Math.floor(dhikr.coins * 0.5)
         },
         {
           type: "quiz",
           title: "Knowledge Check",
           description: "Complete matching game and pronunciation test",
-          completed: progressData?.[`level_${dhikr.id}_quiz_passed`] || false,
+          completed: (progressData as any)?.[`level_${dhikr.id}_quiz_passed`] || false,
           coins: Math.floor(dhikr.coins * 0.2)
         }
       ]
@@ -155,10 +155,10 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
   const completedLevels = levels.filter(level => level.isCompleted).length;
 
   // Currency Display
-  const barakahCoins = gamificationData?.barakahCoins || 0;
-  const noorGems = gamificationData?.noorGems || 0;
-  const currentStreak = progressData?.currentStreak || 0;
-  const totalExperience = gamificationData?.experience || 0;
+  const barakahCoins = (gamificationData as any)?.barakahCoins || 0;
+  const noorGems = (gamificationData as any)?.noorGems || 0;
+  const currentStreak = (progressData as any)?.currentStreak || 0;
+  const totalExperience = (gamificationData as any)?.experience || 0;
 
   // Filter levels by category
   const filteredLevels = selectedCategory === "all" 

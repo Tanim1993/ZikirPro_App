@@ -18,7 +18,7 @@ import { useGamification } from "@/hooks/useGamification";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar } from "lucide-react";
+import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar, BookOpen } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
 
