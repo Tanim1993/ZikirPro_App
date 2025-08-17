@@ -10,6 +10,7 @@ import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import SeasonalCompetitions from "@/pages/seasonal-competitions";
 import { GamificationTopBar } from "@/components/gamification-top-bar";
 import { NewUserOnboarding } from "@/components/NewUserOnboarding";
+import { SpiritualProgressionSystem } from "@/components/spiritual-progression-system";
 import { AchievementNotification } from "@/components/achievement-notification";
 import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
 import { FloatingTasbih } from "@/components/floating-tasbih";
@@ -329,7 +330,7 @@ export default function Dashboard() {
             "bg-gray-100 p-1 rounded-lg w-full",
             (user as any)?.userType === 'organization' 
               ? "grid grid-cols-3" 
-              : "grid grid-cols-5"
+              : "grid grid-cols-6"
           )}>
             <TabsTrigger value="my-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-my-rooms">
               <Home className="w-3 h-3 mr-1" />
@@ -339,6 +340,12 @@ export default function Dashboard() {
               <TabsTrigger value="org-rooms" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-org-rooms">
                 <Building2 className="w-3 h-3 mr-1" />
                 Org
+              </TabsTrigger>
+            )}
+            {(user as any)?.userType !== 'organization' && (
+              <TabsTrigger value="journey" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-journey">
+                <BookOpen className="w-3 h-3 mr-1" />
+                Journey
               </TabsTrigger>
             )}
             <TabsTrigger value="seasonal" className="text-xs data-[state=active]:bg-white data-[state=active]:text-islamic-primary data-[state=active]:shadow-sm" data-testid="tab-seasonal">
@@ -416,6 +423,15 @@ export default function Dashboard() {
                   ))}
                 </div>
               )}
+            </TabsContent>
+          )}
+
+          {(user as any)?.userType !== 'organization' && (
+            <TabsContent value="journey" className="space-y-4">
+              <SpiritualProgressionSystem onStartLevel={(levelId) => {
+                // Navigate to learning interface for specific level
+                console.log("Starting level:", levelId);
+              }} />
             </TabsContent>
           )}
 
