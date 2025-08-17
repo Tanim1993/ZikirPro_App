@@ -873,6 +873,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get spiritual progress endpoint
+  app.get("/api/user/spiritual-progress", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const userId = req.session.user.id;
+      const progress = await storage.getUserSpiritualProgress(userId);
+      res.json(progress);
+    } catch (error) {
+      console.error("Error getting spiritual progress:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  // Complete task endpoint
+  app.post("/api/user/complete-task", async (req, res) => {
+    try {
+      if (!req.session.user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      const userId = req.session.user.id;
+      const { levelId, taskType, practiceCount, timeSpent } = req.body;
+
+      // Calculate coins based on task type and level
+      const coinRewards = {
+        learn: Math.floor([10, 10, 10, 15, 15, 20, 20, 25, 25, 30, 15, 15, 30, 25, 20, 40][levelId - 1] * 0.3),
+        practice: Math.floor([10, 10, 10, 15, 15, 20, 20, 25, 25, 30, 15, 15, 30, 25, 20, 40][levelId - 1] * 0.5),
+        quiz: Math.floor([10, 10, 10, 15, 15, 20, 20, 25, 25, 30, 15, 15, 30, 25, 20, 40][levelId - 1] * 0.2)
+      };
+
+      const experienceRewards = {
+        learn: Math.floor([25, 25, 25, 35, 35, 50, 50, 60, 60, 75, 40, 40, 75, 60, 50, 100][levelId - 1] * 0.3),
+        practice: Math.floor([25, 25, 25, 35, 35, 50, 50, 60, 60, 75, 40, 40, 75, 60, 50, 100][levelId - 1] * 0.5),
+        quiz: Math.floor([25, 25, 25, 35, 35, 50, 50, 60, 60, 75, 40, 40, 75, 60, 50, 100][levelId - 1] * 0.2)
+      };
+
+      // Update user progress
+      await storage.completeUserTask(userId, levelId, taskType, {
+        coins: coinRewards[taskType] || 0,
+        experience: experienceRewards[taskType] || 0,
+        practiceCount,
+        timeSpent
+      });
+
+      res.json({ 
+        message: "Task completed successfully",
+        coins: coinRewards[taskType] || 0,
+        experience: experienceRewards[taskType] || 0
+      });
+    } catch (error) {
+      console.error("Error completing task:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Search rooms route (with organization filters)
   app.get('/api/rooms/search', async (req, res) => {
     try {

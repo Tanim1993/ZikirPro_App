@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
+import { LevelLearningInterface } from "@/components/level-learning-interface";
 
 // Comprehensive Dhikr Database for Dynamic Level Generation
 const dhikriDatabase = [
@@ -103,6 +104,7 @@ interface ProgressionSystemProps {
 export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemProps) {
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [activeLevelId, setActiveLevelId] = useState<number | null>(null);
 
   const { data: gamificationData } = useQuery({
     queryKey: ["/api/user/gamification"],
@@ -331,7 +333,7 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
                 
                 {level.isUnlocked && !level.isCompleted && (
                   <Button 
-                    onClick={() => onStartLevel(level.id)}
+                    onClick={() => setActiveLevelId(level.id)}
                     size="sm"
                     className="bg-blue-600 hover:bg-blue-700"
                   >
@@ -380,6 +382,19 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
           </div>
         </CardContent>
       </Card>
+
+      {/* Level Learning Interface */}
+      {activeLevelId && (
+        <LevelLearningInterface
+          levelData={dhikriDatabase.find(d => d.id === activeLevelId)!}
+          isOpen={!!activeLevelId}
+          onClose={() => setActiveLevelId(null)}
+          onComplete={() => {
+            // Refresh data after completion
+            window.location.reload();
+          }}
+        />
+      )}
     </div>
   );
 }

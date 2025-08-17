@@ -64,6 +64,10 @@ export interface IStorage {
   updateUserProfile(id: string, updates: Partial<User>): Promise<User>;
   updateUserFloatingTasbihSetting(userId: string, enabled: boolean): Promise<User>;
   
+  // Spiritual progress operations
+  getUserSpiritualProgress(userId: string): Promise<any>;
+  completeUserTask(userId: string, levelId: number, taskType: string, rewards: any): Promise<void>;
+  
   // Zikir operations
   getAllZikirs(): Promise<Zikir[]>;
   getZikirById(id: number): Promise<Zikir | undefined>;
@@ -1344,6 +1348,51 @@ export class DatabaseStorage implements IStorage {
     }
 
     return false;
+  }
+
+  // Spiritual progress operations
+  async getUserSpiritualProgress(userId: string): Promise<any> {
+    // For now, return mock data until we set up proper database tables
+    return {
+      completedLevels: [],
+      currentStreak: 0,
+      morningDhikr: 0,
+      eveningDhikr: 0,
+      weeklyStreak: 0,
+      nightPrayer: 0,
+      dailyQuran: 0,
+      dhikriMeanings: 0,
+      helpedUsers: 0,
+      leadershipRoles: 0
+    };
+  }
+
+  async completeUserTask(userId: string, levelId: number, taskType: string, rewards: any): Promise<void> {
+    // Update user's barakah coins and experience
+    const analytics = await this.getUserAnalytics(userId);
+    if (analytics) {
+      await this.updateUserAnalytics(userId, {
+        barakahCoins: (analytics.barakahCoins || 0) + rewards.coins,
+        noorGems: (analytics.noorGems || 0) + (rewards.experience / 10), // Convert some XP to gems
+        experience: (analytics.experience || 0) + rewards.experience
+      });
+    } else {
+      await db.insert(userAnalytics).values({
+        userId,
+        barakahCoins: rewards.coins,
+        noorGems: Math.floor(rewards.experience / 10),
+        experience: rewards.experience,
+        totalCount: 0,
+        currentStreak: 0,
+        longestStreak: 0,
+        roomsJoined: 0,
+        roomsCompleted: 0
+      });
+    }
+
+    // For now, we'll store task completion in a simple way
+    // In production, you'd want proper spiritual progress tables
+    console.log(`User ${userId} completed level ${levelId} task ${taskType} and earned ${rewards.coins} coins + ${rewards.experience} XP`);
   }
 }
 
