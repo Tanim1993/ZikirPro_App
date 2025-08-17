@@ -26,8 +26,8 @@ export default function Dashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showJoinConfirm, setShowJoinConfirm] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
-  const [showOnboarding, setShowOnboarding] = useState(false);
   const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // All custom hooks immediately after useState
   const { user } = useAuth();
