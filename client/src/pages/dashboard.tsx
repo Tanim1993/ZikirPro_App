@@ -10,6 +10,7 @@ import { GlobalLeaderboard } from "@/components/global-leaderboard";
 import SeasonalCompetitions from "@/pages/seasonal-competitions";
 import { GamificationTopBar } from "@/components/gamification-top-bar";
 import { NewUserOnboarding } from "@/components/NewUserOnboarding";
+import { GamificationIntroModal } from "@/components/gamification-intro-modal";
 import { SpiritualProgressionSystem } from "@/components/spiritual-progression-system";
 import { AchievementNotification } from "@/components/achievement-notification";
 import { IslamicBadgeGallery } from "@/components/islamic-badge-gallery";
@@ -29,6 +30,9 @@ export default function Dashboard() {
   const [selectedRoom, setSelectedRoom] = useState<any>(null);
   const [showFloatingTasbih, setShowFloatingTasbih] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showGamificationIntro, setShowGamificationIntro] = useState(() => {
+    return !localStorage.getItem('gamification-intro-seen');
+  });
   
   // All custom hooks immediately after useState
   const { user } = useAuth();
@@ -463,6 +467,12 @@ export default function Dashboard() {
       <NewUserOnboarding 
         onComplete={() => setShowOnboarding(false)}
         onCreateRoom={() => setShowCreateModal(true)}
+      />
+
+      {/* Gamification Introduction Modal */}
+      <GamificationIntroModal
+        open={showGamificationIntro}
+        onClose={() => setShowGamificationIntro(false)}
       />
 
       {/* Join Room Confirmation Dialog */}

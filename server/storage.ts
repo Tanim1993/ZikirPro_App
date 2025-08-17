@@ -68,6 +68,12 @@ export interface IStorage {
   getUserSpiritualProgress(userId: string): Promise<any>;
   completeUserTask(userId: string, levelId: number, taskType: string, rewards: any): Promise<void>;
   
+  // Admin level management
+  getAllDhikriLevels(): Promise<any[]>;
+  createDhikriLevel(levelData: any): Promise<any>;
+  updateDhikriLevel(id: number, levelData: any): Promise<any>;
+  deleteDhikriLevel(id: number): Promise<void>;
+  
   // Zikir operations
   getAllZikirs(): Promise<Zikir[]>;
   getZikirById(id: number): Promise<Zikir | undefined>;
@@ -1393,6 +1399,34 @@ export class DatabaseStorage implements IStorage {
     // For now, we'll store task completion in a simple way
     // In production, you'd want proper spiritual progress tables
     console.log(`User ${userId} completed level ${levelId} task ${taskType} and earned ${rewards.coins} coins + ${rewards.experience} XP`);
+  }
+
+  // Admin level management methods
+  async getAllDhikriLevels(): Promise<any[]> {
+    // Return the current dhikr database with admin metadata
+    const dhikriDatabase = [
+      { id: 1, arabic: "سُبْحَانَ اللهِ", transliteration: "Subhanallahi", meaning: "Glory be to Allah", count: 33, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
+      { id: 2, arabic: "الْحَمْدُ للهِ", transliteration: "Alhamdulillahi", meaning: "Praise be to Allah", count: 33, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
+      { id: 3, arabic: "اللهُ أَكْبَر", transliteration: "Allahu Akbar", meaning: "Allah is Greatest", count: 34, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
+    ];
+    return dhikriDatabase;
+  }
+
+  async createDhikriLevel(levelData: any): Promise<any> {
+    // In a real app, this would insert into a dhikri_levels table
+    console.log("Creating new dhikr level:", levelData);
+    return { id: Date.now(), ...levelData };
+  }
+
+  async updateDhikriLevel(id: number, levelData: any): Promise<any> {
+    // In a real app, this would update the dhikri_levels table
+    console.log(`Updating dhikr level ${id}:`, levelData);
+    return { id, ...levelData };
+  }
+
+  async deleteDhikriLevel(id: number): Promise<void> {
+    // In a real app, this would delete from dhikri_levels table
+    console.log(`Deleting dhikr level ${id}`);
   }
 }
 

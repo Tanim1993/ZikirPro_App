@@ -931,6 +931,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin level management routes
+  app.get("/api/admin/levels", async (req, res) => {
+    try {
+      // TODO: Add admin authentication check
+      const levels = await storage.getAllDhikriLevels();
+      res.json(levels);
+    } catch (error) {
+      console.error("Error getting admin levels:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/admin/levels", async (req, res) => {
+    try {
+      // TODO: Add admin authentication check
+      const level = await storage.createDhikriLevel(req.body);
+      res.json(level);
+    } catch (error) {
+      console.error("Error creating level:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.put("/api/admin/levels/:id", async (req, res) => {
+    try {
+      // TODO: Add admin authentication check
+      const level = await storage.updateDhikriLevel(parseInt(req.params.id), req.body);
+      res.json(level);
+    } catch (error) {
+      console.error("Error updating level:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.delete("/api/admin/levels/:id", async (req, res) => {
+    try {
+      // TODO: Add admin authentication check
+      await storage.deleteDhikriLevel(parseInt(req.params.id));
+      res.json({ message: "Level deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting level:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Search rooms route (with organization filters)
   app.get('/api/rooms/search', async (req, res) => {
     try {

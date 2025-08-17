@@ -31,6 +31,7 @@ import AdminSimple from "./pages/admin-simple";
 import AdminLogin from "./pages/admin-login";
 import AdminDashboard from "./pages/admin-dashboard";
 import AdminGamification from "./pages/admin-gamification";
+import AdminLevelManagement from "./pages/admin-level-management";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -95,6 +96,7 @@ function Router() {
         <Route path="/admin-dashboard" component={AdminDashboard} />
         <Route path="/admin" component={AdminLogin} />
         <Route path="/admin-gamification" component={AdminGamification} />
+        <Route path="/admin-levels" component={AdminLevelManagement} />
         <Route component={NotFound} />
       </Switch>
       

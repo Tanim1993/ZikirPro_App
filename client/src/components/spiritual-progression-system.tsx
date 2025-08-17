@@ -16,7 +16,7 @@ import {
   Crown,
   Gem
 } from 'lucide-react';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/useAuth";
 import { LevelLearningInterface } from "@/components/level-learning-interface";
 
@@ -390,8 +390,11 @@ export function SpiritualProgressionSystem({ onStartLevel }: ProgressionSystemPr
           isOpen={!!activeLevelId}
           onClose={() => setActiveLevelId(null)}
           onComplete={() => {
-            // Refresh data after completion
-            window.location.reload();
+            setActiveLevelId(null);
+            // Force refresh of all queries to show updated coins/progress
+            queryClient.invalidateQueries({ queryKey: ['/api/user/gamification'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/user/spiritual-progress'] });
+            queryClient.invalidateQueries({ queryKey: ['/api/user/analytics'] });
           }}
         />
       )}
