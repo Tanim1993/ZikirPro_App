@@ -73,6 +73,7 @@ export interface IStorage {
   createDhikriLevel(levelData: any): Promise<any>;
   updateDhikriLevel(id: number, levelData: any): Promise<any>;
   deleteDhikriLevel(id: number): Promise<void>;
+  reorderDhikriLevels(updates: { id: number; sortOrder: number; level: number }[]): Promise<void>;
   
   // Zikir operations
   getAllZikirs(): Promise<Zikir[]>;
@@ -1405,9 +1406,66 @@ export class DatabaseStorage implements IStorage {
   async getAllDhikriLevels(): Promise<any[]> {
     // Return the current dhikr database with admin metadata
     const dhikriDatabase = [
-      { id: 1, arabic: "سُبْحَانَ اللهِ", transliteration: "Subhanallahi", meaning: "Glory be to Allah", count: 33, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
-      { id: 2, arabic: "الْحَمْدُ للهِ", transliteration: "Alhamdulillahi", meaning: "Praise be to Allah", count: 33, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
-      { id: 3, arabic: "اللهُ أَكْبَر", transliteration: "Allahu Akbar", meaning: "Allah is Greatest", count: 34, coins: 10, experience: 25, category: "Basic Tasbih", isActive: true, difficulty: "beginner", timeEstimateMinutes: 5 },
+      { 
+        id: 1, 
+        level: 1,
+        arabic: "سُبْحَانَ اللهِ", 
+        transliteration: "Subhanallahi", 
+        meaning: "Glory be to Allah", 
+        count: 33, 
+        coins: 10, 
+        experience: 25, 
+        category: "Basic Tasbih", 
+        isActive: true, 
+        difficulty: "beginner", 
+        timeEstimateMinutes: 5,
+        sortOrder: 1,
+        pronunciation: "Sub-han-al-lah-hee",
+        culturalContext: "One of the most fundamental dhikr practices, mentioned throughout the Quran as a way to glorify Allah.",
+        learningObjectives: ["Learn the meaning of glorification", "Practice rhythmic recitation"],
+        spiritualBenefits: ["Purifies the heart", "Brings peace and tranquility"],
+        bestTimes: ["After prayers", "Morning", "Evening"]
+      },
+      { 
+        id: 2, 
+        level: 2,
+        arabic: "الْحَمْدُ للهِ", 
+        transliteration: "Alhamdulillahi", 
+        meaning: "Praise be to Allah", 
+        count: 33, 
+        coins: 10, 
+        experience: 25, 
+        category: "Basic Tasbih", 
+        isActive: true, 
+        difficulty: "beginner", 
+        timeEstimateMinutes: 5,
+        sortOrder: 2,
+        pronunciation: "Al-ham-du-lil-lah-hee",
+        culturalContext: "The opening phrase of Surah Al-Fatihah, expressing gratitude and praise to Allah.",
+        learningObjectives: ["Understand the concept of praise", "Connect with gratitude"],
+        spiritualBenefits: ["Increases thankfulness", "Opens the heart to blessings"],
+        bestTimes: ["Upon waking", "Before meals", "After achievements"]
+      },
+      { 
+        id: 3, 
+        level: 3,
+        arabic: "اللهُ أَكْبَر", 
+        transliteration: "Allahu Akbar", 
+        meaning: "Allah is Greatest", 
+        count: 34, 
+        coins: 10, 
+        experience: 25, 
+        category: "Basic Tasbih", 
+        isActive: true, 
+        difficulty: "beginner", 
+        timeEstimateMinutes: 5,
+        sortOrder: 3,
+        pronunciation: "Al-lah-hu-ak-bar",
+        culturalContext: "The Takbir, proclaimed during prayers and significant moments, affirming Allah's supreme greatness.",
+        learningObjectives: ["Recognize Allah's supremacy", "Practice with reverence"],
+        spiritualBenefits: ["Strengthens faith", "Provides perspective on worldly matters"],
+        bestTimes: ["Before challenges", "During prayer", "In moments of awe"]
+      },
     ];
     return dhikriDatabase;
   }
@@ -1427,6 +1485,14 @@ export class DatabaseStorage implements IStorage {
   async deleteDhikriLevel(id: number): Promise<void> {
     // In a real app, this would delete from dhikri_levels table
     console.log(`Deleting dhikr level ${id}`);
+  }
+
+  async reorderDhikriLevels(updates: { id: number; sortOrder: number; level: number }[]): Promise<void> {
+    // In a real app, this would update the sort order in dhikri_levels table
+    console.log("Reordering dhikr levels:", updates);
+    for (const update of updates) {
+      console.log(`Level ${update.id} -> sortOrder: ${update.sortOrder}, level: ${update.level}`);
+    }
   }
 }
 

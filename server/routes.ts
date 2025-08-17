@@ -976,6 +976,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.post("/api/admin/levels/reorder", async (req, res) => {
+    try {
+      // TODO: Add admin authentication check
+      const { updates } = req.body;
+      if (!updates || !Array.isArray(updates)) {
+        return res.status(400).json({ message: "Invalid updates data" });
+      }
+      await storage.reorderDhikriLevels(updates);
+      res.json({ message: "Level order updated successfully" });
+    } catch (error) {
+      console.error("Error reordering levels:", error);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
   // Search rooms route (with organization filters)
   app.get('/api/rooms/search', async (req, res) => {
     try {
