@@ -304,14 +304,34 @@ export default function Dashboard() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button 
-                onClick={() => setShowCreateModal(true)}
-                className="bg-islamic-primary text-white hover:bg-islamic-primary/90 shadow-sm px-3 py-2 text-sm font-medium rounded-lg"
-                data-testid="button-create-room"
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.4 }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Plus className="w-4 h-4 mr-1" />
-                Create Room
-              </Button>
+                <Button 
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-islamic-primary text-white hover:bg-islamic-primary/90 shadow-sm px-3 py-2 text-sm font-medium rounded-lg relative overflow-hidden group"
+                  data-testid="button-create-room"
+                >
+                  {/* Islamic pattern overlay */}
+                  <motion.div
+                    className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300"
+                    style={{
+                      background: `url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.3'%3E%3Ccircle cx='10' cy='10' r='3'/%3E%3C/g%3E%3C/svg%3E")`
+                    }}
+                  />
+                  <motion.div
+                    animate={{ rotate: [0, 360] }}
+                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                  </motion.div>
+                  Create Room
+                </Button>
+              </motion.div>
               
               {/* Premium Button - Only for regular users */}
               {user && (user as any)?.userType !== 'organization' && (user as any)?.userType !== 'admin' && (
