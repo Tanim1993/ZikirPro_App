@@ -1820,6 +1820,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register store routes for tasbih system
   const { registerStoreRoutes } = await import("./storeRoutes");
   registerStoreRoutes(app);
+  
+  // Seed premium data on startup
+  try {
+    const { seedPremiumData } = await import("./premium/seed-premium-data");
+    await seedPremiumData();
+  } catch (error) {
+    console.log("Premium seeding error (may already be seeded):", (error as Error).message);
+  }
 
   // Seed tasbih data on startup (temporarily disabled)
   // try {

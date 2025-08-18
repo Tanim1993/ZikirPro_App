@@ -61,6 +61,82 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Premium subscription plans
+export const subscriptionPlans = pgTable("subscription_plans", {
+  id: varchar("id").primaryKey(), // e.g. 'zikir-plus', 'zikir-pro', 'zikir-elite'
+  name: varchar("name", { length: 255 }).notNull(), // e.g. 'Zikir Plus'
+  description: text("description"),
+  price: integer("price").notNull(), // price in cents
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  interval: varchar("interval", { length: 20 }).notNull(), // 'month', 'year'
+  intervalCount: integer("interval_count").default(1),
+  userType: varchar("user_type", { length: 20 }).notNull(), // 'regular', 'organization'
+  features: jsonb("features").notNull(), // array of feature IDs
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Premium features catalog
+export const premiumFeatures = pgTable("premium_features", {
+  id: varchar("id").primaryKey(), // e.g. 'spiritual-journey', 'customization-suite'
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  category: varchar("category", { length: 50 }).notNull(),
+  price: integer("price").notNull(), // price in cents for individual feature
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  userType: varchar("user_type", { length: 20 }).notNull(), // 'regular', 'organization'
+  isPopular: boolean("is_popular").default(false),
+  isNewFeature: boolean("is_new_feature").default(false),
+  featureDetails: jsonb("feature_details"), // specific feature configuration
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User subscriptions
+export const userSubscriptions = pgTable("user_subscriptions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  planId: varchar("plan_id").notNull(),
+  stripeSubscriptionId: varchar("stripe_subscription_id").unique(),
+  stripeCustomerId: varchar("stripe_customer_id"),
+  status: varchar("status", { length: 20 }).notNull(), // 'active', 'cancelled', 'expired', 'trialing'
+  currentPeriodStart: timestamp("current_period_start"),
+  currentPeriodEnd: timestamp("current_period_end"),
+  cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false),
+  trialStart: timestamp("trial_start"),
+  trialEnd: timestamp("trial_end"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// User premium features (individual add-ons)
+export const userPremiumFeatures = pgTable("user_premium_features", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  featureId: varchar("feature_id").notNull(),
+  status: varchar("status", { length: 20 }).notNull(), // 'active', 'cancelled', 'expired'
+  purchaseDate: timestamp("purchase_date").defaultNow(),
+  expiryDate: timestamp("expiry_date"),
+  stripeSubscriptionId: varchar("stripe_subscription_id"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Payment transactions
+export const paymentTransactions = pgTable("payment_transactions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull(),
+  stripePaymentIntentId: varchar("stripe_payment_intent_id").unique(),
+  amount: integer("amount").notNull(), // amount in cents
+  currency: varchar("currency", { length: 3 }).default("USD"),
+  status: varchar("status", { length: 20 }).notNull(), // 'succeeded', 'failed', 'pending'
+  description: text("description"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Zikir master list
 export const zikirs = pgTable("zikirs", {
   id: serial("id").primaryKey(),
@@ -305,6 +381,9 @@ export const usersRelations = relations(users, ({ many }) => ({
   countEntries: many(countEntries),
   liveCounters: many(liveCounters),
   reportsMade: many(reports),
+  subscriptions: many(userSubscriptions),
+  premiumFeatures: many(userPremiumFeatures),
+  paymentTransactions: many(paymentTransactions),
 }));
 
 export const zikirsRelations = relations(zikirs, ({ many }) => ({
@@ -361,6 +440,44 @@ export const liveCountersRelations = relations(liveCounters, ({ one }) => ({
 export const reportsRelations = relations(reports, ({ one }) => ({
   reportedBy: one(users, {
     fields: [reports.byUserId],
+    references: [users.id],
+  }),
+}));
+
+// Premium relations
+export const subscriptionPlansRelations = relations(subscriptionPlans, ({ many }) => ({
+  userSubscriptions: many(userSubscriptions),
+}));
+
+export const premiumFeaturesRelations = relations(premiumFeatures, ({ many }) => ({
+  userPremiumFeatures: many(userPremiumFeatures),
+}));
+
+export const userSubscriptionsRelations = relations(userSubscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [userSubscriptions.userId],
+    references: [users.id],
+  }),
+  plan: one(subscriptionPlans, {
+    fields: [userSubscriptions.planId],
+    references: [subscriptionPlans.id],
+  }),
+}));
+
+export const userPremiumFeaturesRelations = relations(userPremiumFeatures, ({ one }) => ({
+  user: one(users, {
+    fields: [userPremiumFeatures.userId],
+    references: [users.id],
+  }),
+  feature: one(premiumFeatures, {
+    fields: [userPremiumFeatures.featureId],
+    references: [premiumFeatures.id],
+  }),
+}));
+
+export const paymentTransactionsRelations = relations(paymentTransactions, ({ one }) => ({
+  user: one(users, {
+    fields: [paymentTransactions.userId],
     references: [users.id],
   }),
 }));
@@ -485,6 +602,22 @@ export type InsertUserAchievementBadge = typeof userAchievementBadges.$inferInse
 export type SeasonalCompetitionParticipant = typeof seasonalCompetitionParticipants.$inferSelect;
 export type InsertSeasonalCompetitionParticipant = typeof seasonalCompetitionParticipants.$inferInsert;
 
+// Premium types
+export type SubscriptionPlan = typeof subscriptionPlans.$inferSelect;
+export type InsertSubscriptionPlan = typeof subscriptionPlans.$inferInsert;
+
+export type PremiumFeature = typeof premiumFeatures.$inferSelect;
+export type InsertPremiumFeature = typeof premiumFeatures.$inferInsert;
+
+export type UserSubscription = typeof userSubscriptions.$inferSelect;
+export type InsertUserSubscription = typeof userSubscriptions.$inferInsert;
+
+export type UserPremiumFeature = typeof userPremiumFeatures.$inferSelect;
+export type InsertUserPremiumFeature = typeof userPremiumFeatures.$inferInsert;
+
+export type PaymentTransaction = typeof paymentTransactions.$inferSelect;
+export type InsertPaymentTransaction = typeof paymentTransactions.$inferInsert;
+
 // Zod schemas
 export const insertRoomSchema = createInsertSchema(rooms).omit({
   id: true,
@@ -558,6 +691,34 @@ export const insertUserAchievementBadgeSchema = createInsertSchema(userAchieveme
 export const insertSeasonalCompetitionParticipantSchema = createInsertSchema(seasonalCompetitionParticipants).omit({
   id: true,
   registeredAt: true,
+});
+
+// Premium Zod schemas
+export const insertSubscriptionPlanSchema = createInsertSchema(subscriptionPlans).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPremiumFeatureSchema = createInsertSchema(premiumFeatures).omit({
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserSubscriptionSchema = createInsertSchema(userSubscriptions).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertUserPremiumFeatureSchema = createInsertSchema(userPremiumFeatures).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPaymentTransactionSchema = createInsertSchema(paymentTransactions).omit({
+  id: true,
+  createdAt: true,
 });
 
 // Level and promotion rule types
