@@ -22,6 +22,7 @@ import { isUnauthorizedError } from "@/lib/authUtils";
 import { Clock, Users, Target, Trophy, Plus, Globe, Home, Star, Calculator, Building2, Zap, Calendar, BookOpen } from "lucide-react";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export default function Dashboard() {
   // All useState hooks at the top - NEVER move these after any conditional returns
