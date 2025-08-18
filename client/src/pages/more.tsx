@@ -1,65 +1,172 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff, Trophy, Shield } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ArrowLeft, BookOpen, Clock, Calculator, Navigation, Heart, Scroll, CloudOff, Trophy, Shield, Star, Compass, AudioLines, Calendar, Zap, Target, Crown, Users } from "lucide-react";
 
 export default function More() {
-  const features = [
+  const islamicToolsCategories = [
     {
-      title: "Salah Tracker",
-      description: "Track your daily prayers and maintain consistency",
+      title: "Worship & Prayers",
+      description: "Complete suite of Salah tracking and prayer management tools",
       icon: Clock,
-      href: "/salah-tracker",
-      color: "from-blue-500 to-blue-700"
+      color: "from-blue-500 to-blue-700",
+      tools: [
+        {
+          title: "Smart Salah Tracker",
+          description: "Advanced prayer tracking with Qaza management, missed prayers recovery, and prayer time notifications",
+          href: "/salah-tracker",
+          isPremium: true
+        },
+        {
+          title: "Prayer Statistics",
+          description: "Detailed analytics on your prayer consistency and spiritual growth patterns",
+          href: "/salah-stats",
+          isPremium: true
+        },
+        {
+          title: "Qaza Calculator",
+          description: "Calculate and manage missed prayers with systematic recovery plans",
+          href: "/qaza-calculator",
+          isPremium: false
+        }
+      ]
     },
     {
-      title: "Quran Reader",
-      description: "Read and track your Quran progress",
+      title: "Quran & Knowledge",
+      description: "Comprehensive Quranic study tools and Islamic learning resources",
       icon: BookOpen,
-      href: "/quran",
-      color: "from-indigo-500 to-indigo-700"
+      color: "from-indigo-500 to-indigo-700",
+      tools: [
+        {
+          title: "Quran Reader",
+          description: "Read with Arabic text, translations, and audio recitations from renowned Qaris",
+          href: "/quran",
+          isPremium: false
+        },
+        {
+          title: "Quranic Verse of the Day",
+          description: "Daily verses with detailed context, tafsir, and spiritual reflections",
+          href: "/verse-of-day",
+          isPremium: true
+        },
+        {
+          title: "Hadith Collection",
+          description: "Authentic Hadith from Sahih Bukhari, Muslim, and other trusted sources",
+          href: "/hadith",
+          isPremium: false
+        },
+        {
+          title: "Islamic Learning Hub",
+          description: "Interactive courses on Islamic history, jurisprudence, and spiritual development",
+          href: "/learning-hub",
+          isPremium: true
+        }
+      ]
     },
     {
-      title: "Hadith Collection",
-      description: "Daily authentic Hadith from Prophet Muhammad (PBUH)",
-      icon: Scroll,
-      href: "/hadith",
-      color: "from-purple-500 to-purple-700"
+      title: "Duas & Remembrance",
+      description: "Personalized supplications and advanced Zikir tools",
+      icon: Star,
+      color: "from-purple-500 to-purple-700",
+      tools: [
+        {
+          title: "99 Names of Allah",
+          description: "Complete Asma ul-Husna with audio pronunciations, meanings, and benefits",
+          href: "/99-names",
+          isPremium: true
+        },
+        {
+          title: "Personalized Dua Recommendations",
+          description: "AI-powered dua suggestions based on your spiritual needs and life situations",
+          href: "/dua-recommendations",
+          isPremium: true
+        },
+        {
+          title: "Morning & Evening Azkar",
+          description: "Complete collection of daily remembrance with tracking and reminders",
+          href: "/daily-azkar",
+          isPremium: false
+        }
+      ]
     },
     {
-      title: "Zakat Calculator",
-      description: "Calculate your Zakat obligations easily",
+      title: "Navigation & Direction",
+      description: "Advanced location-based Islamic tools and compass features",
+      icon: Compass,
+      color: "from-green-500 to-green-700",
+      tools: [
+        {
+          title: "Advanced Qiblah with AR",
+          description: "AR-powered Qiblah finder with real-time compass and 3D Kaaba visualization",
+          href: "/qiblah",
+          isPremium: true
+        },
+        {
+          title: "Prayer Times by Location",
+          description: "Accurate prayer times for any location worldwide with automatic adjustments",
+          href: "/prayer-times",
+          isPremium: false
+        },
+        {
+          title: "Mosque Finder",
+          description: "Find nearby mosques with reviews, prayer times, and community information",
+          href: "/mosque-finder",
+          isPremium: true
+        }
+      ]
+    },
+    {
+      title: "Islamic Finance",
+      description: "Comprehensive Zakat calculation and Islamic financial management",
       icon: Calculator,
-      href: "/zakat-calculator",
-      color: "from-teal-500 to-teal-700"
+      color: "from-teal-500 to-teal-700",
+      tools: [
+        {
+          title: "Advanced Zakat Calculator",
+          description: "Complete Zakat calculation with savings tracking, gold/silver rates, and business assets",
+          href: "/zakat-calculator",
+          isPremium: true
+        },
+        {
+          title: "Charity Tracker",
+          description: "Track your Sadaqah, Zakat payments, and charitable giving with detailed records",
+          href: "/charity-tracker",
+          isPremium: true
+        },
+        {
+          title: "Islamic Donations",
+          description: "Support verified Islamic causes and charity organizations globally",
+          href: "/donations",
+          isPremium: false
+        }
+      ]
     },
     {
-      title: "Qiblah Direction",
-      description: "Find the direction to Mecca from your location",
-      icon: Navigation,
-      href: "/qiblah",
-      color: "from-green-500 to-green-700"
-    },
-    {
-      title: "Islamic Donations",
-      description: "Support Islamic causes and charity organizations",
-      icon: Heart,
-      href: "/donations",
-      color: "from-rose-500 to-rose-700"
-    },
-    {
-      title: "Offline Sync Demo",
-      description: "Test offline counting with secure synchronization",
-      icon: CloudOff,
-      href: "/offline-demo",
-      color: "from-orange-500 to-orange-700"
-    },
-    {
-      title: "Seasonal Competitions",
-      description: "Join special seasonal zikir competitions and earn exclusive rewards",
+      title: "Community & Competitions",
+      description: "Connect with Muslim community and participate in spiritual competitions",
       icon: Trophy,
-      href: "/seasonal-competitions",
-      color: "from-purple-500 to-pink-600"
+      color: "from-rose-500 to-rose-700",
+      tools: [
+        {
+          title: "Seasonal Competitions",
+          description: "Join special Ramadan, Hajj, and Muharram competitions with exclusive rewards",
+          href: "/seasonal-competitions",
+          isPremium: false
+        },
+        {
+          title: "Community Challenges",
+          description: "Participate in group Zikir challenges and community spiritual goals",
+          href: "/community-challenges",
+          isPremium: true
+        },
+        {
+          title: "Islamic Social Network",
+          description: "Connect with Muslims worldwide, share spiritual progress, and find prayer partners",
+          href: "/islamic-social",
+          isPremium: true
+        }
+      ]
     }
   ];
 
@@ -76,8 +183,8 @@ export default function More() {
           </Link>
           
           <div className="text-center flex-1">
-            <h1 className="text-xl font-bold">Islamic Features</h1>
-            <p className="text-sm text-islamic-secondary/80">Explore spiritual tools</p>
+            <h1 className="text-xl font-bold">Advanced Islamic Tools</h1>
+            <p className="text-sm text-islamic-secondary/80">Comprehensive spiritual toolkit</p>
           </div>
           
           <div className="w-20"></div> {/* Spacer for balance */}
@@ -85,31 +192,89 @@ export default function More() {
       </header>
 
       {/* Content */}
-      <div className="px-4 py-6 space-y-6">
+      <div className="px-4 py-6 space-y-8">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Enhance Your Spiritual Journey</h2>
-          <p className="text-gray-600">Access authentic Islamic tools and resources</p>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Complete Islamic Toolkit</h2>
+          <p className="text-gray-600">Subject-wise organized spiritual tools and authentic resources</p>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {features.map((feature, index) => {
-            const IconComponent = feature.icon;
+        {/* Subject Categories */}
+        <div className="space-y-8">
+          {islamicToolsCategories.map((category, categoryIndex) => {
+            const CategoryIcon = category.icon;
             return (
-              <Link key={index} href={feature.href}>
-                <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group">
-                  <CardHeader className="pb-3">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${feature.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform duration-200`}>
-                      <IconComponent className="w-6 h-6 text-white" />
-                    </div>
-                    <CardTitle className="text-lg text-gray-900">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-gray-600 text-sm leading-relaxed">{feature.description}</p>
-                  </CardContent>
-                </Card>
-              </Link>
+              <div key={categoryIndex} className="space-y-4">
+                {/* Category Header */}
+                <div className="flex items-center space-x-4">
+                  <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${category.color} flex items-center justify-center`}>
+                    <CategoryIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-xl font-bold text-gray-900">{category.title}</h3>
+                    <p className="text-gray-600 text-sm">{category.description}</p>
+                  </div>
+                </div>
+
+                {/* Tools Grid */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 pl-16">
+                  {category.tools.map((tool, toolIndex) => (
+                    <Link key={toolIndex} href={tool.href}>
+                      <Card className="hover:shadow-lg transition-all duration-200 cursor-pointer group h-full">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-base text-gray-900 flex-1 pr-2">{tool.title}</CardTitle>
+                            {tool.isPremium && (
+                              <Badge variant="secondary" className="bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs">
+                                <Crown className="w-3 h-3 mr-1" />
+                                Premium
+                              </Badge>
+                            )}
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <p className="text-gray-600 text-sm leading-relaxed">{tool.description}</p>
+                        </CardContent>
+                      </Card>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             );
           })}
+        </div>
+
+        {/* Quick Access Tools */}
+        <div className="mt-12 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <Zap className="w-5 h-5 mr-2 text-islamic-primary" />
+            Quick Access Tools
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Link href="/offline-demo">
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer group text-center p-4">
+                <CloudOff className="w-6 h-6 mx-auto mb-2 text-gray-600 group-hover:text-islamic-primary transition-colors" />
+                <p className="text-sm font-medium">Offline Sync</p>
+              </Card>
+            </Link>
+            <Link href="/animations-demo">
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer group text-center p-4">
+                <Star className="w-6 h-6 mx-auto mb-2 text-gray-600 group-hover:text-islamic-primary transition-colors" />
+                <p className="text-sm font-medium">Animations</p>
+              </Card>
+            </Link>
+            <Link href="/premium-addons">
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer group text-center p-4">
+                <Crown className="w-6 h-6 mx-auto mb-2 text-amber-600 group-hover:text-amber-700 transition-colors" />
+                <p className="text-sm font-medium">Premium</p>
+              </Card>
+            </Link>
+            <Link href="/stats">
+              <Card className="hover:shadow-md transition-all duration-200 cursor-pointer group text-center p-4">
+                <Target className="w-6 h-6 mx-auto mb-2 text-gray-600 group-hover:text-islamic-primary transition-colors" />
+                <p className="text-sm font-medium">Analytics</p>
+              </Card>
+            </Link>
+          </div>
         </div>
 
         {/* Featured Content */}

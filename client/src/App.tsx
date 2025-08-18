@@ -35,6 +35,11 @@ import AdminLevelManagement from "./pages/admin-level-management";
 import OrganizationAddons from "./pages/organization-addons";
 import PremiumAddons from "./pages/premium-addons";
 import AnimationsDemo from "./pages/animations-demo";
+import NinetyNineNames from "./pages/99-names";
+import DuaRecommendations from "./pages/dua-recommendations";
+import VerseOfDay from "./pages/verse-of-day";
+import PrayerTimes from "./pages/prayer-times";
+import DailyAzkar from "./pages/daily-azkar";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -95,6 +100,11 @@ function Router() {
             <Route path="/seasonal-competitions" component={SeasonalCompetitions} />
             <Route path="/premium-addons" component={PremiumAddons} />
             <Route path="/animations-demo" component={AnimationsDemo} />
+            <Route path="/99-names" component={NinetyNineNames} />
+            <Route path="/dua-recommendations" component={DuaRecommendations} />
+            <Route path="/verse-of-day" component={VerseOfDay} />
+            <Route path="/prayer-times" component={PrayerTimes} />
+            <Route path="/daily-azkar" component={DailyAzkar} />
           </>
         )}
         {/* Admin routes - accessible regardless of authentication status */}
