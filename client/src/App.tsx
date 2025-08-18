@@ -33,6 +33,7 @@ import AdminDashboard from "./pages/admin-dashboard";
 import AdminGamification from "./pages/admin-gamification";
 import AdminLevelManagement from "./pages/admin-level-management";
 import OrganizationAddons from "./pages/organization-addons";
+import PremiumAddons from "./pages/premium-addons";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -91,6 +92,7 @@ function Router() {
             <Route path="/donations" component={Donations} />
             <Route path="/offline-demo" component={OfflineDemo} />
             <Route path="/seasonal-competitions" component={SeasonalCompetitions} />
+            <Route path="/premium-addons" component={PremiumAddons} />
           </>
         )}
         {/* Admin routes - accessible regardless of authentication status */}

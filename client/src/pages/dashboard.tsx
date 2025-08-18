@@ -313,6 +313,16 @@ export default function Dashboard() {
                 Create Room
               </Button>
               
+              {/* Premium Button - Only for regular users */}
+              {user && (user as any)?.userType !== 'organization' && (user as any)?.userType !== 'admin' && (
+                <Link href="/premium-addons">
+                  <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-sm px-3 py-2 text-sm font-medium rounded-lg" data-testid="button-premium-addons">
+                    <div className="text-sm mr-1">💎</div>
+                    Premium
+                  </Button>
+                </Link>
+              )}
+              
               {/* Admin Buttons - Only for admin users */}
               {user && ((user as any)?.userType === 'admin' || (user as any)?.username === 'admin' || (user as any)?.id === 'founder-admin-id') ? (
                 <>
