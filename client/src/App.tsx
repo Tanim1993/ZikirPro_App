@@ -32,6 +32,7 @@ import AdminLogin from "./pages/admin-login";
 import AdminDashboard from "./pages/admin-dashboard";
 import AdminGamification from "./pages/admin-gamification";
 import AdminLevelManagement from "./pages/admin-level-management";
+import OrganizationAddons from "./pages/organization-addons";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -66,6 +67,7 @@ function Router() {
             <Route path="/room/:id" component={Room} />
             <Route path="/profile" component={Profile} />
             <Route path="/organizations" component={OrganizationSearch} />
+            <Route path="/organization-addons" component={OrganizationAddons} />
           </>
         ) : (
           <>

@@ -8,7 +8,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { Plus, Trophy, Users, Calendar, Award, BarChart3, Eye } from "lucide-react";
+import { Plus, Trophy, Users, Calendar, Award, BarChart3, Eye, Crown } from "lucide-react";
 
 interface Competition {
   id: string;
@@ -86,14 +86,25 @@ export default function OrganizationDashboard() {
             </h1>
             <p className="text-gray-600 mt-1">Organization Competition Dashboard</p>
           </div>
-          <Button
-            onClick={() => setShowCreateModal(true)}
-            className="bg-islamic-primary hover:bg-islamic-primary-dark text-white flex items-center gap-2"
-            data-testid="button-create-competition"
-          >
-            <Plus className="w-4 h-4" />
-            Create Competition
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => window.location.href = '/organization-addons'}
+              variant="outline"
+              className="border-purple-600 text-purple-600 hover:bg-purple-50 flex items-center gap-2"
+              data-testid="button-organization-addons"
+            >
+              <Crown className="w-4 h-4" />
+              Premium Add-ons
+            </Button>
+            <Button
+              onClick={() => setShowCreateModal(true)}
+              className="bg-islamic-primary hover:bg-islamic-primary-dark text-white flex items-center gap-2"
+              data-testid="button-create-competition"
+            >
+              <Plus className="w-4 h-4" />
+              Create Competition
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
