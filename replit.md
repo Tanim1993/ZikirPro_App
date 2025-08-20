@@ -2,7 +2,19 @@
 
 This is an Islamic Zikir Competition App called "Zikir Amol" that combines digital tasbih functionality with competitive elements. The application allows users to join or create Zikir rooms where they can perform remembrance (dhikr) while competing with others through real-time leaderboards. The app features a full-stack architecture with React frontend, Express.js backend, PostgreSQL database, and WebSocket support for live updates.
 
-## Recent Changes (August 18, 2025)
+## Recent Changes (August 20, 2025)
+- **Advanced Islamic Tools Implementation:** Complete subject-wise organization of Islamic tools in More button with 7 categories
+- **99 Names of Allah Feature:** Interactive Asma ul-Husna with audio pronunciations, meanings, and spiritual benefits
+- **AI-Powered Dua Recommendations:** Personalized supplications based on user's spiritual needs and life situations  
+- **Quranic Verse of the Day:** Daily verses with detailed context, tafsir, spiritual reflection, and practical application
+- **Prayer Times System:** Accurate location-based prayer scheduling with Islamic calendar integration
+- **Daily Azkar Tracker:** Morning, evening, and anytime dhikr with progress monitoring and completion tracking
+- **Hajj Companion Feature:** Complete digital pilgrimage guide with day-by-day ritual tracking, authentic duas, and progress monitoring
+- **Subject-Based Tool Organization:** 7 main categories (Worship & Prayers, Quran & Knowledge, Duas & Remembrance, Navigation & Direction, Islamic Finance, Community & Competitions, Hajj & Pilgrimage)
+- **Premium Integration:** Crown badges and upgrade prompts throughout advanced Islamic tools
+- **Enhanced User Experience:** Professional Islamic gradients, animations, and intuitive navigation across all new features
+
+## Previous Changes (August 18, 2025)
 - **Premium Add-ons System:** Comprehensive monetization system for both organizations and end users
 - **Organization Premium Features:** Advanced analytics, community management, branding suite, and enterprise tools ($19-45/month per feature)
 - **End User Premium Features:** Spiritual journey enhancement, customization, competitions, and Islamic tools ($1.99-6.99/month per feature)

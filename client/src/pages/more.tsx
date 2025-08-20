@@ -167,6 +167,44 @@ export default function More() {
           isPremium: true
         }
       ]
+    },
+    {
+      title: "Hajj & Pilgrimage",
+      description: "Complete digital companion for the sacred journey of Hajj",
+      icon: Heart,
+      color: "from-amber-500 to-yellow-600",
+      tools: [
+        {
+          title: "Hajj Companion",
+          description: "Step-by-step guide for all Hajj rituals with authentic duas and progress tracking",
+          href: "/hajj-companion",
+          isPremium: true
+        },
+        {
+          title: "Hajj Preparation Course",
+          description: "Complete pre-Hajj learning with history, etiquette, and common mistakes to avoid",
+          href: "/hajj-preparation",
+          isPremium: true
+        },
+        {
+          title: "Holy Sites Map",
+          description: "Interactive 3D maps of Mecca, Mina, Arafat with GPS navigation and crowd info",
+          href: "/hajj-maps",
+          isPremium: true
+        },
+        {
+          title: "Hajj Group Manager",
+          description: "Connect with your pilgrimage group, share location, and coordinate meetings",
+          href: "/hajj-groups",
+          isPremium: true
+        },
+        {
+          title: "Pilgrimage Health Guide",
+          description: "Medical tips, emergency contacts, and safety guidance for Hajj journey",
+          href: "/hajj-health",
+          isPremium: false
+        }
+      ]
     }
   ];
 
