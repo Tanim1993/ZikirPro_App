@@ -41,6 +41,7 @@ import VerseOfDay from "./pages/verse-of-day";
 import PrayerTimes from "./pages/prayer-times";
 import DailyAzkar from "./pages/daily-azkar";
 import HajjCompanion from "./pages/hajj-companion";
+import HajjMaps from "./pages/hajj-maps";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -107,6 +108,7 @@ function Router() {
             <Route path="/prayer-times" component={PrayerTimes} />
             <Route path="/daily-azkar" component={DailyAzkar} />
             <Route path="/hajj-companion" component={HajjCompanion} />
+            <Route path="/hajj-maps" component={HajjMaps} />
           </>
         )}
         {/* Admin routes - accessible regardless of authentication status */}
