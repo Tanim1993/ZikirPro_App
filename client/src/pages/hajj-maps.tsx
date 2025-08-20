@@ -11,7 +11,7 @@ interface HolySite {
   name: string;
   nameArabic: string;
   coordinates: { x: number; y: number };
-  type: "mosque" | "mountain" | "area" | "bridge" | "hotel";
+  type: "mosque" | "mountain" | "area" | "bridge" | "hotel" | "building";
   description: string;
   significance: string;
   crowdLevel: "low" | "medium" | "high" | "very_high";
