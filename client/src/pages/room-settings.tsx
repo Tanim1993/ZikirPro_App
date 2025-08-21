@@ -29,7 +29,7 @@ interface Room {
 
 export default function RoomSettings() {
   const { roomId } = useParams<{ roomId: string }>();
-  const [selectedZikirType, setSelectedZikirType] = useState<string>("");
+  const [selectedTasbihType, setSelectedTasbihType] = useState<string>("digital");
 
   const { data: room } = useQuery<Room>({
     queryKey: [`/api/rooms/${roomId}`],
@@ -42,13 +42,25 @@ export default function RoomSettings() {
     refetchInterval: 5000,
   });
 
-  const zikirOptions = [
-    { id: "subhanallah", name: "Subhanallah", arabic: "سُبْحَانَ اللهِ", meaning: "Glory be to Allah" },
-    { id: "alhamdulillah", name: "Alhamdulillah", arabic: "الْحَمْدُ لِلّهِ", meaning: "All praise be to Allah" },
-    { id: "allahu-akbar", name: "Allahu Akbar", arabic: "اللهُ أَكْبَرُ", meaning: "Allah is the Greatest" },
-    { id: "la-ilaha-illa-allah", name: "La ilaha illa Allah", arabic: "لَا إِلٰهَ إِلَّا الله", meaning: "There is no god but Allah" },
-    { id: "astaghfirullah", name: "Astaghfirullah", arabic: "أَسْتَغْفِرُ اللهَ", meaning: "I seek forgiveness from Allah" },
-    { id: "bismillah", name: "Bismillah", arabic: "بِسْمِ اللهِ", meaning: "In the name of Allah" },
+  const tasbihOptions = [
+    { 
+      id: "digital", 
+      name: "Digital Tasbih", 
+      icon: "📱", 
+      description: "Count using digital button on your phone screen" 
+    },
+    { 
+      id: "physical", 
+      name: "Physical Tasbih", 
+      icon: "📿", 
+      description: "Count using traditional physical tasbih beads" 
+    },
+    { 
+      id: "hand", 
+      name: "Hand Counting", 
+      icon: "✋", 
+      description: "Count using your fingers in traditional way" 
+    },
   ];
 
   const handleShare = () => {
@@ -136,38 +148,40 @@ export default function RoomSettings() {
           </CardContent>
         </Card>
 
-        {/* Zikir Type Selection */}
+        {/* Tasbih Type Selection */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
               <Target className="w-5 h-5 mr-2 text-islamic-primary" />
-              Select Zikir Type
+              Select Tasbih Type
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid gap-3">
-              {zikirOptions.map((zikir) => (
+              {tasbihOptions.map((tasbih) => (
                 <motion.div
-                  key={zikir.id}
+                  key={tasbih.id}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <Card 
                     className={`cursor-pointer transition-all duration-200 ${
-                      selectedZikirType === zikir.id 
+                      selectedTasbihType === tasbih.id 
                         ? "ring-2 ring-islamic-primary shadow-lg bg-islamic-primary/5" 
                         : "hover:shadow-md"
                     }`}
-                    onClick={() => setSelectedZikirType(zikir.id)}
+                    onClick={() => setSelectedTasbihType(tasbih.id)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-semibold text-gray-900">{zikir.name}</h4>
-                          <p className="text-lg font-arabic text-islamic-primary">{zikir.arabic}</p>
-                          <p className="text-sm text-gray-500">{zikir.meaning}</p>
+                        <div className="flex items-center space-x-3">
+                          <div className="text-2xl">{tasbih.icon}</div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{tasbih.name}</h4>
+                            <p className="text-sm text-gray-500">{tasbih.description}</p>
+                          </div>
                         </div>
-                        {selectedZikirType === zikir.id && (
+                        {selectedTasbihType === tasbih.id && (
                           <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
@@ -258,12 +272,12 @@ export default function RoomSettings() {
               </div>
               <div className="p-4 bg-blue-50 rounded-lg">
                 <p className="text-2xl font-bold text-blue-600">
-                  {Math.round(leaderboard.reduce((sum, member) => sum + member.totalCount, 0) / Math.max(leaderboard.length, 1))}
+                  {leaderboard.length > 0 ? Math.round(leaderboard.reduce((sum, member) => sum + member.totalCount, 0) / leaderboard.length) : 0}
                 </p>
                 <p className="text-sm text-gray-600">Average per Member</p>
               </div>
               <div className="p-4 bg-purple-50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">{Math.max(0, room.duration - Math.floor((Date.now() - new Date(room.createdAt).getTime()) / (1000 * 60 * 60 * 24)))}</p>
+                <p className="text-2xl font-bold text-purple-600">{room ? Math.max(0, room.duration - Math.floor((Date.now() - new Date(room.createdAt).getTime()) / (1000 * 60 * 60 * 24))) : 0}</p>
                 <p className="text-sm text-gray-600">Days Remaining</p>
               </div>
             </div>

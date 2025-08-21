@@ -2,7 +2,15 @@
 
 This is an Islamic Zikir Competition App called "Zikir Amol" that combines digital tasbih functionality with competitive elements. The application allows users to join or create Zikir rooms where they can perform remembrance (dhikr) while competing with others through real-time leaderboards. The app features a full-stack architecture with React frontend, Express.js backend, PostgreSQL database, and WebSocket support for live updates.
 
-## Recent Changes (August 20, 2025)
+## Recent Changes (August 21, 2025)
+- **Tasbih Room Redesign:** Complete non-scrollable single-page dashboard for mobile optimization
+- **Compact Mobile Layout:** Reduced all component sizes and spacing for iPhone 16 Plus compatibility
+- **Settings Page Separation:** Moved secondary features (leaderboard, tasbih type selection, room details) to dedicated settings page
+- **Tasbih Type Selection:** Changed from zikir selection to proper tasbih types (Digital, Physical, Hand counting)
+- **Mobile-First Interface:** Single screen height with overflow-hidden, compact header, and simplified circular count button
+- **Removed Global Leaderboard:** Focus on room-specific leaderboards in settings page as requested
+
+## Previous Changes (August 20, 2025)
 - **Advanced Islamic Tools Implementation:** Complete subject-wise organization of Islamic tools in More button with 7 categories
 - **99 Names of Allah Feature:** Interactive Asma ul-Husna with audio pronunciations, meanings, and spiritual benefits
 - **AI-Powered Dua Recommendations:** Personalized supplications based on user's spiritual needs and life situations  
