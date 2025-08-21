@@ -42,6 +42,7 @@ import PrayerTimes from "./pages/prayer-times";
 import DailyAzkar from "./pages/daily-azkar";
 import HajjCompanion from "./pages/hajj-companion";
 import HajjMaps from "./pages/hajj-maps";
+import RoomSettings from "./pages/room-settings";
 
 function Router() {
   const { isAuthenticated, isLoading, user } = useAuth();
@@ -109,6 +110,7 @@ function Router() {
             <Route path="/daily-azkar" component={DailyAzkar} />
             <Route path="/hajj-companion" component={HajjCompanion} />
             <Route path="/hajj-maps" component={HajjMaps} />
+            <Route path="/room/:roomId/settings" component={RoomSettings} />
           </>
         )}
         {/* Admin routes - accessible regardless of authentication status */}
