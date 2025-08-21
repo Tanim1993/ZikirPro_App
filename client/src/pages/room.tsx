@@ -176,30 +176,30 @@ export default function Room() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 flex flex-col overflow-hidden">
-      {/* Fixed Header */}
-      <header className="bg-islamic-gradient text-white px-4 py-3 flex-shrink-0">
-        <div className="flex items-center justify-between mb-3">
+    <div className="h-screen bg-gradient-to-br from-islamic-secondary/20 to-islamic-primary/10 flex flex-col overflow-hidden">
+      {/* Compact Fixed Header */}
+      <header className="bg-islamic-gradient text-white px-3 py-2 flex-shrink-0">
+        <div className="flex items-center justify-between mb-2">
           <Link href="/dashboard">
-            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
-              <ArrowLeft className="w-4 h-4 mr-2" />
+            <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 h-8 px-2">
+              <ArrowLeft className="w-4 h-4 mr-1" />
               Back
             </Button>
           </Link>
           
           <div className="text-center flex-1">
-            <h1 className="text-lg font-bold">{room?.name}</h1>
-            <p className="text-sm text-islamic-secondary/80">
+            <h1 className="text-base font-bold">{room?.name}</h1>
+            <p className="text-xs text-islamic-secondary/80">
               Room #{roomId.toString().padStart(6, '0')}
             </p>
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Button 
               variant="ghost" 
               size="sm" 
               onClick={shareRoom}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/20 h-8 w-8 p-0"
             >
               <Share2 className="w-4 h-4" />
             </Button>
@@ -209,7 +209,7 @@ export default function Room() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => leaveRoomMutation.mutate()}
-                className="text-white hover:bg-red-500/20"
+                className="text-white hover:bg-red-500/20 h-8 w-8 p-0"
               >
                 <LogOut className="w-4 h-4" />
               </Button>
@@ -219,7 +219,7 @@ export default function Room() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="text-white hover:bg-white/20"
+                className="text-white hover:bg-white/20 h-8 w-8 p-0"
               >
                 <Settings className="w-4 h-4" />
               </Button>
@@ -227,60 +227,52 @@ export default function Room() {
           </div>
         </div>
 
-        {/* Room Stats Bar */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
-            <Users className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-sm font-bold">{room?.memberCount || 0}</div>
-            <div className="text-xs text-islamic-secondary/80">Members</div>
+        {/* Compact Stats Bar */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="bg-white/10 backdrop-blur rounded-lg p-1.5 text-center">
+            <Users className="w-3 h-3 mx-auto mb-0.5" />
+            <div className="text-xs font-bold">{room?.memberCount || 0}</div>
+            <div className="text-[10px] text-islamic-secondary/80">Members</div>
           </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
-            <Target className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-sm font-bold">
-              {room?.unlimited ? '∞' : room?.targetCount?.toLocaleString() || '1000'}
+          <div className="bg-white/10 backdrop-blur rounded-lg p-1.5 text-center">
+            <Target className="w-3 h-3 mx-auto mb-0.5" />
+            <div className="text-xs font-bold">
+              {room?.unlimited ? '∞' : room?.targetCount?.toLocaleString() || '1K'}
             </div>
-            <div className="text-xs text-islamic-secondary/80">Target</div>
+            <div className="text-[10px] text-islamic-secondary/80">Target</div>
           </div>
-          <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
-            <Crown className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-sm font-bold">#{1}</div>
-            <div className="text-xs text-islamic-secondary/80">Your Rank</div>
+          <div className="bg-white/10 backdrop-blur rounded-lg p-1.5 text-center">
+            <Crown className="w-3 h-3 mx-auto mb-0.5" />
+            <div className="text-xs font-bold">#{1}</div>
+            <div className="text-[10px] text-islamic-secondary/80">Rank</div>
           </div>
         </div>
       </header>
 
-      {/* Main Content - No Scroll, Single Screen */}
-      <div className="flex-1 flex flex-col px-4 py-4 overflow-hidden">
-        {/* Zikir Display */}
-        <Card className="mb-4 flex-shrink-0">
-          <CardContent className="p-4 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{room?.zikirName || room?.name}</h2>
-            {room?.zikirArabic && (
-              <div className="text-2xl mb-2 leading-relaxed font-arabic text-islamic-primary">
-                {room.zikirArabic}
-              </div>
-            )}
-            {room?.transliteration && (
-              <div className="text-gray-600 italic mb-2">{room.transliteration}</div>
-            )}
-            {room?.translation && (
-              <div className="text-sm text-gray-500">{room.translation}</div>
-            )}
-            {room?.description && (
-              <div className="text-sm text-gray-500 mt-2">{room.description}</div>
-            )}
-          </CardContent>
-        </Card>
+      {/* Main Content - Compact Mobile Layout */}
+      <div className="flex-1 flex flex-col px-3 py-2 overflow-hidden">
+        {/* Compact Zikir Display */}
+        <div className="bg-white/90 backdrop-blur rounded-lg p-3 mb-3 text-center flex-shrink-0">
+          <h2 className="text-lg font-bold text-gray-900 mb-1">{room?.zikirName || room?.name}</h2>
+          {room?.zikirArabic && (
+            <div className="text-xl mb-1 leading-relaxed font-arabic text-islamic-primary">
+              {room.zikirArabic}
+            </div>
+          )}
+          {room?.transliteration && (
+            <div className="text-gray-600 italic text-sm">{room.transliteration}</div>
+          )}
+        </div>
 
-        {/* Voice and Sound Controls */}
-        <div className="flex justify-center gap-4 mb-6 flex-shrink-0">
+        {/* Compact Voice and Sound Controls */}
+        <div className="flex justify-center gap-3 mb-3 flex-shrink-0">
           <Button
             variant={isVoiceEnabled ? "default" : "outline"}
             size="sm"
             onClick={() => setIsVoiceEnabled(!isVoiceEnabled)}
-            className={isVoiceEnabled ? "bg-green-500 hover:bg-green-600" : ""}
+            className={`h-8 px-3 text-xs ${isVoiceEnabled ? "bg-green-500 hover:bg-green-600" : ""}`}
           >
-            {isVoiceEnabled ? <Mic className="w-4 h-4 mr-2" /> : <MicOff className="w-4 h-4 mr-2" />}
+            {isVoiceEnabled ? <Mic className="w-3 h-3 mr-1" /> : <MicOff className="w-3 h-3 mr-1" />}
             Voice {isVoiceEnabled ? "ON" : "OFF"}
           </Button>
 
@@ -288,37 +280,37 @@ export default function Room() {
             variant={isSoundEnabled ? "default" : "outline"}
             size="sm"
             onClick={() => setIsSoundEnabled(!isSoundEnabled)}
-            className={isSoundEnabled ? "bg-blue-500 hover:bg-blue-600" : ""}
+            className={`h-8 px-3 text-xs ${isSoundEnabled ? "bg-blue-500 hover:bg-blue-600" : ""}`}
           >
-            {isSoundEnabled ? <Volume2 className="w-4 h-4 mr-2" /> : <VolumeX className="w-4 h-4 mr-2" />}
+            {isSoundEnabled ? <Volume2 className="w-3 h-3 mr-1" /> : <VolumeX className="w-3 h-3 mr-1" />}
             Sound {isSoundEnabled ? "ON" : "OFF"}
           </Button>
         </div>
 
-        {/* Count Display - Large and Prominent */}
-        <div className="flex-1 flex items-center justify-center">
+        {/* Compact Count Display */}
+        <div className="flex-1 flex items-center justify-center min-h-0">
           <motion.div
-            animate={countMutation.isPending ? { scale: [1, 1.1, 1] } : {}}
+            animate={countMutation.isPending ? { scale: [1, 1.05, 1] } : {}}
             transition={{ duration: 0.2 }}
             className="text-center"
           >
-            <div className="text-6xl font-bold text-islamic-primary mb-4">
+            <div className="text-5xl font-bold text-islamic-primary mb-2">
               {(userCount || 0).toLocaleString()}
             </div>
-            <div className="text-lg text-gray-600 mb-8">Total Count</div>
+            <div className="text-sm text-gray-600 mb-3">Total Count</div>
             
-            {/* Progress Bar if target exists */}
+            {/* Compact Progress Bar */}
             {!room?.unlimited && room?.targetCount && (
-              <div className="w-80 mx-auto mb-8">
-                <div className="bg-gray-200 rounded-full h-3 mb-2">
+              <div className="w-60 mx-auto mb-3">
+                <div className="bg-gray-200 rounded-full h-2 mb-1">
                   <motion.div
-                    className="bg-islamic-primary h-3 rounded-full"
+                    className="bg-islamic-primary h-2 rounded-full"
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min(100, ((userCount || 0) / room.targetCount) * 100)}%` }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
-                <div className="text-sm text-gray-500">
+                <div className="text-xs text-gray-500">
                   {Math.round(((userCount || 0) / room.targetCount) * 100)}% of target
                 </div>
               </div>
@@ -326,18 +318,20 @@ export default function Room() {
           </motion.div>
         </div>
 
-        {/* Digital Tasbih - Bottom Section */}
-        <div className="flex-shrink-0">
-          <DigitalTasbih 
-            onCount={handleCount}
-            count={userCount || 0}
-            targetCount={room?.targetCount}
-            unlimited={room?.unlimited}
-            roomName={room?.name}
-          />
+        {/* Compact Digital Tasbih */}
+        <div className="flex-shrink-0 pb-2">
+          <div className="flex justify-center">
+            <Button
+              onPointerDown={handleCount}
+              disabled={countMutation.isPending || !user}
+              className="w-32 h-32 rounded-full bg-islamic-primary hover:bg-islamic-primary-dark text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-150"
+            >
+              {countMutation.isPending ? "..." : "COUNT"}
+            </Button>
+          </div>
           
           {isVoiceEnabled && (
-            <div className="mt-4 flex justify-center">
+            <div className="mt-2 flex justify-center">
               <VoiceRecognitionButton 
                 targetPhrase={room?.zikirName || "Subhanallah"}
                 onPhraseDetected={handleCount}
