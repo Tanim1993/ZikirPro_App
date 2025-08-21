@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Users, Trophy, Info, Share2, Crown, Calendar, Clock, Target, Award } from "lucide-react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 
 interface RoomMember {
   userId: string;
@@ -29,6 +30,7 @@ interface Room {
 
 export default function RoomSettings() {
   const { roomId } = useParams<{ roomId: string }>();
+  const { toast } = useToast();
   const [selectedTasbihType, setSelectedTasbihType] = useState<string>("digital");
 
   const { data: room } = useQuery<Room>({
@@ -41,6 +43,28 @@ export default function RoomSettings() {
     enabled: !!roomId,
     refetchInterval: 5000,
   });
+
+  // Load saved tasbih type from localStorage
+  useEffect(() => {
+    if (roomId) {
+      const savedType = localStorage.getItem(`tasbih-type-${roomId}`);
+      if (savedType) {
+        setSelectedTasbihType(savedType);
+      }
+    }
+  }, [roomId]);
+
+  // Save tasbih type selection
+  const handleTasbihTypeChange = (type: string) => {
+    setSelectedTasbihType(type);
+    if (roomId) {
+      localStorage.setItem(`tasbih-type-${roomId}`, type);
+      toast({
+        title: "Tasbih Type Updated",
+        description: `Changed to ${tasbihOptions.find(t => t.id === type)?.name}`,
+      });
+    }
+  };
 
   const tasbihOptions = [
     { 
@@ -170,7 +194,7 @@ export default function RoomSettings() {
                         ? "ring-2 ring-islamic-primary shadow-lg bg-islamic-primary/5" 
                         : "hover:shadow-md"
                     }`}
-                    onClick={() => setSelectedTasbihType(tasbih.id)}
+                    onClick={() => handleTasbihTypeChange(tasbih.id)}
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">

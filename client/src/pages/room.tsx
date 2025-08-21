@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useParams, Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,17 @@ export default function Room() {
   
   const [isVoiceEnabled, setIsVoiceEnabled] = useState(false);
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
+  const [tasbihType, setTasbihType] = useState<string>("digital");
+
+  // Load tasbih type from localStorage
+  useEffect(() => {
+    if (roomId) {
+      const savedType = localStorage.getItem(`tasbih-type-${roomId}`);
+      if (savedType) {
+        setTasbihType(savedType);
+      }
+    }
+  }, [roomId]);
 
   const { data: room, isLoading: roomLoading } = useQuery({
     queryKey: [`/api/rooms/${roomId}`],
@@ -318,17 +329,49 @@ export default function Room() {
           </motion.div>
         </div>
 
-        {/* Compact Digital Tasbih */}
+        {/* Dynamic Tasbih Interface */}
         <div className="flex-shrink-0 pb-2">
-          <div className="flex justify-center">
-            <Button
-              onPointerDown={handleCount}
-              disabled={countMutation.isPending || !user}
-              className="w-32 h-32 rounded-full bg-islamic-primary hover:bg-islamic-primary-dark text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-150"
-            >
-              {countMutation.isPending ? "..." : "COUNT"}
-            </Button>
-          </div>
+          {tasbihType === "digital" && (
+            <div className="flex justify-center">
+              <Button
+                onPointerDown={handleCount}
+                disabled={countMutation.isPending || !user}
+                className="w-32 h-32 rounded-full bg-islamic-primary hover:bg-islamic-primary-dark text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-150"
+              >
+                {countMutation.isPending ? "..." : "COUNT"}
+              </Button>
+            </div>
+          )}
+
+          {tasbihType === "physical" && (
+            <div className="text-center">
+              <div className="text-6xl mb-3">📿</div>
+              <p className="text-sm text-gray-600 mb-3">Use your physical tasbih</p>
+              <Button
+                onPointerDown={handleCount}
+                disabled={countMutation.isPending || !user}
+                variant="outline"
+                className="w-24 h-12 text-sm"
+              >
+                {countMutation.isPending ? "..." : "Manual +1"}
+              </Button>
+            </div>
+          )}
+
+          {tasbihType === "hand" && (
+            <div className="text-center">
+              <div className="text-6xl mb-3">✋</div>
+              <p className="text-sm text-gray-600 mb-3">Count with your fingers</p>
+              <Button
+                onPointerDown={handleCount}
+                disabled={countMutation.isPending || !user}
+                variant="outline"
+                className="w-24 h-12 text-sm"
+              >
+                {countMutation.isPending ? "..." : "Count +1"}
+              </Button>
+            </div>
+          )}
           
           {isVoiceEnabled && (
             <div className="mt-2 flex justify-center">
