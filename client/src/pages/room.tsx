@@ -231,13 +231,13 @@ export default function Room() {
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
             <Users className="w-4 h-4 mx-auto mb-1" />
-            <div className="text-sm font-bold">{room.memberCount || 0}</div>
+            <div className="text-sm font-bold">{room?.memberCount || 0}</div>
             <div className="text-xs text-islamic-secondary/80">Members</div>
           </div>
           <div className="bg-white/10 backdrop-blur rounded-lg p-2 text-center">
             <Target className="w-4 h-4 mx-auto mb-1" />
             <div className="text-sm font-bold">
-              {room.unlimited ? '∞' : room.targetCount?.toLocaleString() || '1000'}
+              {room?.unlimited ? '∞' : room?.targetCount?.toLocaleString() || '1000'}
             </div>
             <div className="text-xs text-islamic-secondary/80">Target</div>
           </div>
@@ -254,17 +254,20 @@ export default function Room() {
         {/* Zikir Display */}
         <Card className="mb-4 flex-shrink-0">
           <CardContent className="p-4 text-center">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">{room.zikirName}</h2>
-            {room.zikirArabic && (
+            <h2 className="text-xl font-bold text-gray-900 mb-2">{room?.zikirName || room?.name}</h2>
+            {room?.zikirArabic && (
               <div className="text-2xl mb-2 leading-relaxed font-arabic text-islamic-primary">
                 {room.zikirArabic}
               </div>
             )}
-            {room.transliteration && (
+            {room?.transliteration && (
               <div className="text-gray-600 italic mb-2">{room.transliteration}</div>
             )}
-            {room.translation && (
+            {room?.translation && (
               <div className="text-sm text-gray-500">{room.translation}</div>
+            )}
+            {room?.description && (
+              <div className="text-sm text-gray-500 mt-2">{room.description}</div>
             )}
           </CardContent>
         </Card>
@@ -300,23 +303,23 @@ export default function Room() {
             className="text-center"
           >
             <div className="text-6xl font-bold text-islamic-primary mb-4">
-              {userCount.toLocaleString()}
+              {(userCount || 0).toLocaleString()}
             </div>
             <div className="text-lg text-gray-600 mb-8">Total Count</div>
             
             {/* Progress Bar if target exists */}
-            {!room.unlimited && room.targetCount && (
+            {!room?.unlimited && room?.targetCount && (
               <div className="w-80 mx-auto mb-8">
                 <div className="bg-gray-200 rounded-full h-3 mb-2">
                   <motion.div
                     className="bg-islamic-primary h-3 rounded-full"
                     initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(100, (userCount / room.targetCount) * 100)}%` }}
+                    animate={{ width: `${Math.min(100, ((userCount || 0) / room.targetCount) * 100)}%` }}
                     transition={{ duration: 0.5 }}
                   />
                 </div>
                 <div className="text-sm text-gray-500">
-                  {Math.round((userCount / room.targetCount) * 100)}% of target
+                  {Math.round(((userCount || 0) / room.targetCount) * 100)}% of target
                 </div>
               </div>
             )}
@@ -327,17 +330,17 @@ export default function Room() {
         <div className="flex-shrink-0">
           <DigitalTasbih 
             onCount={handleCount}
-            isPending={countMutation.isPending}
-            disabled={!user}
-            soundEnabled={isSoundEnabled}
+            count={userCount || 0}
+            targetCount={room?.targetCount}
+            unlimited={room?.unlimited}
+            roomName={room?.name}
           />
           
           {isVoiceEnabled && (
             <div className="mt-4 flex justify-center">
               <VoiceRecognitionButton 
-                onCount={handleCount}
-                zikirName={room.zikirName}
-                disabled={countMutation.isPending}
+                targetPhrase={room?.zikirName || "Subhanallah"}
+                onPhraseDetected={handleCount}
               />
             </div>
           )}
