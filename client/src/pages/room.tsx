@@ -72,12 +72,7 @@ export default function Room() {
     },
     onError: (error, variables, context) => {
       if (context?.previousCount !== undefined) {
-        const currentCount = queryClient.getQueryData([`/api/rooms/${roomId}/user-count`]) as number || 0;
-        if (context.previousCount <= currentCount) {
-          queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], context.previousCount);
-        } else {
-          queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], Math.max(0, currentCount - 1));
-        }
+        queryClient.setQueryData([`/api/rooms/${roomId}/user-count`], context.previousCount);
       }
       
       if (isUnauthorizedError(error)) {
@@ -97,7 +92,10 @@ export default function Room() {
       });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/user-count`] });
+      // Reduced refetch frequency to prevent excessive API calls
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: [`/api/rooms/${roomId}/user-count`] });
+      }, 500);
     },
   });
 
@@ -137,6 +135,8 @@ export default function Room() {
   });
 
   const handleCount = useCallback(() => {
+    // Prevent rapid clicks/taps
+    if (countMutation.isPending) return;
     countMutation.mutate();
   }, [countMutation]);
 
@@ -334,9 +334,9 @@ export default function Room() {
           {tasbihType === "digital" && (
             <div className="flex justify-center">
               <Button
-                onPointerDown={handleCount}
+                onClick={handleCount}
                 disabled={countMutation.isPending || !user}
-                className="w-32 h-32 rounded-full bg-islamic-primary hover:bg-islamic-primary-dark text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-150"
+                className="w-32 h-32 rounded-full bg-islamic-primary hover:bg-islamic-primary-dark text-white font-bold text-lg shadow-lg active:scale-95 transition-all duration-150 select-none"
               >
                 {countMutation.isPending ? "..." : "COUNT"}
               </Button>
@@ -348,10 +348,10 @@ export default function Room() {
               <div className="text-6xl mb-3">📿</div>
               <p className="text-sm text-gray-600 mb-3">Use your physical tasbih</p>
               <Button
-                onPointerDown={handleCount}
+                onClick={handleCount}
                 disabled={countMutation.isPending || !user}
                 variant="outline"
-                className="w-24 h-12 text-sm"
+                className="w-24 h-12 text-sm select-none"
               >
                 {countMutation.isPending ? "..." : "Manual +1"}
               </Button>
@@ -363,10 +363,10 @@ export default function Room() {
               <div className="text-6xl mb-3">✋</div>
               <p className="text-sm text-gray-600 mb-3">Count with your fingers</p>
               <Button
-                onPointerDown={handleCount}
+                onClick={handleCount}
                 disabled={countMutation.isPending || !user}
                 variant="outline"
-                className="w-24 h-12 text-sm"
+                className="w-24 h-12 text-sm select-none"
               >
                 {countMutation.isPending ? "..." : "Count +1"}
               </Button>
